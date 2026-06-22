@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v23</title>
+<title>Modelo mensual de caja v24</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
 header{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:18px 22px;position:sticky;top:0;z-index:10;background:rgba(15,23,42,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);box-shadow:0 8px 28px rgba(0,0,0,.22)}
 header h1{font-size:28px;margin:0;color:#fff}.header-left{display:flex;align-items:center;gap:12px}.menu-toggle{font-size:22px;line-height:1;width:44px;height:44px;padding:0;background:#1e293b}.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}button{border:1px solid var(--line);background:#172554;color:var(--text);padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px}button.secondary{background:#1e293b}button.danger{background:#451a1a;border-color:#7f1d1d}button.soft{background:#064e3b;border-color:#047857;color:#dcfce7}button:active{transform:translateY(1px)}
-.side-panel{position:fixed;top:0;left:0;height:100vh;width:290px;background:#0b1220;border-right:1px solid var(--line);z-index:30;transform:translateX(-105%);transition:transform .2s ease;box-shadow:20px 0 60px rgba(0,0,0,.35);padding:18px;overflow:auto}.side-panel.open{transform:translateX(0)}.side-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.side-head h2{font-size:18px;margin:0}.side-menu{display:grid;gap:10px}.side-menu button{width:100%;text-align:left;background:#1e293b}.side-menu button.primary{background:#172554}.side-menu button.danger{text-align:left}.side-backdrop{display:none;position:fixed;inset:0;background:#0008;z-index:29}.side-backdrop.open{display:block}
+.side-panel{position:fixed;top:0;left:0;height:100vh;width:290px;background:#0b1220;border-right:1px solid var(--line);z-index:30;transform:translateX(-105%);transition:transform .2s ease;box-shadow:20px 0 60px rgba(0,0,0,.35);padding:18px;overflow:auto}.side-panel.open{transform:translateX(0)}.side-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.side-head h2{font-size:18px;margin:0}.side-menu{display:grid;gap:10px}.side-menu button{width:100%;text-align:left;background:#1e293b}.side-menu button.primary{background:#172554}.side-menu button.danger{text-align:left}.resizer{position:absolute;right:0;top:0;width:8px;height:100%;cursor:col-resize;user-select:none}.input-ledger{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden}.ledger-wrap{padding:0 14px 14px;overflow:auto;max-height:260px}.ledger-table{width:100%;min-width:900px}.ledger-table th,.ledger-table td{position:static!important;min-width:auto;height:auto;padding:7px 8px;background:transparent;text-align:left}.ledger-table th{background:#0b1220}.mini-btn{font-size:11px;padding:6px 7px;margin-right:4px}.side-backdrop{display:none;position:fixed;inset:0;background:#0008;z-index:29}.side-backdrop.open{display:block}
 main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1px solid #92400e;padding:12px 14px;border-radius:14px;margin-bottom:16px;color:#fde68a}.formula-help{font-size:13px;color:var(--muted);margin:10px 0 18px}.formula-help b{color:#cbd5e1}
 .summary{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:14px;margin-bottom:18px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.18)}.kpi small{color:var(--muted);display:block;margin-bottom:8px}.kpi strong{font-size:22px}.superavit,.negative{color:var(--accent)!important}.deficit,.positive{color:var(--bad)!important}.neutral{color:var(--blue)!important}
 .panel{background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22)}.panelTitle{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:18px 18px 10px}.panelTitle h2{margin:0;font-size:18px}.panelTitle span{color:var(--muted);font-size:13px}.tableWrap{overflow:auto;padding:0 18px 18px}
@@ -57,8 +57,9 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
     <button onclick="toggleInitialColumn();toggleSidePanel(false)" id="toggleInitialBtn">Ocultar saldo inicial</button>
     <button onclick="saveData();toggleSidePanel(false)">Guardar</button>
     <button onclick="exportJSON();toggleSidePanel(false)">Exportar respaldo</button>
-    <button onclick="exportVariableInputsExcel();toggleSidePanel(false)">Informe gastos variables Excel</button>
+    <button onclick="exportVariableInputsExcel();toggleSidePanel(false)">Informe inputs Excel</button>
     <button onclick="exportInputLogExcel();toggleSidePanel(false)">Historial cambios Excel</button>
+    <button onclick="promptColumnWidths();toggleSidePanel(false)">Ajustar ancho columnas</button>
     <button onclick="document.getElementById('importFile').click();toggleSidePanel(false)">Importar respaldo</button>
     <button class="danger" onclick="resetData();toggleSidePanel(false)">Restaurar modelo base</button>
     <input id="importFile" type="file" accept="application/json" hidden onchange="importJSON(event)">
@@ -68,12 +69,11 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
   <div class="note"><b>Lógica del modelo:</b> ingresos negativos, gastos positivos. Saldo negativo = superávit de caja; saldo positivo = déficit/faltante. Los saldos bancarios se digitan positivos, pero el sistema los totaliza negativos para compararlos contra caja.</div>
 
   <section class="input-panel">
-    <div class="panelTitle"><h2>Formulario de gastos variables</h2><span>Ingreso rápido solo para gastos variables.</span></div>
+    <div class="panelTitle"><h2>Formulario de inputs</h2><span>Ingreso rápido para gastos variables y otros movimientos.</span></div>
     <div class="exclusive-help"><b>Sección y concepto son excluyentes:</b> al escoger una sección, solo aparecen los conceptos pertenecientes a esa sección.</div>
     <form id="lineInputForm" class="input-form" onsubmit="submitLineInput(event)">
       <label>Sección
-        <input id="formSectionLabel" value="Gastos variables" readonly>
-        <input id="formSection" type="hidden" value="variable">
+        <select id="formSection" onchange="updateConceptSelect()"><option value="variable">Gastos variables</option><option value="other">Otros movimientos</option></select>
       </label>
       <label>Concepto
         <select id="formConcept"></select>
@@ -102,6 +102,10 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
         <span id="formStatus" class="form-status"></span>
       </div>
     </form>
+  </section>
+  <section class="input-ledger">
+    <div class="panelTitle"><h2>Inputs registrados</h2><span>Consulta, edita o elimina inputs activos del formulario.</span></div>
+    <div class="ledger-wrap"><table id="inputsLedgerTable" class="ledger-table"></table></div>
   </section>
   <div class="summary" id="summary"></div>
   <section class="panel"><div class="panelTitle"><h2>Resumen por mes</h2><span>Se recalcula automáticamente con la lógica original del Excel.</span></div><div class="tableWrap"><table id="summaryTable"></table></div></section>
@@ -190,7 +194,7 @@ async function onSignedIn(user){
      data=firstUsableLocalModel();
      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
      render();
-     await doc.set({data:encodeCloudModel(data),version:'v23',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+     await doc.set({data:encodeCloudModel(data),version:'v24',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
      setSync('Modelo base creado en la nube','sync-ok');
    }
    cloudReady=true;
@@ -246,7 +250,7 @@ function queueCloudSave(){
 }
 async function saveCloudNow(){
  if(!currentUser||!db)return;
- try{await cloudDoc().set({data:encodeCloudModel(data),version:'v23',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
+ try{await cloudDoc().set({data:encodeCloudModel(data),version:'v24',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
  catch(e){setSync('No se pudo guardar','sync-bad');console.error(e);alert('No se pudo guardar en la nube. Revisa reglas de Firestore y conexión.');}
 }
 
@@ -269,7 +273,19 @@ function migrateData(d){
  if(!d.notes)d.notes={};
  if(!d.paid)d.paid={};
  if(!Array.isArray(d.inputLog))d.inputLog=[];
+ if(!Array.isArray(d.formInputs))d.formInputs=[];
+ if(!d.formInputs.length && Array.isArray(d.inputLog)){
+   d.formInputs=d.inputLog.filter(r=>r&&r.origen==='Formulario'&&(r.seccion==='Gastos variables'||r.seccion==='Otros movimientos')).map(r=>{
+     const secId=r.seccion==='Otros movimientos'?'other':'variable';
+     const sec=(d.sections||[]).find(s=>s.id===secId);
+     const ri=sec?Math.max(0,sec.rows.findIndex(row=>row[0]===r.concepto)):0;
+     const pi=Math.max(0,(d.periods||[]).findIndex(p=>p===r.periodo));
+     return {id:'legacy_'+Math.random().toString(36).slice(2,10),active:true,fecha:r.fecha||'',secId,ri:ri<0?0:ri,pi:String(pi<0?0:pi),mode:r.accion||'add',amount:num(r.valorIngresado),before:num(r.valorAnterior),after:num(r.valorFinal),note:r.comentario||''};
+   });
+ }
  if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[];
+ if(!d.columnWidths)d.columnWidths={concept:250,initial:130,periods:{}};
+ if(!d.columnWidths.periods)d.columnWidths.periods={};
  return d;
 }
 async function saveData(){saveSilent();await saveCloudNow();toast('Modelo guardado y sincronizado.')}function toast(msg){alert(msg)}
@@ -287,16 +303,16 @@ function cellKey(sec,ri,pi,type='value'){return `${sec}|${ri}|${pi}|${type}`}
 function visiblePeriodIndexes(){return data.periods.map((_,i)=>i).filter(i=>!data.hiddenPeriods.includes(i))}
 function visiblePeriods(){return visiblePeriodIndexes().map(i=>data.periods[i])}
 function isPeriodVisible(i){return !data.hiddenPeriods.includes(i)}
-function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small></th>`:'';let html='<thead><tr><th>Concepto</th>'+initialHeader+visibleIdx.map(i=>`<th><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"></th>`).join('')+'</tr></thead><tbody>';
+function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th style="${colStyle('initial')}"><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small><span class="resizer" onmousedown="startColumnResize(event,'initial')"></span></th>`:'';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
 function sectionTitleRow(title, initialVisible){
  const extraCells=visibleIdx.length+(initialVisible?1:0);
- return `<tr class="section-title"><td>${esc(title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
+ return `<tr class="section-title"><td style="${colStyle('concept')}">${esc(title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
- sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
- if(initialVisible){if(sec.kind==='bank'){html+=`<td>${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+='<td class="money muted">—</td>'}}
- for(const pi of visibleIdx)html+=`<td>${inputCell(sec.id,ri,pi,r[1][pi])}</td>`;
+ sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
+ if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
+ for(const pi of visibleIdx)html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,r[1][pi])}</td>`;
  html+='</tr>'});
  html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
@@ -343,16 +359,16 @@ function renderSummary(c){
 function renderInputForm(){
  const secInput=document.getElementById('formSection');
  if(!secInput)return;
- secInput.value='variable';
+ if(!['variable','other'].includes(secInput.value))secInput.value='variable';
  updateConceptSelect();
 }
 function updateConceptSelect(){
  const secInput=document.getElementById('formSection'), conceptSelect=document.getElementById('formConcept'), periodSelect=document.getElementById('formPeriod');
  if(!secInput||!conceptSelect||!periodSelect)return;
- secInput.value='variable';
+ if(!['variable','other'].includes(secInput.value))secInput.value='variable';
  const prevConcept=conceptSelect.value;
  const prevPeriod=periodSelect.value;
- const sec=section('variable');
+ const sec=section(secInput.value);
  conceptSelect.innerHTML=sec.rows.map((r,i)=>`<option value="${i}">${esc(r[0])}</option>`).join('');
  if([...conceptSelect.options].some(o=>o.value===prevConcept))conceptSelect.value=prevConcept;
  periodSelect.innerHTML=data.periods.map((p,i)=>`<option value="${i}">${esc(p)}</option>`).join('');
@@ -377,30 +393,54 @@ function appendVariableInputNote(secId,ri,pi,amount,note,mode){
  const prev=String(data.notes[key]||'').trim();
  data.notes[key]=prev?prev+'\n'+bullet:bullet;
 }
-function submitLineInput(ev){
- ev.preventDefault();
- const secId='variable';
+function makeInputId(){return 'inp_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+function activeFormInputs(){data.formInputs=data.formInputs||[];return data.formInputs.filter(x=>x&&x.active!==false)}
+function applyInputRecordToModel(rec, reverse=false){
+ const sec=section(rec.secId); if(!sec||!sec.rows[rec.ri])return;
+ const current=rec.pi==='initial'?num(sec.rows[rec.ri][2]):num(sec.rows[rec.ri][1][Number(rec.pi)]);
+ let next=current;
+ const amount=num(rec.amount);
+ if(reverse){
+   if(rec.mode==='add')next=current-amount;
+   else next=num(rec.before);
+ }else{
+   if(rec.mode==='add')next=current+amount;
+   else next=amount;
+ }
+ if(rec.pi==='initial')sec.rows[rec.ri][2]=next; else sec.rows[rec.ri][1][Number(rec.pi)]=next;
+ return next;
+}
+function createInputRecordFromForm(existingId=null){
+ const secId=document.getElementById('formSection').value;
  const ri=Number(document.getElementById('formConcept').value);
  const pi=document.getElementById('formPeriod').value;
  const raw=document.getElementById('formAmount').value;
- if(String(raw).trim()===''){alert('Ingresa un valor.');return}
- const sec=section(secId);
- let v=normalizeFormAmount(secId,raw);
- if(document.getElementById('formMode').value==='add'){
-   const current=pi==='initial'?sec.rows[ri][2]:sec.rows[ri][1][Number(pi)];
-   v=num(current)+v;
- }
+ if(String(raw).trim()===''){alert('Ingresa un valor.');return null}
+ const sec=section(secId); if(!sec||!sec.rows[ri]){alert('Selecciona un concepto válido.');return null}
  const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]);
- if(pi==='initial')sec.rows[ri][2]=v; else sec.rows[ri][1][Number(pi)]=v;
+ const mode=document.getElementById('formMode').value;
+ const amount=normalizeFormAmount(secId,raw);
  const note=document.getElementById('formNote').value.trim();
- appendVariableInputNote(secId,ri,pi,normalizeFormAmount(secId,raw),note,document.getElementById('formMode').value);
- const paid=(secId==='fixed'&&pi!=='initial')?!!document.getElementById('formPaid').checked:false;
- if(secId==='fixed'&&pi!=='initial')data.paid[cellKey(secId,ri,pi,'paid')]=paid;
- logInput({source:'Formulario',secId,ri,pi,mode:document.getElementById('formMode').value,amount:normalizeFormAmount(secId,raw),before,after:v,note,paid});
+ return {id:existingId||makeInputId(),active:true,fecha:new Date().toLocaleString('es-CO'),secId,ri,pi,mode,amount,before,after:null,note};
+}
+function submitLineInput(ev){
+ ev.preventDefault();
+ const editingId=document.getElementById('lineInputForm').dataset.editingId||'';
+ data.formInputs=data.formInputs||[];
+ if(editingId){
+   const idx=data.formInputs.findIndex(x=>x.id===editingId&&x.active!==false);
+   if(idx>=0){applyInputRecordToModel(data.formInputs[idx],true);data.formInputs[idx].active=false;data.formInputs[idx].deletedAt=new Date().toLocaleString('es-CO');}
+ }
+ const rec=createInputRecordFromForm(editingId||null); if(!rec)return;
+ const after=applyInputRecordToModel(rec,false); rec.after=after;
+ data.formInputs.push(rec);
+ appendVariableInputNote(rec.secId,rec.ri,rec.pi,rec.amount,rec.note,rec.mode);
+ logInput({source:'Formulario',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:rec.mode,amount:rec.amount,before:rec.before,after:rec.after,note:rec.note,paid:false});
+ delete document.getElementById('lineInputForm').dataset.editingId;
  saveSilent();
  clearLineInputForm(true);
  render();
- document.getElementById('formStatus').textContent='Valor aplicado y formulario limpio';
+ document.getElementById('formStatus').textContent='Input aplicado y formulario limpio';
  setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
 }
 function clearLineInputForm(keepStatus=false){
@@ -410,6 +450,58 @@ function clearLineInputForm(keepStatus=false){
 
 
 
+
+function renderInputsLedger(){
+ const tbl=document.getElementById('inputsLedgerTable'); if(!tbl)return;
+ const rows=activeFormInputs().filter(r=>['variable','other'].includes(r.secId));
+ if(!rows.length){tbl.innerHTML='<tbody><tr><td class="muted">No hay inputs activos registrados desde el formulario.</td></tr></tbody>';return}
+ const tr=rows.slice().reverse().map(r=>{const sec=section(r.secId);const concept=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';const period=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(concept)}</td><td>${esc(period)}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td><td><button class="mini-btn secondary" onclick="editFormInput('${r.id}')">Editar</button><button class="mini-btn danger" onclick="deleteFormInput('${r.id}')">Eliminar</button></td></tr>`}).join('');
+ tbl.innerHTML=`<thead><tr><th>Fecha</th><th>Sección</th><th>Concepto</th><th>Mes</th><th>Acción</th><th>Valor</th><th>Nota</th><th>Opciones</th></tr></thead><tbody>${tr}</tbody>`;
+}
+function editFormInput(id){
+ const rec=activeFormInputs().find(x=>x.id===id); if(!rec)return;
+ document.getElementById('formSection').value=rec.secId; updateConceptSelect();
+ document.getElementById('formConcept').value=String(rec.ri);
+ document.getElementById('formPeriod').value=String(rec.pi);
+ document.getElementById('formAmount').value=formatNumber(rec.amount);
+ document.getElementById('formMode').value=rec.mode||'add';
+ document.getElementById('formNote').value=rec.note||'';
+ document.getElementById('lineInputForm').dataset.editingId=id;
+ document.getElementById('formStatus').textContent='Editando input existente';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteFormInput(id){
+ data.formInputs=data.formInputs||[];
+ const rec=data.formInputs.find(x=>x.id===id&&x.active!==false); if(!rec)return;
+ if(!confirm('¿Eliminar este input? El valor se retirará del modelo y no aparecerá en el informe.'))return;
+ applyInputRecordToModel(rec,true); rec.active=false; rec.deletedAt=new Date().toLocaleString('es-CO');
+ logInput({source:'Eliminación input',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:'delete',amount:rec.amount,before:rec.after,after:rec.before,note:'Input eliminado',paid:false});
+ saveSilent();render();
+}
+function colWidth(key){
+ data.columnWidths=data.columnWidths||{concept:250,initial:130,periods:{}}; data.columnWidths.periods=data.columnWidths.periods||{};
+ if(key==='concept')return data.columnWidths.concept||250;
+ if(key==='initial')return data.columnWidths.initial||130;
+ if(String(key).startsWith('p'))return data.columnWidths.periods[String(key).slice(1)]||130;
+ return 130;
+}
+function setColWidth(key,w){
+ w=Math.max(80,Math.min(520,Math.round(Number(w)||130)));
+ data.columnWidths=data.columnWidths||{concept:250,initial:130,periods:{}}; data.columnWidths.periods=data.columnWidths.periods||{};
+ if(key==='concept')data.columnWidths.concept=w; else if(key==='initial')data.columnWidths.initial=w; else if(String(key).startsWith('p'))data.columnWidths.periods[String(key).slice(1)]=w;
+}
+function colStyle(key){const w=colWidth(key);return `min-width:${w}px;width:${w}px`}
+function startColumnResize(ev,key){
+ ev.preventDefault();ev.stopPropagation();const startX=ev.clientX,startW=colWidth(key);
+ function move(e){setColWidth(key,startW+(e.clientX-startX));render()}
+ function up(){document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',up);saveSilent()}
+ document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
+}
+function promptColumnWidths(){
+ const concept=prompt('Ancho primera columna/conceptos en px:',colWidth('concept')); if(concept!==null)setColWidth('concept',concept);
+ const periods=prompt('Ancho columnas de meses en px:',130); if(periods!==null){data.periods.forEach((_,i)=>setColWidth('p'+i,periods));}
+ saveSilent();render();
+}
 function openMonthsModal(){
  const list=document.getElementById('monthsVisibilityList');
  list.innerHTML=data.periods.map((p,i)=>`<label style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px"><input type="checkbox" data-period-index="${i}" ${isPeriodVisible(i)?'checked':''} style="width:18px;height:18px;accent-color:#22c55e"><span>${esc(p)}</span></label>`).join('');
@@ -428,22 +520,21 @@ function closeMonthsModal(apply){
 function showAllPeriods(){data.hiddenPeriods=[];saveSilent();render();document.getElementById('monthsModal').classList.remove('open')}
 
 function exportVariableInputsExcel(){
- const rows=(data.inputLog||[]).filter(r=>r.origen==='Formulario' && r.seccion==='Gastos variables');
- if(!rows.length){alert('Aún no hay inputs de gastos variables registrados para exportar.');return}
+ const rows=activeFormInputs().filter(r=>['variable','other'].includes(r.secId));
+ if(!rows.length){alert('Aún no hay inputs activos registrados para exportar.');return}
  const summary={};
  rows.forEach(r=>{
-   const key=(r.periodo||'')+'||'+(r.concepto||'');
-   if(!summary[key])summary[key]={periodo:r.periodo,concepto:r.concepto,total:0,cantidad:0,comentarios:[]};
-   summary[key].total+=num(r.valorIngresado);
-   summary[key].cantidad+=1;
-   if(r.comentario)summary[key].comentarios.push(r.comentario);
+   const sec=section(r.secId); const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)]; const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';
+   const key=(sec?sec.title:r.secId)+'||'+periodo+'||'+concepto;
+   if(!summary[key])summary[key]={seccion:sec?sec.title:r.secId,periodo,concepto,total:0,cantidad:0,comentarios:[]};
+   summary[key].total+=num(r.amount); summary[key].cantidad+=1; if(r.note)summary[key].comentarios.push(r.note);
  });
- const summaryRows=Object.values(summary).sort((a,b)=>String(a.periodo).localeCompare(String(b.periodo))||String(a.concepto).localeCompare(String(b.concepto)));
- const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
- const detailTr=rows.map(r=>`<tr><td>${esc(r.fecha)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${esc(r.accion)}</td><td>${esc(r.valorIngresado)}</td><td>${esc(money(num(r.valorIngresado)))}</td><td>${esc(r.comentario)}</td></tr>`).join('');
- const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen inputs de gastos variables</h2><table border="1"><thead><tr><th>Periodo</th><th>Concepto</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs considerados</h2><table border="1"><thead><tr><th>Fecha</th><th>Periodo</th><th>Concepto</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table></body></html>`;
+ const summaryRows=Object.values(summary).sort((a,b)=>String(a.seccion).localeCompare(String(b.seccion))||String(a.periodo).localeCompare(String(b.periodo))||String(a.concepto).localeCompare(String(b.concepto)));
+ const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
+ const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
+ const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table></body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-gastos-variables.xls';a.click();URL.revokeObjectURL(a.href);
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 }
 function exportInputLogExcel(){
  const rows=data.inputLog||[];
