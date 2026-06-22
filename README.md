@@ -1,14 +1,17 @@
-# App web modelo v31
+# App web modelo v32
 
-Versión basada en la v30 cloud/Firebase.
+Versión basada en v31 con mejoras de estados e inputs.
 
-Cambios principales:
+## Cambios v32
 
-- Reorganización responsive del formulario para PC y móvil.
-- Fusión de conceptos en Gastos variables y Otros movimientos.
-- Botón de inicialización de mes desde el formulario.
-- Cierre de mes con validación de fecha calendario, bloqueo de edición e inputs, y respaldo independiente.
-- Apertura de mes cerrado con advertencia.
-- Estados visuales: abierto, inicializado y cerrado.
+- Estados de mes concentrados en el formulario de inputs y en el control de presupuesto:
+  - Sin inicializar
+  - Inicializado
+  - Abierto
+  - Cerrado
+- Se eliminan estados visuales de otros puntos del informe.
+- Entrada directa al formulario: solo acción **Sumar**.
+- Edición desde Inputs registrados: cierra automáticamente el cuadro, abre el formulario, fuerza acción **Reemplazar** y exige guardar o cancelar antes de continuar.
+- El reemplazo de un input modifica ese input sin destruir otros inputs del mismo concepto/mes.
 
-Se mantiene la ruta cloud `users/{uid}/models/principal` y el campo `data` serializado como JSON.
+Subir a GitHub reemplazando `index.html` y `README.md`.
