@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v31</title>
+<title>Modelo mensual de caja v32</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -47,6 +47,16 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 .merge-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.merge-grid label{display:flex;flex-direction:column;gap:6px;color:#94a3b8;font-weight:800;font-size:12px}.merge-grid select{border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:10px}
 .close-open-list{display:grid;gap:10px;max-height:55vh;overflow:auto}.close-open-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:10px}
 @media(max-width:700px){.close-open-row{grid-template-columns:1fr}.merge-grid{grid-template-columns:1fr}}
+
+/* ===================== v32 refinements ===================== */
+.month-state.sin{background:#334155;border-color:#64748b;color:#e2e8f0}
+.month-state.open{background:#075985;border-color:#38bdf8;color:#bae6fd}
+.month-state.init{background:#064e3b;border-color:#047857;color:#bbf7d0}
+.month-state.closed{background:#7f1d1d;border-color:#ef4444;color:#fecaca}
+.editing-mode .edit-locked-ui{opacity:.45;pointer-events:none}
+.input-form .actions .edit-only{display:none}
+.editing-mode .input-form .actions .edit-only{display:inline-flex}
+.editing-mode #formModeWrap select{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.15)}
 </style>
 </head>
 <body class="locked">
@@ -854,6 +864,240 @@ exportVariableInputsExcel=function(){
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table></body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 }
+
+
+/* ===================== v32 overrides =====================
+   - Estados solo en formulario y control de presupuesto.
+   - Directo al formulario: siempre Sumar.
+   - Edición desde inputs registrados: cierra ledger, abre formulario, fuerza Reemplazar y exige guardar/cancelar.
+*/
+function hasActiveInputsInPeriod(pi){
+  return activeFormInputs().some(r=>['variable','other'].includes(r.secId) && String(r.pi)===String(pi));
+}
+function monthStateText(pi){
+  pi=Number(pi);
+  if(isMonthClosed(pi))return 'Cerrado';
+  if(!isVariableInitialized(pi))return 'Sin inicializar';
+  if(hasActiveInputsInPeriod(pi))return 'Abierto';
+  return 'Inicializado';
+}
+function monthStateClass(pi){
+  const t=monthStateText(pi);
+  if(t==='Cerrado')return 'closed';
+  if(t==='Abierto')return 'open';
+  if(t==='Inicializado')return 'init';
+  return 'sin';
+}
+monthStateLabel=function(pi){return `<span class="month-state ${monthStateClass(pi)}">${monthStateText(pi)}</span>`};
+
+// No mostrar estados en encabezados del modelo completo.
+decorateMonthHeadersAndSections=function(){};
+
+periodOptionsWithState=function(){
+  return data.periods.map((p,i)=>`<option value="${i}">${esc(p)} - ${monthStateText(i)}</option>`).join('');
+};
+
+renderVariableBudgetSummary=function(c){
+ const visibleIdx=visiblePeriodIndexes();
+ const tbl=document.getElementById('variableBudgetSummaryTable'); if(!tbl)return;
+ let html='<thead><tr><th>Indicador</th>'+visibleIdx.map(i=>`<th>${esc(data.periods[i])}</th>`).join('')+'</tr></thead><tbody>';
+ const rows=[
+   ['Estado',visibleIdx.map(i=>monthStateLabel(i))],
+   ['Ppto gastos variables',visibleIdx.map(i=>money(c.variableBudget[i]))],
+   ['Total gastos variables real',visibleIdx.map(i=>money(c.variable[i]))],
+   ['Diferencia ppto - real',visibleIdx.map(i=>money(c.variableDiff[i]))]
+ ];
+ rows.forEach(r=>{html+=`<tr><td>${esc(r[0])}</td>`+r[1].map((v,idx)=>{const pi=visibleIdx[idx];const cls=r[0].includes('Diferencia')?(c.variableDiff[pi]<0?'positive':'negative'):'';return `<td class="${cls}">${r[0]==='Estado'?v:esc(v)}</td>`}).join('')+'</tr>'});
+ html+='</tbody>'; tbl.innerHTML=html;
+};
+
+function isInputEditMode(){return !!(document.getElementById('lineInputForm')&&document.getElementById('lineInputForm').dataset.editingId)}
+function setInputMode(editing){
+  const form=document.getElementById('lineInputForm'); if(!form)return;
+  const mode=document.getElementById('formMode');
+  const wrap=document.getElementById('formModeWrap');
+  const cancel=document.getElementById('cancelEditBtn');
+  const banner=document.getElementById('editLockBanner');
+  const submit=document.getElementById('inputSubmitBtn');
+  document.body.classList.toggle('editing-mode',!!editing);
+  document.body.classList.toggle('normal-mode',!editing);
+  if(mode){
+    mode.innerHTML=editing?'<option value="replaceInput">Reemplazar</option>':'<option value="add">Sumar</option>';
+    mode.value=editing?'replaceInput':'add';
+  }
+  if(wrap)wrap.style.display=editing?'flex':'none';
+  if(cancel)cancel.style.display=editing?'inline-flex':'none';
+  if(banner)banner.style.display=editing?'block':'none';
+  if(submit)submit.textContent=editing?'Guardar edición':'Aplicar al modelo';
+  if(editing) setFormStatus('Editando input registrado: guarda o cancela antes de continuar.','warn');
+}
+function requireNoInputEdit(){
+  if(isInputEditMode()){
+    alert('Estás editando un input registrado. Debes guardar o cancelar la edición antes de continuar.');
+    return false;
+  }
+  return true;
+}
+
+// Modal del formulario: se puede abrir en modo normal; no se puede cerrar si hay edición activa.
+openInputFormModal=function(){
+  if(!requireNoInputEdit())return;
+  setInputMode(false);
+  const modal=document.getElementById('inputFormModal');
+  const body=document.getElementById('inputFormModalBody');
+  const panel=document.getElementById('inputPanel');
+  if(body&&panel&&!body.contains(panel))body.appendChild(panel);
+  if(modal)modal.classList.add('open');
+  renderInputForm();
+};
+closeInputFormModal=function(){
+  if(!requireNoInputEdit())return;
+  const modal=document.getElementById('inputFormModal');
+  const main=document.querySelector('main');
+  const panel=document.getElementById('inputPanel');
+  const insertBefore=document.querySelector('.model-only.model-input-btn');
+  if(main&&panel&&!main.contains(panel))main.insertBefore(panel,insertBefore||main.firstChild);
+  if(modal)modal.classList.remove('open');
+};
+
+const _v32_oldToggleSidePanel=toggleSidePanel;
+toggleSidePanel=function(show){ if(!requireNoInputEdit())return; return _v32_oldToggleSidePanel(show); };
+const _v32_oldShowAppView=showAppView;
+showAppView=function(view){ if(!requireNoInputEdit())return; if(view==='input')setInputMode(false); return _v32_oldShowAppView(view); };
+const _v32_oldOpenInputsLedger=openInputsLedgerModal;
+openInputsLedgerModal=function(){ if(!requireNoInputEdit())return; return _v32_oldOpenInputsLedger(); };
+const _v32_oldOpenConceptModal=typeof openConceptModal==='function'?openConceptModal:null;
+openConceptModal=function(fromInput){ if(!requireNoInputEdit())return; if(_v32_oldOpenConceptModal)return _v32_oldOpenConceptModal(fromInput); };
+const _v32_oldOpenMergeConceptModal=openMergeConceptModal;
+openMergeConceptModal=function(){ if(!requireNoInputEdit())return; return _v32_oldOpenMergeConceptModal(); };
+
+// Validar mes y refrescar modo.
+const _v32_oldRenderInputForm=renderInputForm;
+renderInputForm=function(){
+  _v32_oldRenderInputForm();
+  if(isInputEditMode())setInputMode(true); else setInputMode(false);
+};
+
+// Reemplazo seguro de inputs: directo siempre suma; edición reemplaza el input, sin destruir otros inputs de la misma celda.
+const _v32_oldApplyInputRecordToModel=applyInputRecordToModel;
+applyInputRecordToModel=function(rec, reverse=false){
+ const sec=section(rec.secId); if(!sec||!sec.rows[rec.ri])return;
+ const current=rec.pi==='initial'?num(sec.rows[rec.ri][2]):num(sec.rows[rec.ri][1][Number(rec.pi)]);
+ const amount=num(rec.amount);
+ let next=current;
+ if(rec.mode==='replaceInput'){
+   next=reverse?current-amount:current+amount;
+ }else{
+   return _v32_oldApplyInputRecordToModel(rec,reverse);
+ }
+ if(rec.pi==='initial')sec.rows[rec.ri][2]=next; else sec.rows[rec.ri][1][Number(rec.pi)]=next;
+ return next;
+};
+
+const _v32_oldCreateInputRecordFromForm=createInputRecordFromForm;
+createInputRecordFromForm=function(existingId=null){
+ const rec=_v32_oldCreateInputRecordFromForm(existingId);
+ if(!rec)return null;
+ if(existingId){rec.mode='replaceInput';}
+ else {rec.mode='add';}
+ return rec;
+};
+
+function submitLineInput(ev){
+ ev.preventDefault();
+ const form=document.getElementById('lineInputForm');
+ const editingId=form.dataset.editingId||'';
+ data.formInputs=data.formInputs||[];
+ if(!validateInputMonthSelection())return;
+ if(editingId){
+   const idx=data.formInputs.findIndex(x=>x.id===editingId&&x.active!==false);
+   if(idx<0){alert('No se encontró el input original. Cancela la edición e intenta de nuevo.');return;}
+   const oldRec=clone(data.formInputs[idx]);
+   const rec=createInputRecordFromForm(editingId); if(!rec)return;
+   applyInputRecordToModel(data.formInputs[idx],true);
+   data.formInputs[idx].active=false;
+   data.formInputs[idx].deletedAt=new Date().toLocaleString('es-CO');
+   rec.before=oldRec.amount;
+   const after=applyInputRecordToModel(rec,false); rec.after=after;
+   rec.editedFrom=oldRec.id;
+   data.formInputs.push(rec);
+   rebuildInputNotesForCell(oldRec.secId,oldRec.ri,oldRec.pi);
+   rebuildInputNotesForCell(rec.secId,rec.ri,rec.pi);
+   logInput({source:'Edición input registrado',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:'replace',amount:rec.amount,before:oldRec.amount,after:rec.amount,note:rec.note,paid:false});
+   delete form.dataset.editingId;
+   saveSilent();
+   clearLineInputForm(true);
+   setInputMode(false);
+   render();
+   setFormStatus('Edición guardada.','ok');
+   setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
+   return;
+ }
+ const rec=createInputRecordFromForm(null); if(!rec)return;
+ rec.mode='add';
+ const after=applyInputRecordToModel(rec,false); rec.after=after;
+ data.formInputs.push(rec);
+ rebuildInputNotesForCell(rec.secId,rec.ri,rec.pi);
+ logInput({source:'Formulario',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:'add',amount:rec.amount,before:rec.before,after:rec.after,note:rec.note,paid:false});
+ saveSilent();
+ clearLineInputForm(true);
+ render();
+ setInputMode(false);
+ setFormStatus('Input sumado y formulario limpio','ok');
+ setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
+}
+
+function editFormInput(id){
+ const rec=activeFormInputs().find(x=>x.id===id); if(!rec)return;
+ if(isMonthClosed(rec.pi)){alert('Este mes está cerrado. No se permite editar inputs.');return}
+ closeInputsLedgerModal();
+ const modal=document.getElementById('inputFormModal');
+ const body=document.getElementById('inputFormModalBody');
+ const panel=document.getElementById('inputPanel');
+ if(body&&panel&&!body.contains(panel))body.appendChild(panel);
+ if(modal)modal.classList.add('open');
+ document.getElementById('formSection').value=rec.secId; updateConceptSelect();
+ document.getElementById('formConcept').value=String(rec.ri);
+ document.getElementById('formPeriod').value=String(rec.pi);
+ document.getElementById('formAmount').value=formatNumber(rec.amount);
+ document.getElementById('formNote').value=rec.note||'';
+ document.getElementById('lineInputForm').dataset.editingId=id;
+ setInputMode(true);
+ validateInputMonthSelection();
+ setTimeout(()=>{const el=document.getElementById('formAmount'); if(el){el.focus();el.select();}},100);
+}
+
+function cancelInputEdit(){
+ const form=document.getElementById('lineInputForm');
+ if(form)delete form.dataset.editingId;
+ clearLineInputForm(true);
+ setInputMode(false);
+ setFormStatus('Edición cancelada.','warn');
+ setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},1800);
+}
+
+// Ledger/report muestran replaceInput como Reemplazar.
+renderInputsLedger=function(){
+ const tbl=document.getElementById('inputsLedgerTable'); if(!tbl)return;
+ const rows=activeFormInputs().filter(r=>['variable','other'].includes(r.secId));
+ if(!rows.length){tbl.innerHTML='<tbody><tr><td class="muted">No hay inputs activos registrados desde el formulario.</td></tr></tbody>';return}
+ const actionLabel=r=>(r.mode==='add'?'Sumar':'Reemplazar');
+ const tr=rows.slice().reverse().map(r=>{const sec=section(r.secId);const concept=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';const period=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(concept)}</td><td>${esc(period)}</td><td>${esc(actionLabel(r))}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td><td><button class="mini-btn secondary" onclick="editFormInput('${r.id}')">Editar</button><button class="mini-btn danger" onclick="deleteFormInput('${r.id}')">Eliminar</button></td></tr>`}).join('');
+ tbl.innerHTML=`<thead><tr><th>Fecha</th><th>Sección</th><th>Concepto</th><th>Mes</th><th>Acción</th><th>Valor</th><th>Nota</th><th>Opciones</th></tr></thead><tbody>${tr}</tbody>`;
+};
+
+exportVariableInputsExcel=function(){
+ const rows=activeFormInputs().filter(r=>['variable','other'].includes(r.secId));
+ if(!rows.length){alert('Aún no hay inputs activos registrados para exportar.');return}
+ const actionLabel=r=>(r.mode==='add'?'Sumar':'Reemplazar');
+ const summary={};
+ rows.forEach(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');const key=(sec?sec.title:r.secId)+'||'+periodo+'||'+concepto;if(!summary[key])summary[key]={seccion:sec?sec.title:r.secId,periodo,concepto,total:0,cantidad:0,comentarios:[]};summary[key].total+=num(r.amount);summary[key].cantidad+=1;if(r.note)summary[key].comentarios.push(r.note);});
+ const summaryRows=Object.values(summary).sort((a,b)=>String(a.seccion).localeCompare(String(b.seccion))||String(a.periodo).localeCompare(String(b.periodo))||String(a.concepto).localeCompare(String(b.concepto)));
+ const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
+ const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(actionLabel(r))}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
+ const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table></body></html>`;
+ const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
+};
 
 initCloud();
 </script>
