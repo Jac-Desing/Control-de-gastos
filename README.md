@@ -1,11 +1,7 @@
-# App web modelo v35
+# App web modelo v36.1
 
-Versión basada en la v33 estable. Restaura funcionamiento y agrega indicadores 3D brillantes de estado de mes sin modificar la estructura Firebase.
+Versión basada en v36.
 
-Estados:
-- Sin inicializar: bolita gris/blanca.
-- Inicializado: bolita azul.
-- Abierto: bolita verde.
-- Cerrado: bolita roja.
-
-Subir a GitHub reemplazando `index.html` y `README.md`.
+Ajuste aplicado:
+- Los submenús del panel lateral ahora son desplegables dentro de su propia categoría.
+- Se mantiene la lógica cloud/Firebase y las funcionalidades de v36.
