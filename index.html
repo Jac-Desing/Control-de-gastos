@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v25</title>
+<title>Modelo mensual de caja v27</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -114,6 +114,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
       <div class="actions">
         <button type="submit" class="soft">Aplicar al modelo</button>
         <button type="button" class="secondary" onclick="clearLineInputForm()">Limpiar</button>
+        <button type="button" class="secondary" onclick="openInputsLedgerModal()">Ver inputs registrados</button>
         <span id="formStatus" class="form-status"></span>
       </div>
     </form>
@@ -419,9 +420,9 @@ function renderSummary(c){
    kpi('Cuadre de caja - mes actual',currentIdx,c.cashCheck)+
    kpi('Saldo proyectado - último mes visible',lastVisibleIdx,c.projected)+
    kpi('Cuadre de caja - último mes visible',lastVisibleIdx,c.cashCheck);
+ const summaryBudgetDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?0:c.variableBudget[i]);
  const summaryVariableDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?c.variable[i]:0);
- const summaryBaseGVDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?0:c.variableEffect[i]);
- const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',c.variableBudget,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Base usada flujo GV',summaryBaseGVDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
+ const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',summaryBudgetDisplay,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
  let html='<thead><tr><th>Concepto</th>'+visibleIdx.map(i=>`<th>${esc(data.periods[i])}</th>`).join('')+'</tr></thead><tbody>';
  rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+visibleIdx.map(i=>`<td class="${r[1][i]<0?'negative':'positive'}">${money(r[1][i])}</td>`).join('')+'</tr>'});
  html+='</tbody>';

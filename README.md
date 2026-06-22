@@ -1,10 +1,13 @@
-# App web modelo v26
+# App web modelo v27
 
-Versión basada en v25 cloud.
+Versión basada en la v26 cloud.
 
-Cambios:
-- Resumen superior ajustado: Total gastos variables muestra cero en meses sin inicializar y valor real en meses inicializados.
-- Base usada flujo GV muestra presupuesto solo cuando el mes no está inicializado y cero cuando ya está inicializado, sin nota adicional.
-- Las notas generadas por inputs se reconstruyen automáticamente al editar o eliminar inputs.
-- Menú lateral organizado por submenús: Gestión meses, Informes, Modelo y respaldo.
-- Mantiene compatibilidad con Firebase/Firestore y el modelo guardado en la nube.
+Ajustes aplicados:
+- En el resumen superior, **Ppto gastos variables** solo muestra valor y afecta el flujo cuando el mes no está inicializado.
+- En el resumen superior, **Total gastos variables** solo muestra valor y afecta el flujo cuando el mes ya está inicializado.
+- Los dos campos son excluyentes por mes.
+- Se mantiene el cálculo interno del flujo: presupuesto antes de inicializar y gasto real después de inicializar.
+- Se agrega botón directo **Ver inputs registrados** desde el formulario de inputs.
+- Se conserva compatibilidad con Firebase/Firestore v22+ usando `users/{uid}/models/principal` y campo `data` serializado como JSON.
+
+Para actualizar GitHub Pages, sube `index.html` y `README.md` reemplazando los existentes.
