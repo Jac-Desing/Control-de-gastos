@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja</title>
+<title>Modelo mensual de caja v21</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -110,8 +110,8 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script>
-const STORAGE_KEY='gastosModeloV20';
-const LEGACY_STORAGE_KEYS=['gastosModeloV20','gastosModeloV12'];
+const STORAGE_KEY='gastosModeloV21';
+const LEGACY_STORAGE_KEYS=['gastosModeloV20','gastosModeloV19'];
 const baseData={
   initialColumnLabel:'Saldo inicial bancos',
   initialColumnDate:'01-jun-2026',
@@ -137,34 +137,67 @@ const firebaseConfig={
   messagingSenderId:"284253882078",
   appId:"1:284253882078:web:e6c80d0b0320351864e44f"
 };
-let auth=null, db=null, currentUser=null, unsubscribeCloud=null, saveTimer=null, applyingCloud=false;
-function cloudDoc(){return db.collection('users').doc(currentUser.uid).collection('models').doc('main')}
+let auth=null, db=null, currentUser=null, unsubscribeCloud=null, saveTimer=null, applyingCloud=false, cloudReady=false;
+function cloudDoc(){return db.collection('users').doc(currentUser.uid).collection('models').doc('principal')}
 function setSync(msg,cls='sync-warn'){const el=document.getElementById('syncStatus');if(el){el.textContent=msg;el.className=cls}}
 function authStatus(msg){const el=document.getElementById('authStatus');if(el)el.textContent=msg||''}
 function initCloud(){
  try{
-   firebase.initializeApp(firebaseConfig);
+   if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
    auth=firebase.auth(); db=firebase.firestore();
    auth.onAuthStateChanged(user=>{ if(user) onSignedIn(user); else onSignedOut(); });
- }catch(e){authStatus('No se pudo iniciar Firebase: '+e.message);}
+ }catch(e){authStatus('No se pudo iniciar Firebase: '+e.message);console.error(e);}
+}
+function usableModel(candidate){
+ return !!(candidate && Array.isArray(candidate.periods) && candidate.periods.length && Array.isArray(candidate.sections) && candidate.sections.some(s=>s && s.id==='variable') && candidate.sections.some(s=>s && s.id==='banks'));
+}
+function firstUsableLocalModel(){
+ const keys=[STORAGE_KEY].concat(LEGACY_STORAGE_KEYS||[]);
+ for(const k of keys){
+   try{const v=JSON.parse(localStorage.getItem(k)); if(usableModel(v))return migrateData(v);}catch(e){}
+ }
+ return clone(baseData);
 }
 async function onSignedIn(user){
- currentUser=user; document.body.classList.remove('locked');
+ currentUser=user; cloudReady=false; document.body.classList.remove('locked');
  const u=document.getElementById('cloudUser'); if(u)u.textContent=user.email||user.uid;
  setSync('Cargando nube...','sync-warn');
- if(unsubscribeCloud)unsubscribeCloud();
- unsubscribeCloud=cloudDoc().onSnapshot(async snap=>{
-   if(snap.exists){
-     const cloud=snap.data();
-     if(cloud && cloud.data){applyingCloud=true;data=migrateData(cloud.data);localStorage.setItem(STORAGE_KEY,JSON.stringify(data));render();applyingCloud=false;setSync('Sincronizado en la nube','sync-ok');}
+ if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null;}
+ const doc=cloudDoc();
+ try{
+   const snap=await doc.get();
+   if(snap.exists && snap.data() && usableModel(snap.data().data)){
+     data=migrateData(snap.data().data);
+     localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+     render();
+     setSync('Modelo cargado desde la nube','sync-ok');
    }else{
-     await cloudDoc().set({data:migrateData(data),version:'v20',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-     setSync('Modelo creado en la nube','sync-ok');
+     data=firstUsableLocalModel();
+     localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+     render();
+     await doc.set({data:migrateData(data),version:'v21',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+     setSync('Modelo base creado en la nube','sync-ok');
    }
- },err=>{setSync('Error de sincronización','sync-bad');console.error(err);alert('Firestore no permitió sincronizar. Revisa las reglas de seguridad.');});
+   cloudReady=true;
+   unsubscribeCloud=doc.onSnapshot(snap=>{
+     if(!snap.exists || !snap.data() || !usableModel(snap.data().data))return;
+     if(applyingCloud)return;
+     applyingCloud=true;
+     data=migrateData(snap.data().data);
+     localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+     render();
+     applyingCloud=false;
+     setSync('Sincronizado en la nube','sync-ok');
+   },err=>{setSync('Error de sincronización','sync-bad');console.error(err);alert('Firestore no permitió sincronizar. Revisa reglas o conexión.');});
+ }catch(err){
+   console.error(err);
+   cloudReady=false;
+   setSync('Error al cargar nube','sync-bad');
+   alert('No se pudo cargar o crear el modelo en Firestore. Revisa que las reglas estén publicadas y que la conexión esté activa.');
+ }
 }
 function onSignedOut(){
- currentUser=null; if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null;}
+ currentUser=null; cloudReady=false; if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null;}
  document.body.classList.add('locked'); setSync('Sin sesión','sync-warn');
  const u=document.getElementById('cloudUser'); if(u)u.textContent='—';
 }
@@ -197,13 +230,32 @@ function queueCloudSave(){
 }
 async function saveCloudNow(){
  if(!currentUser||!db)return;
- try{await cloudDoc().set({data:migrateData(data),version:'v20',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
- catch(e){setSync('No se pudo guardar','sync-bad');console.error(e);}
+ try{await cloudDoc().set({data:migrateData(data),version:'v21',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
+ catch(e){setSync('No se pudo guardar','sync-bad');console.error(e);alert('No se pudo guardar en la nube. Revisa reglas de Firestore y conexión.');}
 }
 
 function clone(o){return JSON.parse(JSON.stringify(o))}
-function loadData(){try{for(const key of LEGACY_STORAGE_KEYS){const raw=localStorage.getItem(key);if(raw)return migrateData(JSON.parse(raw)||clone(baseData));}return clone(baseData)}catch(e){return clone(baseData)}}
-function migrateData(d){d=d||clone(baseData); if(d.initialColumnLabel==null)d.initialColumnLabel='Saldo inicial bancos'; if(d.initialColumnDate==null)d.initialColumnDate='01-jun-2026'; if(d.showInitialColumn==null)d.showInitialColumn=true; if(!d.notes)d.notes={}; if(!d.paid)d.paid={}; if(!Array.isArray(d.inputLog))d.inputLog=[]; if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[]; return d}
+function loadData(){
+ try{
+   const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));
+   if(usableModel(saved))return migrateData(saved);
+   for(const k of (LEGACY_STORAGE_KEYS||[])){
+     try{const legacy=JSON.parse(localStorage.getItem(k)); if(usableModel(legacy))return migrateData(legacy);}catch(e){}
+   }
+   return clone(baseData);
+ }catch(e){return clone(baseData)}
+}
+function migrateData(d){
+ if(!usableModel(d))d=clone(baseData);
+ if(d.initialColumnLabel==null)d.initialColumnLabel='Saldo inicial bancos';
+ if(d.initialColumnDate==null)d.initialColumnDate='01-jun-2026';
+ if(d.showInitialColumn==null)d.showInitialColumn=true;
+ if(!d.notes)d.notes={};
+ if(!d.paid)d.paid={};
+ if(!Array.isArray(d.inputLog))d.inputLog=[];
+ if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[];
+ return d;
+}
 async function saveData(){saveSilent();await saveCloudNow();toast('Modelo guardado y sincronizado.')}function toast(msg){alert(msg)}
 function money(n){n=Number(n)||0;return n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})}
 function formatNumber(n){n=Number(n)||0;return n.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:2})}

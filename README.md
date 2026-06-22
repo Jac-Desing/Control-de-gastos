@@ -1,20 +1,22 @@
-# App web modelo v20
+# App web modelo v21 Cloud
 
-Versión basada en la v19, con sincronización en la nube mediante Firebase Authentication y Cloud Firestore.
+Versión corregida sobre la v20 y la v19 funcional.
 
-## Funciones principales
+## Cambios v21
 
-- Un solo modelo sincronizado por usuario.
-- Inicio de sesión con correo y contraseña.
-- Guardado automático en Firestore.
-- Respaldo local en el navegador.
-- Conserva las funcionalidades de la v19: meses ocultables, formulario solo para gastos variables, comentarios por celda, informe Excel, conceptos editables, paneles inmovilizados y lógica del Excel original.
+- Crea automáticamente el documento inicial en Firestore cuando el usuario entra por primera vez.
+- Usa la ruta de nube: `users/{uid}/models/principal`.
+- Si Firestore está vacío, carga el modelo base completo derivado del Excel original.
+- Valida que el modelo tenga períodos, secciones, gastos variables y bancos antes de usarlo.
+- Migra datos locales previos desde v20/v19 si existen.
+- Evita que la app se quede indefinidamente en "Cargando nube...".
+- Mantiene las funcionalidades de la v19: formulario solo para gastos variables, meses ocultables, informe de inputs en Excel, comentarios por celda, paneles inmovilizados, resumen superior y lógica financiera del Excel.
 
-## Reglas sugeridas de Firestore
+## Reglas Firestore requeridas
 
-Pegar en Firestore > Reglas:
+Pegar en Firestore > Reglas y publicar:
 
-```
+```txt
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -25,6 +27,6 @@ service cloud.firestore {
 }
 ```
 
-## Nota de migración
+## Publicación
 
-Si el navegador tenía datos de la v19, la v20 intenta leerlos desde el almacenamiento local anterior y subirlos como primer modelo en la nube al crear/iniciar sesión.
+Subir `index.html` y `README.md` a GitHub Pages reemplazando la versión anterior.
