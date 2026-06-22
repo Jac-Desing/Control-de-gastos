@@ -1,33 +1,35 @@
-# App web modelo v22 Cloud
+# App web modelo v23
 
-Versión corregida sobre la v21 cloud y la v19 funcional.
+Versión basada en la v22 cloud estable y compatible con Firestore.
 
-## Cambios v22
+## Cambios v23
 
-- Crea automáticamente el documento inicial en Firestore cuando el usuario entra por primera vez.
-- Usa la ruta de nube: `users/{uid}/models/principal`.
-- Si Firestore está vacío, carga el modelo base completo derivado del Excel original.
-- Guarda el modelo como texto JSON para evitar el error de Firestore por arrays anidados.
-- Valida que el modelo tenga períodos, secciones, gastos variables y bancos antes de usarlo.
-- Migra datos locales previos desde v21/v20/v19 si existen.
-- Evita que la app se quede indefinidamente en "Cargando nube...".
-- Mantiene las funcionalidades de la v19/v21: formulario solo para gastos variables, meses ocultables, informe de inputs en Excel, comentarios por celda, paneles inmovilizados, resumen superior y lógica financiera del Excel.
+1. Las notas generadas desde el formulario de gastos variables ahora se acumulan por viñetas en la celda correspondiente, incluyendo fecha, mes, concepto, acción y valor del input.
+2. El informe principal ahora es **Informe gastos variables Excel** y resume los inputs realizados desde el formulario para gastos variables.
+3. El antiguo historial de cambios se conserva como informe separado: **Historial cambios Excel**.
+4. Las opciones superiores se movieron a un panel lateral izquierdo ocultable mediante botón de tres rayas.
+5. Los indicadores superiores ahora muestran:
+   - Saldo proyectado del mes actual.
+   - Cuadre de caja del mes actual.
+   - Saldo proyectado del último mes visible.
+   - Cuadre de caja del último mes visible.
+6. Se eliminó el indicador de mes más deficitario.
 
-## Reglas Firestore requeridas
+## Compatibilidad
 
-Pegar en Firestore > Reglas y publicar:
+Mantiene la ruta de Firestore:
 
-```txt
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId}/models/{modelId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
+```text
+users/{uid}/models/principal
 ```
+
+Mantiene el modelo guardado en el campo `data` como JSON serializado, por lo que es compatible con los datos ya creados en la v22.
 
 ## Publicación
 
-Subir `index.html` y `README.md` a GitHub Pages reemplazando la versión anterior.
+Subir a GitHub reemplazando:
+
+- `index.html`
+- `README.md`
+
+No borrar datos en Firebase.
