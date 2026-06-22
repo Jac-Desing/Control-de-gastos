@@ -9,7 +9,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
 header{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:18px 22px;position:sticky;top:0;z-index:10;background:rgba(15,23,42,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);box-shadow:0 8px 28px rgba(0,0,0,.22)}
 header h1{font-size:28px;margin:0;color:#fff}.header-left{display:flex;align-items:center;gap:12px}.menu-toggle{font-size:22px;line-height:1;width:44px;height:44px;padding:0;background:#1e293b}.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}button{border:1px solid var(--line);background:#172554;color:var(--text);padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px}button.secondary{background:#1e293b}button.danger{background:#451a1a;border-color:#7f1d1d}button.soft{background:#064e3b;border-color:#047857;color:#dcfce7}button:active{transform:translateY(1px)}
-.side-panel{position:fixed;top:0;left:0;height:100vh;width:290px;background:#0b1220;border-right:1px solid var(--line);z-index:30;transform:translateX(-105%);transition:transform .2s ease;box-shadow:20px 0 60px rgba(0,0,0,.35);padding:18px;overflow:auto}.side-panel.open{transform:translateX(0)}.side-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.side-head h2{font-size:18px;margin:0}.side-menu{display:grid;gap:10px}.side-menu button{width:100%;text-align:left;background:#1e293b}.side-menu button.primary{background:#172554}.side-menu button.danger{text-align:left}.resizer{position:absolute;right:0;top:0;width:8px;height:100%;cursor:col-resize;user-select:none}.input-ledger{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden}.ledger-wrap{padding:0 14px 14px;overflow:auto;max-height:260px}.ledger-table{width:100%;min-width:900px}.ledger-table th,.ledger-table td{position:static!important;min-width:auto;height:auto;padding:7px 8px;background:transparent;text-align:left}.ledger-table th{background:#0b1220}.mini-btn{font-size:11px;padding:6px 7px;margin-right:4px}.side-backdrop{display:none;position:fixed;inset:0;background:#0008;z-index:29}.side-backdrop.open{display:block}
+.side-panel{position:fixed;top:0;left:0;height:100vh;width:290px;background:#0b1220;border-right:1px solid var(--line);z-index:30;transform:translateX(-105%);transition:transform .2s ease;box-shadow:20px 0 60px rgba(0,0,0,.35);padding:18px;overflow:auto}.side-panel.open{transform:translateX(0)}.side-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.side-head h2{font-size:18px;margin:0}.side-menu{display:grid;gap:10px}.side-menu button{width:100%;text-align:left;background:#1e293b}.side-menu button.primary{background:#172554}.side-menu button.danger{text-align:left}.submenu{border:1px solid #334155;border-radius:12px;padding:10px;background:#0f172a;margin-bottom:8px}.submenu-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;font-weight:900;margin:0 0 8px}.submenu .side-menu-btn{margin-bottom:8px}.submenu .side-menu-btn:last-child{margin-bottom:0}.resizer{position:absolute;right:0;top:0;width:8px;height:100%;cursor:col-resize;user-select:none}.input-ledger{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden}.ledger-wrap{padding:0 14px 14px;overflow:auto;max-height:260px}.ledger-table{width:100%;min-width:900px}.ledger-table th,.ledger-table td{position:static!important;min-width:auto;height:auto;padding:7px 8px;background:transparent;text-align:left}.ledger-table th{background:#0b1220}.mini-btn{font-size:11px;padding:6px 7px;margin-right:4px}.side-backdrop{display:none;position:fixed;inset:0;background:#0008;z-index:29}.side-backdrop.open{display:block}
 main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1px solid #92400e;padding:12px 14px;border-radius:14px;margin-bottom:16px;color:#fde68a}.formula-help{font-size:13px;color:var(--muted);margin:10px 0 18px}.formula-help b{color:#cbd5e1}
 .summary{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:14px;margin-bottom:18px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.18)}.kpi small{color:var(--muted);display:block;margin-bottom:8px}.kpi strong{font-size:22px}.superavit,.negative{color:var(--accent)!important}.deficit,.positive{color:var(--bad)!important}.neutral{color:var(--blue)!important}
 .panel{background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22)}.panelTitle{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:18px 18px 10px}.panelTitle h2{margin:0;font-size:18px}.panelTitle span{color:var(--muted);font-size:13px}.tableWrap{overflow:auto;padding:0 18px 18px}
@@ -56,18 +56,27 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 <aside id="sidePanel" class="side-panel">
   <div class="side-head"><h2>Opciones</h2><button class="secondary" onclick="toggleSidePanel(false)">×</button></div>
   <div class="side-menu">
-    <button class="primary" onclick="addPeriod();toggleSidePanel(false)">+ Agregar mes</button>
-    <button onclick="openMonthsModal();toggleSidePanel(false)">Mostrar/ocultar meses</button>
-    <button onclick="openVariableInitModal();toggleSidePanel(false)">Inicializar mes gastos variables</button>
-    <button onclick="openInputsLedgerModal();toggleSidePanel(false)">Ver inputs registrados</button>
-    <button onclick="toggleInitialColumn();toggleSidePanel(false)" id="toggleInitialBtn">Ocultar saldo inicial</button>
-    <button onclick="saveData();toggleSidePanel(false)">Guardar</button>
-    <button onclick="exportJSON();toggleSidePanel(false)">Exportar respaldo</button>
-    <button onclick="exportVariableInputsExcel();toggleSidePanel(false)">Informe inputs Excel</button>
-    <button onclick="exportInputLogExcel();toggleSidePanel(false)">Historial cambios Excel</button>
-    <button onclick="promptColumnWidths();toggleSidePanel(false)">Ajustar ancho columnas</button>
-    <button onclick="document.getElementById('importFile').click();toggleSidePanel(false)">Importar respaldo</button>
-    <button class="danger" onclick="resetData();toggleSidePanel(false)">Restaurar modelo base</button>
+    <div class="submenu">
+      <div class="submenu-title">Gestión meses</div>
+      <button class="primary side-menu-btn" onclick="addPeriod();toggleSidePanel(false)">+ Agregar mes</button>
+      <button class="side-menu-btn" onclick="openMonthsModal();toggleSidePanel(false)">Ocultar/Mostrar mes</button>
+      <button class="side-menu-btn" onclick="openVariableInitModal();toggleSidePanel(false)">Inicializar mes gastos variables</button>
+      <button class="side-menu-btn" onclick="toggleInitialColumn();toggleSidePanel(false)" id="toggleInitialBtn">Ocultar saldo inicial</button>
+    </div>
+    <div class="submenu">
+      <div class="submenu-title">Informes</div>
+      <button class="side-menu-btn" onclick="openInputsLedgerModal();toggleSidePanel(false)">Ver inputs registrados</button>
+      <button class="side-menu-btn" onclick="exportVariableInputsExcel();toggleSidePanel(false)">Informe inputs Excel</button>
+      <button class="side-menu-btn" onclick="exportInputLogExcel();toggleSidePanel(false)">Historial cambios Excel</button>
+    </div>
+    <div class="submenu">
+      <div class="submenu-title">Modelo y respaldo</div>
+      <button class="side-menu-btn" onclick="saveData();toggleSidePanel(false)">Guardar</button>
+      <button class="side-menu-btn" onclick="exportJSON();toggleSidePanel(false)">Exportar respaldo</button>
+      <button class="side-menu-btn" onclick="promptColumnWidths();toggleSidePanel(false)">Ajustar ancho columnas</button>
+      <button class="side-menu-btn" onclick="document.getElementById('importFile').click();toggleSidePanel(false)">Importar respaldo</button>
+      <button class="danger side-menu-btn" onclick="resetData();toggleSidePanel(false)">Restaurar modelo base</button>
+    </div>
     <input id="importFile" type="file" accept="application/json" hidden onchange="importJSON(event)">
   </div>
 </aside>
@@ -285,6 +294,7 @@ function migrateData(d){
  if(!d.columnWidths.periods)d.columnWidths.periods={};
  ensureVariableBudgetSection(d);
  ensureVariableInitState(d);
+ rebuildAllInputNotesForModel(d);
  return d;
 }
 
@@ -309,7 +319,18 @@ function ensureVariableInitState(model){
  while(model.variableInitialized.length<(model.periods||[]).length)model.variableInitialized.push(false);
 }
 function isVariableInitialized(pi){ensureVariableInitState(data);return !!data.variableInitialized[Number(pi)]}
-function variableBudgetValue(pi){pi=Number(pi);const sec=section('variableBudget');if(!isVariableInitialized(pi))return rowSum(section('variable'),pi);return sec&&sec.rows[0]?num(sec.rows[0][1][pi]):0}
+function variableBudgetValue(pi){const sec=section('variableBudget');return sec&&sec.rows[0]?num(sec.rows[0][1][Number(pi)]):0}
+function rebuildAllInputNotesForModel(model){
+ if(!model||!Array.isArray(model.formInputs))return;
+ const old=data;
+ try{
+   data=model;
+   if(!data.notes)data.notes={};
+   const touched=new Set();
+   model.formInputs.filter(x=>x&&x.active!==false).forEach(r=>touched.add(cellKey(r.secId,r.ri,r.pi)));
+   touched.forEach(k=>{const [secId,ri,pi]=k.split('|');rebuildInputNotesForCell(secId,ri,pi);});
+ }finally{data=old;}
+}
 
 async function saveData(){saveSilent();await saveCloudNow();toast('Modelo guardado y sincronizado.')}function toast(msg){alert(msg)}
 function money(n){n=Number(n)||0;return n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})}
@@ -348,11 +369,11 @@ function sectionTitleRow(title, initialVisible){
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
- sec.rows.forEach((r,ri)=>{const rowActions=sec.kind==='budget'?'':`<span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span>`; html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" ${sec.kind==='budget'?'readonly title="Fila calculada"':''} onchange="renameRow('${sec.id}',${ri},this.value)">${rowActions}</div></td>`;
+ sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
  if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
- for(const pi of visibleIdx){const displayVal=sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi];html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
+ for(const pi of visibleIdx)html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,r[1][pi])}</td>`;
  html+='</tr>'});
- if(sec.kind!=='budget')html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
+ html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
  html+='</tbody>';t.innerHTML=html;}
 function inputCell(sec,ri,pi,val){
@@ -360,7 +381,7 @@ function inputCell(sec,ri,pi,val){
  const shown=formatNumber(val);
  const isPaidCell=(sec==='fixed'&&pi!=='initial');
  const paid=data.paid[cellKey(sec,ri,pi,'paid')];
- const locked=(sec==='variableBudget')||(sec==='variable'&&pi!=='initial'&&isVariableInitialized(pi));
+ const locked=(sec==='variable'&&pi!=='initial'&&isVariableInitialized(pi));
  const readonly=locked?'readonly title="Mes inicializado: editar solo por inputs"':'';
  const focus=locked?'this.blur()':'this.value=rawEditValue(this.value);this.select()';
  const blur=locked?'':`onblur="setValue('${sec}',${ri},'${pi}',this.value)"`;
@@ -369,7 +390,7 @@ function inputCell(sec,ri,pi,val){
 function totalRow(label,arr){return `<tr class="total-row"><td>${label}</td><td></td>`+arr.map(v=>`<td class="money ${v<0?'negative':'positive'}">${money(v)}</td>`).join('')+'</tr>'}
 function calcRow(label,arr,flag=false){return `<tr class="calc-row"><td>${label}</td><td></td>`+arr.map(v=>`<td class="money ${v<0?'negative':'positive'}">${money(v)}${flag?`<br><small>${v<0?'Superávit':'Déficit'}</small>`:''}</td>`).join('')+'</tr>'}
 function bankTotalRows(c){return `<tr class="total-row"><td>Total saldos bancos reales</td><td class="money negative">${money(initialBankTotal())}</td>`+c.banks.map(v=>`<td class="money negative">${money(v)}</td>`).join('')+'</tr>'}
-function setValue(secId,ri,pi,v){if(secId==='variableBudget'){alert('El presupuesto se calcula al inicializar el mes.');render();return} if(secId==='variable'&&pi!=='initial'&&isVariableInitialized(pi)){alert('Este mes de gastos variables ya está inicializado. Usa el formulario de inputs.');render();return} const sec=section(secId); const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]); const after=num(v); if(pi==='initial')sec.rows[ri][2]=after; else sec.rows[ri][1][Number(pi)]=after; logInput({source:'Edición directa',secId,ri,pi,mode:'replace',amount:after,before,after,note:data.notes[cellKey(secId,ri,pi)]||'',paid:data.paid[cellKey(secId,ri,pi,'paid')]||false}); saveSilent(); render()}
+function setValue(secId,ri,pi,v){if(secId==='variable'&&pi!=='initial'&&isVariableInitialized(pi)){alert('Este mes de gastos variables ya está inicializado. Usa el formulario de inputs.');render();return} const sec=section(secId); const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]); const after=num(v); if(pi==='initial')sec.rows[ri][2]=after; else sec.rows[ri][1][Number(pi)]=after; logInput({source:'Edición directa',secId,ri,pi,mode:'replace',amount:after,before,after,note:data.notes[cellKey(secId,ri,pi)]||'',paid:data.paid[cellKey(secId,ri,pi,'paid')]||false}); saveSilent(); render()}
 function togglePaid(secId,ri,pi,checked){data.paid[cellKey(secId,ri,pi,'paid')]=!!checked;logInput({source:'Check pago fijo',secId,ri,pi,mode:'paid',amount:'',before:'',after:num(section(secId).rows[ri][1][Number(pi)]),note:checked?'Pago marcado como realizado':'Pago desmarcado',paid:!!checked});saveSilent();render()}
 function logInput(entry){data.inputLog=data.inputLog||[];const sec=section(entry.secId);const period=entry.pi==='initial'?data.initialColumnLabel:data.periods[Number(entry.pi)];data.inputLog.push({fecha:new Date().toLocaleString('es-CO'),origen:entry.source||'Formulario',seccion:sec?sec.title:entry.secId,concepto:sec&&sec.rows[entry.ri]?sec.rows[entry.ri][0]:'',periodo:period,accion:entry.mode||'',valorIngresado:entry.amount,valorAnterior:entry.before,valorFinal:entry.after,comentario:entry.note||'',pagoRealizado:entry.paid?'Sí':'No'});}
 function renameRow(secId,ri,v){section(secId).rows[ri][0]=v;saveSilent();render()}function renamePeriod(i,v){data.periods[i]=v||`Mes ${i+1}`;saveSilent();render()}function renameInitialColumn(v){data.initialColumnLabel=v||'Saldo inicial bancos';saveSilent();render()}function toggleInitialColumn(){data.showInitialColumn=!data.showInitialColumn;saveSilent();render()}
@@ -398,9 +419,11 @@ function renderSummary(c){
    kpi('Cuadre de caja - mes actual',currentIdx,c.cashCheck)+
    kpi('Saldo proyectado - último mes visible',lastVisibleIdx,c.projected)+
    kpi('Cuadre de caja - último mes visible',lastVisibleIdx,c.cashCheck);
- const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',c.variableBudget,'total'],['Total gastos variables',c.variable,'total'],['Base usada flujo GV',c.variableEffect,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
+ const summaryVariableDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?c.variable[i]:0);
+ const summaryBaseGVDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?0:c.variableEffect[i]);
+ const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',c.variableBudget,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Base usada flujo GV',summaryBaseGVDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
  let html='<thead><tr><th>Concepto</th>'+visibleIdx.map(i=>`<th>${esc(data.periods[i])}</th>`).join('')+'</tr></thead><tbody>';
- rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+visibleIdx.map(i=>`<td class="${r[1][i]<0?'negative':'positive'}">${money(r[1][i])}${r[0]==='Base usada flujo GV'?`<br><small>${isVariableInitialized(i)?'Real inicializado':'Presupuesto sin inicializar'}</small>`:''}</td>`).join('')+'</tr>'});
+ rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+visibleIdx.map(i=>`<td class="${r[1][i]<0?'negative':'positive'}">${money(r[1][i])}</td>`).join('')+'</tr>'});
  html+='</tbody>';
  const tbl=document.getElementById('summaryTable'); if(tbl) tbl.innerHTML=html;
  renderVariableBudgetSummary(c);
@@ -440,15 +463,30 @@ function normalizeFormAmount(secId,value){
  if(sec && sec.kind==='bank')v=Math.abs(v);
  return v;
 }
-function appendVariableInputNote(secId,ri,pi,amount,note,mode){
+function makeInputBullet(rec){
+ const sec=section(rec.secId);
+ const period=rec.pi==='initial'?data.initialColumnLabel:data.periods[Number(rec.pi)];
+ const concept=sec&&sec.rows[rec.ri]?sec.rows[rec.ri][0]:'';
+ const textNote=String(rec.note||'').trim();
+ return `• ${rec.fecha||new Date().toLocaleString('es-CO')} | ${period} | ${concept} | ${rec.mode==='add'?'Sumado':'Registrado'}: ${money(rec.amount)}${textNote?' | '+textNote:''}`;
+}
+function rebuildInputNotesForCell(secId,ri,pi){
+ data.notes=data.notes||{};
  const key=cellKey(secId,ri,pi);
- const sec=section(secId);
- const period=pi==='initial'?data.initialColumnLabel:data.periods[Number(pi)];
- const concept=sec&&sec.rows[ri]?sec.rows[ri][0]:'';
- const textNote=String(note||'').trim();
- const bullet=`• ${new Date().toLocaleString('es-CO')} | ${period} | ${concept} | ${mode==='add'?'Sumado':'Registrado'}: ${money(amount)}${textNote?' | '+textNote:''}`;
- const prev=String(data.notes[key]||'').trim();
- data.notes[key]=prev?prev+'\n'+bullet:bullet;
+ const bullets=activeFormInputs()
+   .filter(r=>r.secId===secId&&Number(r.ri)===Number(ri)&&String(r.pi)===String(pi))
+   .map(makeInputBullet);
+ if(bullets.length)data.notes[key]=bullets.join('\n');
+ else delete data.notes[key];
+}
+function rebuildAllInputNotes(){
+ const touched=new Set();
+ activeFormInputs().forEach(r=>touched.add(cellKey(r.secId,r.ri,r.pi)));
+ Object.keys(data.notes||{}).forEach(k=>{
+   const parts=k.split('|');
+   if(parts.length>=4 && ['variable','other'].includes(parts[0]))touched.add(cellKey(parts[0],parts[1],parts[2]));
+ });
+ touched.forEach(k=>{const [secId,ri,pi]=k.split('|');rebuildInputNotesForCell(secId,ri,pi);});
 }
 function makeInputId(){return 'inp_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
 function activeFormInputs(){data.formInputs=data.formInputs||[];return data.formInputs.filter(x=>x&&x.active!==false)}
@@ -484,14 +522,16 @@ function submitLineInput(ev){
  ev.preventDefault();
  const editingId=document.getElementById('lineInputForm').dataset.editingId||'';
  data.formInputs=data.formInputs||[];
+ let oldRec=null;
  if(editingId){
    const idx=data.formInputs.findIndex(x=>x.id===editingId&&x.active!==false);
-   if(idx>=0){applyInputRecordToModel(data.formInputs[idx],true);data.formInputs[idx].active=false;data.formInputs[idx].deletedAt=new Date().toLocaleString('es-CO');}
+   if(idx>=0){oldRec=clone(data.formInputs[idx]);applyInputRecordToModel(data.formInputs[idx],true);data.formInputs[idx].active=false;data.formInputs[idx].deletedAt=new Date().toLocaleString('es-CO');}
  }
  const rec=createInputRecordFromForm(editingId||null); if(!rec)return;
  const after=applyInputRecordToModel(rec,false); rec.after=after;
  data.formInputs.push(rec);
- appendVariableInputNote(rec.secId,rec.ri,rec.pi,rec.amount,rec.note,rec.mode);
+ if(oldRec)rebuildInputNotesForCell(oldRec.secId,oldRec.ri,oldRec.pi);
+ rebuildInputNotesForCell(rec.secId,rec.ri,rec.pi);
  logInput({source:'Formulario',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:rec.mode,amount:rec.amount,before:rec.before,after:rec.after,note:rec.note,paid:false});
  delete document.getElementById('lineInputForm').dataset.editingId;
  saveSilent();
@@ -553,6 +593,7 @@ function deleteFormInput(id){
  const rec=data.formInputs.find(x=>x.id===id&&x.active!==false); if(!rec)return;
  if(!confirm('¿Eliminar este input? El valor se retirará del modelo y no aparecerá en el informe.'))return;
  applyInputRecordToModel(rec,true); rec.active=false; rec.deletedAt=new Date().toLocaleString('es-CO');
+ rebuildInputNotesForCell(rec.secId,rec.ri,rec.pi);
  logInput({source:'Eliminación input',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:'delete',amount:rec.amount,before:rec.after,after:rec.before,note:'Input eliminado',paid:false});
  saveSilent();render();renderInputsLedger();
 }
