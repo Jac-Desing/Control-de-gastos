@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v21</title>
+<title>Modelo mensual de caja v22</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -139,6 +139,16 @@ const firebaseConfig={
 };
 let auth=null, db=null, currentUser=null, unsubscribeCloud=null, saveTimer=null, applyingCloud=false, cloudReady=false;
 function cloudDoc(){return db.collection('users').doc(currentUser.uid).collection('models').doc('principal')}
+function encodeCloudModel(model){return JSON.stringify(migrateData(model));}
+function decodeCloudModel(raw){
+  if(!raw)return null;
+  if(typeof raw==='string'){try{return JSON.parse(raw)}catch(e){console.error('No se pudo leer JSON de nube',e);return null}}
+  return raw;
+}
+function cloudModelFromSnap(snap){
+  if(!snap.exists || !snap.data())return null;
+  return decodeCloudModel(snap.data().data);
+}
 function setSync(msg,cls='sync-warn'){const el=document.getElementById('syncStatus');if(el){el.textContent=msg;el.className=cls}}
 function authStatus(msg){const el=document.getElementById('authStatus');if(el)el.textContent=msg||''}
 function initCloud(){
@@ -166,8 +176,9 @@ async function onSignedIn(user){
  const doc=cloudDoc();
  try{
    const snap=await doc.get();
-   if(snap.exists && snap.data() && usableModel(snap.data().data)){
-     data=migrateData(snap.data().data);
+   const cloudModel=cloudModelFromSnap(snap);
+   if(usableModel(cloudModel)){
+     data=migrateData(cloudModel);
      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
      render();
      setSync('Modelo cargado desde la nube','sync-ok');
@@ -175,15 +186,16 @@ async function onSignedIn(user){
      data=firstUsableLocalModel();
      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
      render();
-     await doc.set({data:migrateData(data),version:'v21',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+     await doc.set({data:encodeCloudModel(data),version:'v22',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
      setSync('Modelo base creado en la nube','sync-ok');
    }
    cloudReady=true;
    unsubscribeCloud=doc.onSnapshot(snap=>{
-     if(!snap.exists || !snap.data() || !usableModel(snap.data().data))return;
+     const cloudModel=cloudModelFromSnap(snap);
+     if(!usableModel(cloudModel))return;
      if(applyingCloud)return;
      applyingCloud=true;
-     data=migrateData(snap.data().data);
+     data=migrateData(cloudModel);
      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
      render();
      applyingCloud=false;
@@ -230,7 +242,7 @@ function queueCloudSave(){
 }
 async function saveCloudNow(){
  if(!currentUser||!db)return;
- try{await cloudDoc().set({data:migrateData(data),version:'v21',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
+ try{await cloudDoc().set({data:encodeCloudModel(data),version:'v22',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
  catch(e){setSync('No se pudo guardar','sync-bad');console.error(e);alert('No se pudo guardar en la nube. Revisa reglas de Firestore y conexión.');}
 }
 
