@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v27</title>
+<title>Modelo mensual de caja v28</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -17,6 +17,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 .input-panel{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22)}
 .input-form{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:8px;padding:0 14px 14px}.input-form label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.input-form select,.input-form input,.input-form textarea{width:100%;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:8px;font-size:13px}.input-form textarea{min-height:38px;resize:vertical}.input-form .wide{grid-column:span 2}.input-form .actions{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}.paid-label{flex-direction:row!important;align-items:center;justify-content:flex-start;gap:8px!important;padding-top:18px}.paid-label input{width:auto!important}.paid-check{display:flex;align-items:center;justify-content:center;min-width:28px}.paid-check input{width:18px;height:18px;accent-color:#22c55e}.cell.paid-done input[type="text"]{border-color:#22c55e;background:#052e16}.compact-title{font-size:12px;color:var(--muted);margin:0 14px 8px}.form-status{color:var(--accent);font-size:13px;font-weight:700}.exclusive-help{padding:0 18px 12px;color:var(--muted);font-size:13px}.exclusive-help b{color:#cbd5e1}
 @media(max-width:900px){.input-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:0 10px 12px}.input-form .wide{grid-column:span 2}.input-form .actions{grid-column:span 2}.input-form select,.input-form input,.input-form textarea{padding:7px;font-size:13px}.paid-label{padding-top:0}}
+.home-panel{min-height:calc(100vh - 90px);display:none;align-items:center;justify-content:center;padding:28px}.home-card{width:min(760px,94vw);background:rgba(17,24,39,.97);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.32)}.home-card h2{margin:0 0 8px;font-size:28px;color:#fff}.home-card p{color:var(--muted);line-height:1.45}.home-actions{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:14px;margin-top:18px}.home-actions button{min-height:92px;text-align:left;font-size:16px;background:#172554}.home-actions button span{display:block;color:#94a3b8;font-size:12px;margin-top:8px;font-weight:500}.view-home #homePanel{display:flex}.view-home main{display:none}.view-input .model-only{display:none}.view-input main{max-width:760px}.view-input .input-panel{display:block}.view-input .sheet-wrap{display:none}@media(max-width:700px){.home-actions{grid-template-columns:1fr}.home-card{padding:18px}.home-card h2{font-size:23px}}
 
 #summaryTable{width:100%;min-width:900px}#summaryTable th,#summaryTable td{padding:8px 10px;text-align:right;position:static;min-width:120px;background:transparent}#summaryTable th:first-child,#summaryTable td:first-child{text-align:left;min-width:230px;background:transparent}#summaryTable thead th{background:#0b1220;color:#cbd5e1}.result td{background:#172554!important;font-weight:800}.total td{background:#042f2e!important;font-weight:800}
 
@@ -56,6 +57,9 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 <aside id="sidePanel" class="side-panel">
   <div class="side-head"><h2>Opciones</h2><button class="secondary" onclick="toggleSidePanel(false)">×</button></div>
   <div class="side-menu">
+    <button class="primary" onclick="showAppView('home');toggleSidePanel(false)">Inicio</button>
+    <button onclick="showAppView('model');toggleSidePanel(false)">Ver modelo completo</button>
+    <button class="soft" onclick="showAppView('input');toggleSidePanel(false)">Agregar inputs</button>
     <div class="submenu">
       <div class="submenu-title">Gestión meses</div>
       <button class="primary side-menu-btn" onclick="addPeriod();toggleSidePanel(false)">+ Agregar mes</button>
@@ -80,6 +84,16 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
     <input id="importFile" type="file" accept="application/json" hidden onchange="importJSON(event)">
   </div>
 </aside>
+<section id="homePanel" class="home-panel">
+  <div class="home-card">
+    <h2>¿Qué quieres hacer?</h2>
+    <p>Selecciona una opción. En celular puedes entrar directamente al formulario de inputs sin cargar visualmente todo el modelo.</p>
+    <div class="home-actions">
+      <button type="button" onclick="showAppView('model')">Ver modelo completo <span>Resumen, flujo de caja, secciones, meses e informes.</span></button>
+      <button type="button" class="soft" onclick="showAppView('input')">Agregar inputs <span>Formulario rápido para gastos variables y otros movimientos.</span></button>
+    </div>
+  </div>
+</section>
 <main>
   <div class="note"><b>Lógica del modelo:</b> ingresos negativos, gastos positivos. Saldo negativo = superávit de caja; saldo positivo = déficit/faltante. Los saldos bancarios se digitan positivos, pero el sistema los totaliza negativos para compararlos contra caja.</div>
 
@@ -119,11 +133,11 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
       </div>
     </form>
   </section>
-  <div class="summary" id="summary"></div>
-  <section class="panel"><div class="panelTitle"><h2>Resumen por mes</h2><span>Se recalcula automáticamente con la lógica original del Excel.</span></div><div class="tableWrap"><table id="summaryTable"></table></div></section>
-  <section class="panel"><div class="panelTitle"><h2>Control presupuesto gastos variables</h2><span>Compara presupuesto inicializado contra ejecución real por inputs.</span></div><div class="tableWrap"><table id="variableBudgetSummaryTable" class="budget-summary-table"></table></div></section>
-  <div class="formula-help">El saldo inicial de bancos no aparece en los totales superiores; se aplica directamente al primer saldo proyectado.</div>
-  <div class="sheet-wrap"><table id="modelTable"></table></div>
+  <div class="summary model-only" id="summary"></div>
+  <section class="panel model-only"><div class="panelTitle"><h2>Resumen por mes</h2><span>Se recalcula automáticamente con la lógica original del Excel.</span></div><div class="tableWrap"><table id="summaryTable"></table></div></section>
+  <section class="panel model-only"><div class="panelTitle"><h2>Control presupuesto gastos variables</h2><span>Compara presupuesto inicializado contra ejecución real por inputs.</span></div><div class="tableWrap"><table id="variableBudgetSummaryTable" class="budget-summary-table"></table></div></section>
+  <div class="formula-help model-only">El saldo inicial de bancos no aparece en los totales superiores; se aplica directamente al primer saldo proyectado.</div>
+  <div class="sheet-wrap model-only"><table id="modelTable"></table></div>
 </main>
 <div class="modal" id="monthsModal"><div class="modal-card"><h3>Mostrar u ocultar meses</h3><p style="color:#94a3b8;margin-top:-8px">Selecciona los meses que quieres ver. Los meses ocultos conservan sus datos y siguen haciendo parte del modelo.</p><div id="monthsVisibilityList" style="display:grid;gap:8px;margin:12px 0;max-height:50vh;overflow:auto"></div><div class="modal-actions"><button class="secondary" onclick="showAllPeriods()">Mostrar todos</button><button class="secondary" onclick="closeMonthsModal(false)">Cancelar</button><button onclick="closeMonthsModal(true)">Aplicar</button></div></div></div>
 
@@ -193,7 +207,7 @@ function firstUsableLocalModel(){
  return clone(baseData);
 }
 async function onSignedIn(user){
- currentUser=user; cloudReady=false; document.body.classList.remove('locked');
+ currentUser=user; cloudReady=false; document.body.classList.remove('locked'); if(!document.body.classList.contains('view-model')&&!document.body.classList.contains('view-input'))document.body.classList.add('view-home');
  const u=document.getElementById('cloudUser'); if(u)u.textContent=user.email||user.uid;
  setSync('Cargando nube...','sync-warn');
  if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null;}
@@ -210,7 +224,7 @@ async function onSignedIn(user){
      data=firstUsableLocalModel();
      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
      render();
-     await doc.set({data:encodeCloudModel(data),version:'v25',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+     await doc.set({data:encodeCloudModel(data),version:'v28',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
      setSync('Modelo base creado en la nube','sync-ok');
    }
    cloudReady=true;
@@ -234,7 +248,7 @@ async function onSignedIn(user){
 }
 function onSignedOut(){
  currentUser=null; cloudReady=false; if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null;}
- document.body.classList.add('locked'); setSync('Sin sesión','sync-warn');
+ document.body.classList.add('locked'); document.body.classList.remove('view-home','view-model','view-input'); setSync('Sin sesión','sync-warn');
  const u=document.getElementById('cloudUser'); if(u)u.textContent='—';
 }
 async function signInCloud(){
@@ -266,7 +280,7 @@ function queueCloudSave(){
 }
 async function saveCloudNow(){
  if(!currentUser||!db)return;
- try{await cloudDoc().set({data:encodeCloudModel(data),version:'v25',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
+ try{await cloudDoc().set({data:encodeCloudModel(data),version:'v28',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
  catch(e){setSync('No se pudo guardar','sync-bad');console.error(e);alert('No se pudo guardar en la nube. Revisa reglas de Firestore y conexión.');}
 }
 
@@ -320,7 +334,7 @@ function ensureVariableInitState(model){
  while(model.variableInitialized.length<(model.periods||[]).length)model.variableInitialized.push(false);
 }
 function isVariableInitialized(pi){ensureVariableInitState(data);return !!data.variableInitialized[Number(pi)]}
-function variableBudgetValue(pi){const sec=section('variableBudget');return sec&&sec.rows[0]?num(sec.rows[0][1][Number(pi)]):0}
+function variableBudgetValue(pi){pi=Number(pi);const sec=section('variableBudget');if(!isVariableInitialized(pi))return rowSum(section('variable'),pi);return sec&&sec.rows[0]?num(sec.rows[0][1][pi]):0}
 function rebuildAllInputNotesForModel(model){
  if(!model||!Array.isArray(model.formInputs))return;
  const old=data;
@@ -370,11 +384,11 @@ function sectionTitleRow(title, initialVisible){
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
- sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
+ sec.rows.forEach((r,ri)=>{const budgetConceptLocked=sec.id==='variableBudget';html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" ${budgetConceptLocked?'readonly title="Concepto automático"':''} onchange="renameRow('${sec.id}',${ri},this.value)">${budgetConceptLocked?'':`<span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span>`}</div></td>`;
  if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
- for(const pi of visibleIdx)html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,r[1][pi])}</td>`;
+ for(const pi of visibleIdx){const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
  html+='</tr>'});
- html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
+ if(sec.id!=='variableBudget')html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
  html+='</tbody>';t.innerHTML=html;}
 function inputCell(sec,ri,pi,val){
@@ -382,8 +396,11 @@ function inputCell(sec,ri,pi,val){
  const shown=formatNumber(val);
  const isPaidCell=(sec==='fixed'&&pi!=='initial');
  const paid=data.paid[cellKey(sec,ri,pi,'paid')];
- const locked=(sec==='variable'&&pi!=='initial'&&isVariableInitialized(pi));
- const readonly=locked?'readonly title="Mes inicializado: editar solo por inputs"':'';
+ const isBudgetCell=(sec==='variableBudget'&&pi!=='initial');
+ const isInitLocked=(pi!=='initial'&&isVariableInitialized(pi)&&(sec==='variable'||sec==='other'));
+ const locked=isBudgetCell||isInitLocked;
+ const lockTitle=isBudgetCell?'Presupuesto automático: se calcula desde gastos variables antes de inicializar y queda fijo después':'Mes inicializado: editar solo por inputs';
+ const readonly=locked?`readonly title="${lockTitle}"`:'';
  const focus=locked?'this.blur()':'this.value=rawEditValue(this.value);this.select()';
  const blur=locked?'':`onblur="setValue('${sec}',${ri},'${pi}',this.value)"`;
  return `<div class="cell ${paid?'paid-done':''}${locked?' locked-cell':''}">${isPaidCell?`<span class="paid-check"><input type="checkbox" ${paid?'checked':''} title="Pago realizado" onchange="togglePaid('${sec}',${ri},'${pi}',this.checked)"></span>`:''}<input type="text" inputmode="decimal" value="${esc(shown)}" ${readonly} onfocus="${focus}" ${blur}><button title="Comentario" class="note-btn ${has}" onclick="openNote('${sec}',${ri},'${pi}')">●</button></div>`
@@ -391,7 +408,7 @@ function inputCell(sec,ri,pi,val){
 function totalRow(label,arr){return `<tr class="total-row"><td>${label}</td><td></td>`+arr.map(v=>`<td class="money ${v<0?'negative':'positive'}">${money(v)}</td>`).join('')+'</tr>'}
 function calcRow(label,arr,flag=false){return `<tr class="calc-row"><td>${label}</td><td></td>`+arr.map(v=>`<td class="money ${v<0?'negative':'positive'}">${money(v)}${flag?`<br><small>${v<0?'Superávit':'Déficit'}</small>`:''}</td>`).join('')+'</tr>'}
 function bankTotalRows(c){return `<tr class="total-row"><td>Total saldos bancos reales</td><td class="money negative">${money(initialBankTotal())}</td>`+c.banks.map(v=>`<td class="money negative">${money(v)}</td>`).join('')+'</tr>'}
-function setValue(secId,ri,pi,v){if(secId==='variable'&&pi!=='initial'&&isVariableInitialized(pi)){alert('Este mes de gastos variables ya está inicializado. Usa el formulario de inputs.');render();return} const sec=section(secId); const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]); const after=num(v); if(pi==='initial')sec.rows[ri][2]=after; else sec.rows[ri][1][Number(pi)]=after; logInput({source:'Edición directa',secId,ri,pi,mode:'replace',amount:after,before,after,note:data.notes[cellKey(secId,ri,pi)]||'',paid:data.paid[cellKey(secId,ri,pi,'paid')]||false}); saveSilent(); render()}
+function setValue(secId,ri,pi,v){if(secId==='variableBudget'&&pi!=='initial'){alert('El presupuesto de gastos variables es automático y no se edita manualmente.');render();return} if(['variable','other'].includes(secId)&&pi!=='initial'&&isVariableInitialized(pi)){alert('Este mes ya está inicializado. Usa el formulario de inputs.');render();return} const sec=section(secId); const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]); const after=num(v); if(pi==='initial')sec.rows[ri][2]=after; else sec.rows[ri][1][Number(pi)]=after; logInput({source:'Edición directa',secId,ri,pi,mode:'replace',amount:after,before,after,note:data.notes[cellKey(secId,ri,pi)]||'',paid:data.paid[cellKey(secId,ri,pi,'paid')]||false}); saveSilent(); render()}
 function togglePaid(secId,ri,pi,checked){data.paid[cellKey(secId,ri,pi,'paid')]=!!checked;logInput({source:'Check pago fijo',secId,ri,pi,mode:'paid',amount:'',before:'',after:num(section(secId).rows[ri][1][Number(pi)]),note:checked?'Pago marcado como realizado':'Pago desmarcado',paid:!!checked});saveSilent();render()}
 function logInput(entry){data.inputLog=data.inputLog||[];const sec=section(entry.secId);const period=entry.pi==='initial'?data.initialColumnLabel:data.periods[Number(entry.pi)];data.inputLog.push({fecha:new Date().toLocaleString('es-CO'),origen:entry.source||'Formulario',seccion:sec?sec.title:entry.secId,concepto:sec&&sec.rows[entry.ri]?sec.rows[entry.ri][0]:'',periodo:period,accion:entry.mode||'',valorIngresado:entry.amount,valorAnterior:entry.before,valorFinal:entry.after,comentario:entry.note||'',pagoRealizado:entry.paid?'Sí':'No'});}
 function renameRow(secId,ri,v){section(secId).rows[ri][0]=v;saveSilent();render()}function renamePeriod(i,v){data.periods[i]=v||`Mes ${i+1}`;saveSilent();render()}function renameInitialColumn(v){data.initialColumnLabel=v||'Saldo inicial bancos';saveSilent();render()}function toggleInitialColumn(){data.showInitialColumn=!data.showInitialColumn;saveSilent();render()}
@@ -669,6 +686,16 @@ function toggleSidePanel(show){
  const panel=document.getElementById('sidePanel'), backdrop=document.getElementById('sideBackdrop');
  const open=show==null?!panel.classList.contains('open'):!!show;
  panel.classList.toggle('open',open);backdrop.classList.toggle('open',open);
+}
+
+
+function showAppView(view){
+ const allowed=['home','model','input']; if(!allowed.includes(view))view='home';
+ document.body.classList.remove('view-home','view-model','view-input');
+ document.body.classList.add('view-'+view);
+ if(view==='input')renderInputForm();
+ if(view==='model')render();
+ window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function saveSilent(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));queueCloudSave()}

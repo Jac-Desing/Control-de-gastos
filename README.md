@@ -1,13 +1,11 @@
-# App web modelo v27
+# App web modelo v28
 
-Versión basada en la v26 cloud.
+Versión cloud basada en v27.
 
-Ajustes aplicados:
-- En el resumen superior, **Ppto gastos variables** solo muestra valor y afecta el flujo cuando el mes no está inicializado.
-- En el resumen superior, **Total gastos variables** solo muestra valor y afecta el flujo cuando el mes ya está inicializado.
-- Los dos campos son excluyentes por mes.
-- Se mantiene el cálculo interno del flujo: presupuesto antes de inicializar y gasto real después de inicializar.
-- Se agrega botón directo **Ver inputs registrados** desde el formulario de inputs.
-- Se conserva compatibilidad con Firebase/Firestore v22+ usando `users/{uid}/models/principal` y campo `data` serializado como JSON.
-
-Para actualizar GitHub Pages, sube `index.html` y `README.md` reemplazando los existentes.
+Cambios principales:
+- Menú inicial después del login: Ver modelo completo o Agregar inputs.
+- En vista móvil se puede abrir solo el formulario de inputs.
+- Ppto Gastos Variables se calcula automáticamente desde Gastos variables antes de inicializar el mes.
+- Al inicializar el mes, el presupuesto queda fijo, Gastos variables queda en cero y bloqueado.
+- Otros movimientos queda editable manualmente solo mientras el mes no esté inicializado; después solo cambia por inputs.
+- Se mantiene sincronización Firebase/Firestore y compatibilidad con datos previos.
