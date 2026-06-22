@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v30</title>
+<title>Modelo mensual de caja v31</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -30,6 +30,23 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 .locked-cell input[type="text"]{background:#1f2937!important;color:#94a3b8!important;border-color:#475569!important;cursor:not-allowed}.init-badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid #475569;background:#1e293b;color:#cbd5e1}.init-badge.ok{background:#064e3b;border-color:#047857;color:#bbf7d0}.budget-summary-table{width:100%;min-width:760px}.budget-summary-table th,.budget-summary-table td{position:static!important;padding:8px 10px;text-align:right;min-width:140px;background:transparent}.budget-summary-table th:first-child,.budget-summary-table td:first-child{text-align:left;min-width:210px}.budget-summary-table thead th{background:#0b1220;color:#cbd5e1}.side-menu .divider{height:1px;background:#334155;margin:4px 0}.inline-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.month-init-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px;margin-bottom:8px}
 
 @media(max-width:900px){header{align-items:center}.cloudbar{justify-content:flex-start}.summary{grid-template-columns:1fr}.panelTitle{display:block}main{padding:14px}th:first-child,td:first-child{min-width:210px}.side-panel{width:min(86vw,320px)}}
+
+/* v31: interfaz escritorio/móvil, estados de mes y diálogos operativos */
+@media(min-width:901px){
+  .input-panel{max-width:980px;margin-left:auto;margin-right:auto}
+  .input-form{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:0 18px 18px;align-items:end}
+  .input-form .wide{grid-column:span 2}
+  .input-form .actions{grid-column:1 / -1;display:flex;justify-content:flex-start;align-items:center;gap:10px}
+  .input-form textarea{min-height:54px}
+  .input-form label{font-size:12px}
+}
+.modal-card.wide-modal{max-width:980px}.modal-card.tall-modal{max-height:88vh;overflow:auto}
+.month-state{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid #475569;background:#1e293b;color:#cbd5e1}
+.month-state.init{background:#064e3b;border-color:#047857;color:#bbf7d0}.month-state.closed{background:#7f1d1d;border-color:#ef4444;color:#fecaca}
+.closed-cell input[type="text"],.closed-cell .note-btn{opacity:.55;cursor:not-allowed!important}
+.merge-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.merge-grid label{display:flex;flex-direction:column;gap:6px;color:#94a3b8;font-weight:800;font-size:12px}.merge-grid select{border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:10px}
+.close-open-list{display:grid;gap:10px;max-height:55vh;overflow:auto}.close-open-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:10px}
+@media(max-width:700px){.close-open-row{grid-template-columns:1fr}.merge-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="locked">
@@ -65,6 +82,8 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
       <button class="primary side-menu-btn" onclick="addPeriod();toggleSidePanel(false)">+ Agregar mes</button>
       <button class="side-menu-btn" onclick="openMonthsModal();toggleSidePanel(false)">Ocultar/Mostrar mes</button>
       <button class="side-menu-btn" onclick="openVariableInitModal();toggleSidePanel(false)">Inicializar mes gastos variables</button>
+      <button class="side-menu-btn" onclick="openCloseMonthModal();toggleSidePanel(false)">Cerrar mes</button>
+      <button class="side-menu-btn" onclick="openOpenMonthModal();toggleSidePanel(false)">Abrir mes</button>
       <button class="side-menu-btn" onclick="toggleInitialColumn();toggleSidePanel(false)" id="toggleInitialBtn">Ocultar saldo inicial</button>
     </div>
     <div class="submenu">
@@ -76,6 +95,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
     <div class="submenu">
       <div class="submenu-title">Conceptos</div>
       <button class="side-menu-btn" onclick="openConceptModal(false);toggleSidePanel(false)">Crear concepto variable/otros</button>
+      <button class="side-menu-btn" onclick="openMergeConceptModal();toggleSidePanel(false)">Fusionar conceptos</button>
     </div>
     <div class="submenu">
       <div class="submenu-title">Modelo y respaldo</div>
@@ -133,6 +153,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
         <button id="inputSubmitBtn" type="submit" class="soft">Aplicar al modelo</button>
         <button id="cancelEditBtn" type="button" class="danger" style="display:none" onclick="cancelInputEdit()">Cancelar edición</button>
         <button type="button" class="secondary" onclick="clearLineInputForm()">Limpiar</button>
+        <button type="button" class="secondary" onclick="openVariableInitModal()">Inicializar mes</button>
         <button type="button" class="secondary" onclick="openConceptModal(true)">Crear concepto</button>
         <button type="button" class="secondary" onclick="openInputsLedgerModal()">Ver inputs registrados</button>
         <span id="formStatus" class="form-status"></span>
@@ -153,6 +174,10 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 
 <div class="modal" id="inputsLedgerModal"><div class="modal-card wide-modal tall-modal"><h3>Inputs registrados activos</h3><p style="color:#94a3b8;margin-top:-8px">Consulta, edita o elimina inputs activos. Los eliminados no aparecen en el informe de inputs.</p><div class="ledger-wrap"><table id="inputsLedgerTable" class="ledger-table"></table></div><div class="modal-actions"><button class="secondary" onclick="closeInputsLedgerModal()">Cerrar</button></div></div></div>
 <div class="modal" id="variableInitModal"><div class="modal-card tall-modal"><h3>Inicializar gastos variables por mes</h3><p style="color:#94a3b8;margin-top:-8px">Al inicializar un mes, el total actual de Gastos variables pasa a Presupuestos Gastos variables / Ppto Gastos Variables; luego los valores de gastos variables se ponen en cero y quedan bloqueados para edición manual. Desde ese momento solo se actualizan por inputs.</p><div id="variableInitList"></div><div class="modal-actions"><button class="secondary" onclick="closeVariableInitModal()">Cerrar</button></div></div></div>
+
+<div class="modal" id="closeMonthModal"><div class="modal-card tall-modal"><h3>Cerrar mes</h3><p style="color:#94a3b8;margin-top:-8px">Solo se puede cerrar un mes cuando ya pasó su último día calendario. Al cerrar, se bloquea edición e inputs y se crea un respaldo independiente con corte a la fecha de cierre.</p><div id="closeMonthList" class="close-open-list"></div><div class="modal-actions"><button class="secondary" onclick="closeCloseMonthModal()">Cerrar</button></div></div></div>
+<div class="modal" id="openMonthModal"><div class="modal-card tall-modal"><h3>Abrir mes cerrado</h3><p style="color:#fecaca;margin-top:-8px">Advertencia: al abrir un mes cerrado se permitirá editar información histórica. Úsalo solo para correcciones controladas.</p><div id="openMonthList" class="close-open-list"></div><div class="modal-actions"><button class="secondary" onclick="closeOpenMonthModal()">Cerrar</button></div></div></div>
+<div class="modal" id="mergeConceptModal"><div class="modal-card"><h3>Fusionar conceptos</h3><p style="color:#94a3b8;margin-top:-8px">Mueve valores, inputs y notas del concepto origen al concepto destino. El informe de inputs quedará relacionado al concepto final.</p><div class="merge-grid"><label>Sección<select id="mergeSection" onchange="refreshMergeConceptOptions()"><option value="variable">Gastos variables</option><option value="other">Otros movimientos</option></select></label><label>Concepto origen<select id="mergeSource"></select></label><label>Concepto destino<select id="mergeTarget"></select></label></div><div class="modal-actions"><button class="secondary" onclick="closeMergeConceptModal()">Cancelar</button><button class="soft" onclick="mergeConcepts()">Fusionar</button></div></div></div>
 <div class="modal" id="noteModal"><div class="modal-card"><h3>Comentario de celda</h3><p id="noteTarget" style="color:#64748b;margin-top:-8px"></p><textarea id="noteText" placeholder="Escribe una nota aclaratoria..."></textarea><div class="modal-actions"><button class="secondary" onclick="closeNote(false)">Cancelar</button><button onclick="closeNote(true)">Guardar nota</button></div></div></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -317,8 +342,6 @@ function migrateData(d){
  if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[];
  if(!d.columnWidths)d.columnWidths={concept:250,initial:130,periods:{}};
  if(!d.columnWidths.periods)d.columnWidths.periods={};
- if(!d.collapsedSections)d.collapsedSections={};
- if(d.summaryCollapsed==null)d.summaryCollapsed=false;
  ensureVariableBudgetSection(d);
  ensureVariableInitState(d);
  rebuildAllInputNotesForModel(d);
@@ -390,15 +413,12 @@ function visiblePeriodIndexes(){return data.periods.map((_,i)=>i).filter(i=>!dat
 function visiblePeriods(){return visiblePeriodIndexes().map(i=>data.periods[i])}
 function isPeriodVisible(i){return !data.hiddenPeriods.includes(i)}
 function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th style="${colStyle('initial')}"><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small><span class="resizer" onmousedown="startColumnResize(event,'initial')"></span></th>`:'';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
-function sectionTitleRow(sec, initialVisible){
+function sectionTitleRow(title, initialVisible){
  const extraCells=visibleIdx.length+(initialVisible?1:0);
- const collapsed=!!(data.collapsedSections&&data.collapsedSections[sec.id]);
- return `<tr class="section-title"><td style="${colStyle('concept')}"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button>${esc(sec.title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
+ return `<tr class="section-title"><td style="${colStyle('concept')}">${esc(title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
 }
 
- data.sections.forEach(sec=>{html+=sectionTitleRow(sec, initialVisible);
- const collapsed=!!(data.collapsedSections&&data.collapsedSections[sec.id]);
- if(collapsed){html+=`<tr><td class="collapsed-note" colspan="${visibleIdx.length+(initialVisible?2:1)}">Sección contraída. Pulsa + para expandir.</td></tr>`;return;}
+ data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
  sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
  if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
  for(const pi of visibleIdx){const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
@@ -411,7 +431,7 @@ function inputCell(sec,ri,pi,val){
  const shown=formatNumber(val);
  const isPaidCell=(sec==='fixed'&&pi!=='initial');
  const paid=data.paid[cellKey(sec,ri,pi,'paid')];
- const locked=(['variable','other'].includes(sec)&&pi!=='initial'&&isVariableInitialized(pi));
+ const locked=(sec==='variable'&&pi!=='initial'&&isVariableInitialized(pi));
  const readonly=locked?'readonly title="Mes inicializado: editar solo por inputs"':'';
  const focus=locked?'this.blur()':'this.value=rawEditValue(this.value);this.select()';
  const blur=locked?'':`onblur="setValue('${sec}',${ri},'${pi}',this.value)"`;
@@ -424,8 +444,6 @@ function setValue(secId,ri,pi,v){if(secId==='variableBudget'&&pi!=='initial'){al
 function togglePaid(secId,ri,pi,checked){data.paid[cellKey(secId,ri,pi,'paid')]=!!checked;logInput({source:'Check pago fijo',secId,ri,pi,mode:'paid',amount:'',before:'',after:num(section(secId).rows[ri][1][Number(pi)]),note:checked?'Pago marcado como realizado':'Pago desmarcado',paid:!!checked});saveSilent();render()}
 function logInput(entry){data.inputLog=data.inputLog||[];const sec=section(entry.secId);const period=entry.pi==='initial'?data.initialColumnLabel:data.periods[Number(entry.pi)];data.inputLog.push({fecha:new Date().toLocaleString('es-CO'),origen:entry.source||'Formulario',seccion:sec?sec.title:entry.secId,concepto:sec&&sec.rows[entry.ri]?sec.rows[entry.ri][0]:'',periodo:period,accion:entry.mode||'',valorIngresado:entry.amount,valorAnterior:entry.before,valorFinal:entry.after,comentario:entry.note||'',pagoRealizado:entry.paid?'Sí':'No'});}
 function renameRow(secId,ri,v){section(secId).rows[ri][0]=v;saveSilent();render()}function renamePeriod(i,v){data.periods[i]=v||`Mes ${i+1}`;saveSilent();render()}function renameInitialColumn(v){data.initialColumnLabel=v||'Saldo inicial bancos';saveSilent();render()}function toggleInitialColumn(){data.showInitialColumn=!data.showInitialColumn;saveSilent();render()}
-function toggleSectionCollapsed(secId){data.collapsedSections=data.collapsedSections||{};data.collapsedSections[secId]=!data.collapsedSections[secId];saveSilent();render()}
-function toggleSummaryCollapsed(){data.summaryCollapsed=!data.summaryCollapsed;saveSilent();render()}
 function addRow(secId,pos){const sec=section(secId);const row=['Nuevo concepto',Array(data.periods.length).fill(0)];if(sec.kind==='bank')row.push(0);sec.rows.splice(pos==null?sec.rows.length:pos,0,row);saveSilent();render()}
 function deleteRow(secId,ri){if(section(secId).rows.length<=1){alert('Debe quedar al menos un concepto en la sección.');return} if(confirm('¿Eliminar este concepto?')){section(secId).rows.splice(ri,1);saveSilent();render()}}
 function addPeriod(){let name=prompt('Nombre del nuevo mes/periodo:',nextMonthName(data.periods[data.periods.length-1])); if(!name)return; data.periods.push(name);data.sections.forEach(s=>s.rows.forEach(r=>r[1].push(0)));ensureVariableInitState(data);saveSilent();render()}
@@ -453,9 +471,7 @@ function renderSummary(c){
    kpi('Cuadre de caja - último mes visible',lastVisibleIdx,c.cashCheck);
  const summaryBudgetDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?0:c.variableBudget[i]);
  const summaryVariableDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?c.variable[i]:0);
- let rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',summaryBudgetDisplay,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
- const st=document.getElementById('summaryToggleBtn'); if(st)st.textContent=data.summaryCollapsed?'+':'−';
- if(data.summaryCollapsed)rows=rows.filter(r=>['Saldo proyectado','Total saldos bancos','Cuadre de caja'].includes(r[0]));
+ const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',summaryBudgetDisplay,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
  let html='<thead><tr><th>Concepto</th>'+visibleIdx.map(i=>`<th>${esc(data.periods[i])}</th>`).join('')+'</tr></thead><tbody>';
  rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+visibleIdx.map(i=>`<td class="${r[1][i]<0?'negative':'positive'}">${money(r[1][i])}</td>`).join('')+'</tr>'});
  html+='</tbody>';
@@ -475,9 +491,7 @@ function renderInputForm(){
  if(!secInput)return;
  if(!['variable','other'].includes(secInput.value))secInput.value='variable';
  updateConceptSelect();
- updateInputEditUi();
 }
-
 function updateConceptSelect(){
  const secInput=document.getElementById('formSection'), conceptSelect=document.getElementById('formConcept'), periodSelect=document.getElementById('formPeriod');
  if(!secInput||!conceptSelect||!periodSelect)return;
@@ -574,8 +588,7 @@ function createInputRecordFromForm(existingId=null){
    return null;
  }
  const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]);
- const editingId=document.getElementById('lineInputForm').dataset.editingId||'';
- const mode=editingId?'replace':'add';
+ const mode=document.getElementById('formMode').value;
  const amount=normalizeFormAmount(secId,raw);
  const note=document.getElementById('formNote').value.trim();
  return {id:existingId||makeInputId(),active:true,fecha:new Date().toLocaleString('es-CO'),secId,ri,pi,mode,amount,before,after:null,note};
@@ -597,7 +610,6 @@ function submitLineInput(ev){
  rebuildInputNotesForCell(rec.secId,rec.ri,rec.pi);
  logInput({source:'Formulario',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:rec.mode,amount:rec.amount,before:rec.before,after:rec.after,note:rec.note,paid:false});
  delete document.getElementById('lineInputForm').dataset.editingId;
- updateInputEditUi();
  saveSilent();
  clearLineInputForm(true);
  render();
@@ -606,29 +618,17 @@ function submitLineInput(ev){
  setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
 }
 function clearLineInputForm(keepStatus=false){
- if(isEditingInput()&&!keepStatus){alert('Primero debes guardar o cancelar la edición del input.');return}
  const amount=document.getElementById('formAmount'), note=document.getElementById('formNote'), status=document.getElementById('formStatus'), paid=document.getElementById('formPaid');
  if(amount)amount.value=''; if(note)note.value=''; if(paid)paid.checked=false; if(status&&!keepStatus)status.textContent='';
  validateInputMonthSelection();
- updateInputEditUi();
 }
-function isEditingInput(){const f=document.getElementById('lineInputForm');return !!(f&&f.dataset.editingId)}
-function updateInputEditUi(){
- const editing=isEditingInput(); const panel=document.getElementById('inputPanel'); if(panel){panel.classList.toggle('editing-mode',editing);panel.classList.toggle('normal-mode',!editing)}
- const mode=document.getElementById('formMode'); if(mode)mode.value=editing?'replace':'add';
- const submit=document.getElementById('inputSubmitBtn'); if(submit)submit.textContent=editing?'Guardar edición':'Aplicar al modelo';
- const cancel=document.getElementById('cancelEditBtn'); if(cancel)cancel.style.display=editing?'inline-block':'none';
-}
-function cancelInputEdit(){delete document.getElementById('lineInputForm').dataset.editingId;clearLineInputForm(true);setFormStatus('Edición cancelada.','warn');updateInputEditUi();}
-function blockIfEditing(){if(isEditingInput()){alert('Termina la edición actual: guarda o cancela antes de continuar.');return true}return false}
 
 
 
 
-
-function openInputsLedgerModal(){if(blockIfEditing())return;renderInputsLedger();document.getElementById('inputsLedgerModal').classList.add('open')}
+function openInputsLedgerModal(){renderInputsLedger();document.getElementById('inputsLedgerModal').classList.add('open')}
 function closeInputsLedgerModal(){document.getElementById('inputsLedgerModal').classList.remove('open')}
-function openVariableInitModal(){if(blockIfEditing())return;renderVariableInitModal();document.getElementById('variableInitModal').classList.add('open')}
+function openVariableInitModal(){renderVariableInitModal();document.getElementById('variableInitModal').classList.add('open')}
 function closeVariableInitModal(){document.getElementById('variableInitModal').classList.remove('open')}
 function renderVariableInitModal(){
  const c=calculations(); const list=document.getElementById('variableInitList'); if(!list)return;
@@ -655,17 +655,14 @@ function renderInputsLedger(){
 }
 function editFormInput(id){
  const rec=activeFormInputs().find(x=>x.id===id); if(!rec)return;
- closeInputsLedgerModal();
- if(document.body.classList.contains('view-model'))openInputFormModal(); else showAppView('input');
  document.getElementById('formSection').value=rec.secId; updateConceptSelect();
  document.getElementById('formConcept').value=String(rec.ri);
  document.getElementById('formPeriod').value=String(rec.pi);
  document.getElementById('formAmount').value=formatNumber(rec.amount);
- document.getElementById('formMode').value='replace';
+ document.getElementById('formMode').value=rec.mode||'add';
  document.getElementById('formNote').value=rec.note||'';
  document.getElementById('lineInputForm').dataset.editingId=id;
- updateInputEditUi();
- setFormStatus('Editando input existente. Guarda o cancela la edición antes de continuar.','warn');
+ document.getElementById('formStatus').textContent='Editando input existente';
  window.scrollTo({top:0,behavior:'smooth'});
 }
 function deleteFormInput(id){
@@ -702,7 +699,6 @@ function promptColumnWidths(){
  saveSilent();render();
 }
 function openMonthsModal(){
- if(blockIfEditing())return;
  const list=document.getElementById('monthsVisibilityList');
  list.innerHTML=data.periods.map((p,i)=>`<label style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px"><input type="checkbox" data-period-index="${i}" ${isPeriodVisible(i)?'checked':''} style="width:18px;height:18px;accent-color:#22c55e"><span>${esc(p)}</span></label>`).join('');
  document.getElementById('monthsModal').classList.add('open');
@@ -746,53 +742,14 @@ function exportInputLogExcel(){
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='historial-cambios-modelo.xls';a.click();URL.revokeObjectURL(a.href);
 }
 function toggleSidePanel(show){
- if(show&&blockIfEditing())return;
  const panel=document.getElementById('sidePanel'), backdrop=document.getElementById('sideBackdrop');
  const open=show==null?!panel.classList.contains('open'):!!show;
  panel.classList.toggle('open',open);backdrop.classList.toggle('open',open);
 }
 
 
-
-function openInputFormModal(){
- if(blockIfEditing())return;
- const panel=document.getElementById('inputPanel'), body=document.getElementById('inputFormModalBody');
- if(panel&&body){body.appendChild(panel);document.getElementById('inputFormModal').classList.add('open');renderInputForm();}
-}
-function closeInputFormModal(){
- if(blockIfEditing())return;
- const panel=document.getElementById('inputPanel'), main=document.querySelector('main'), note=document.querySelector('main .note');
- if(panel&&main){main.insertBefore(panel, note?note.nextSibling:main.firstChild);}
- document.getElementById('inputFormModal').classList.remove('open');
-}
-let conceptReturnToInput=false;
-function openConceptModal(returnToInput=false){
- if(blockIfEditing())return;
- conceptReturnToInput=!!returnToInput;
- const n=document.getElementById('newConceptName'); if(n)n.value='';
- document.getElementById('conceptModal').classList.add('open');
- setTimeout(()=>{const el=document.getElementById('newConceptName'); if(el)el.focus();},50);
-}
-function closeConceptModal(){document.getElementById('conceptModal').classList.remove('open')}
-function saveNewConceptFromModal(){
- const secId=document.getElementById('newConceptSection').value;
- const name=(document.getElementById('newConceptName').value||'').trim();
- if(!['variable','other'].includes(secId)){alert('Sección inválida.');return}
- if(!name){alert('Escribe el nombre del concepto.');return}
- const sec=section(secId); if(!sec)return;
- sec.rows.push([name,Array(data.periods.length).fill(0)]);
- saveSilent();render();
- document.getElementById('formSection').value=secId;updateConceptSelect();document.getElementById('formConcept').value=String(sec.rows.length-1);
- closeConceptModal();
- if(conceptReturnToInput)setFormStatus('Concepto creado y seleccionado.','ok');
-}
-
 function showAppView(view){
- if(blockIfEditing())return;
  const allowed=['home','model','input']; if(!allowed.includes(view))view='home';
- const panel=document.getElementById('inputPanel'), main=document.querySelector('main'), note=document.querySelector('main .note');
- if(panel&&main&&!document.getElementById('inputFormModal').classList.contains('open'))main.insertBefore(panel, note?note.nextSibling:main.firstChild);
- document.getElementById('inputFormModal').classList.remove('open');
  document.body.classList.remove('view-home','view-model','view-input');
  document.body.classList.add('view-'+view);
  if(view==='input')renderInputForm();
@@ -805,6 +762,99 @@ function resetData(){if(confirm('Esto restaurará el modelo base y sincronizará
 function exportJSON(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo-modelo-caja.json';a.click();URL.revokeObjectURL(a.href)}
 function importJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{data=migrateData(JSON.parse(r.result));saveSilent();render()}catch(e){alert('Archivo de respaldo inválido')}};r.readAsText(f)}
 function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+
+/* ===================== v31 overrides ===================== */
+const VERSION_LABEL='v31';
+function ensureMonthStatusState(model=data){
+  model.monthClosed=Array.isArray(model.monthClosed)?model.monthClosed:[];
+  model.monthClosedBackups=model.monthClosedBackups||{};
+  model.monthClosedMeta=model.monthClosedMeta||{};
+  while(model.monthClosed.length<(model.periods||[]).length)model.monthClosed.push(false);
+}
+const _v31_oldMigrate=migrateData;
+migrateData=function(d){ d=_v31_oldMigrate(d); ensureMonthStatusState(d); return d; };
+function isMonthClosed(pi){ensureMonthStatusState(data);return !!data.monthClosed[Number(pi)]}
+function monthStateLabel(pi){if(isMonthClosed(pi))return '<span class="month-state closed">Cerrado</span>'; if(isVariableInitialized(pi))return '<span class="month-state init">Inicializado</span>'; return '<span class="month-state">Abierto</span>';}
+function parsePeriodEndDate(label){
+  const months={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11};
+  const m=String(label||'').toLowerCase().match(/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+(\d{4})/);
+  if(!m)return null; const mon=months[m[1]], year=Number(m[2]); return new Date(year,mon+1,0,23,59,59,999);
+}
+function canCloseMonth(pi){const end=parsePeriodEndDate(data.periods[pi]);return end && new Date()>end;}
+
+const _v31_oldEnsure=ensureLengths;
+ensureLengths=function(){_v31_oldEnsure();ensureMonthStatusState(data)};
+
+const _v31_oldSetValue=setValue;
+setValue=function(secId,ri,pi,v){
+ if(pi!=='initial'&&isMonthClosed(pi)){alert('Este mes está cerrado. No se permite editar información.');render();return}
+ return _v31_oldSetValue(secId,ri,pi,v);
+};
+
+const _v31_oldInputCell=inputCell;
+inputCell=function(sec,ri,pi,val){
+ let html=_v31_oldInputCell(sec,ri,pi,val);
+ if(pi!=='initial'&&isMonthClosed(pi))html=html.replace('class="cell ','class="cell closed-cell ').replace('onfocus="','readonly title="Mes cerrado" onfocus="this.blur();');
+ return html;
+};
+
+const _v31_oldCreateRecord=createInputRecordFromForm;
+createInputRecordFromForm=function(existingId=null){
+ const pi=document.getElementById('formPeriod').value;
+ if(isMonthClosed(pi)){alert('No es posible registrar inputs en un mes cerrado. Debes abrir el mes desde Gestión meses si necesitas corregirlo.');setFormStatus('Mes cerrado: no permite inputs.','error');return null}
+ return _v31_oldCreateRecord(existingId);
+};
+
+const _v31_oldDeleteInput=deleteFormInput;
+deleteFormInput=function(id){const rec=activeFormInputs().find(x=>x.id===id); if(rec&&isMonthClosed(rec.pi)){alert('Este mes está cerrado. No se permite eliminar inputs.');return} return _v31_oldDeleteInput(id)};
+
+const _v31_oldEditInput=editFormInput;
+editFormInput=function(id){const rec=activeFormInputs().find(x=>x.id===id); if(rec&&isMonthClosed(rec.pi)){alert('Este mes está cerrado. No se permite editar inputs.');return} return _v31_oldEditInput(id)};
+
+const _v31_oldInitMonth=initializeVariableMonth;
+initializeVariableMonth=function(pi){if(isMonthClosed(pi)){alert('Este mes está cerrado. No se puede inicializar.');return} return _v31_oldInitMonth(pi)};
+
+function periodOptionsWithState(){return data.periods.map((p,i)=>`<option value="${i}">${esc(p)} ${isMonthClosed(i)?'🔴 Cerrado':isVariableInitialized(i)?'🟢 Inicializado':'⚪ Abierto'}</option>`).join('')}
+const _v31_oldRenderInputForm=renderInputForm;
+renderInputForm=function(){_v31_oldRenderInputForm(); const fp=document.getElementById('formPeriod'); if(fp){const old=fp.value; fp.innerHTML=periodOptionsWithState(); if([...fp.options].some(o=>o.value===old))fp.value=old; validateInputMonthSelection();}}
+
+const _v31_oldRender=render;
+render=function(){ensureMonthStatusState(data);_v31_oldRender(); try{decorateMonthHeadersAndSections()}catch(e){console.warn(e)}};
+function decorateMonthHeadersAndSections(){
+ document.querySelectorAll('#modelTable thead th').forEach((th,idx)=>{if(idx>0){let pi=idx-1-(data.showInitialColumn?1:0); if(data.showInitialColumn&&idx===1)return; if(pi>=0&&data.periods[pi]&&!th.querySelector('.month-state'))th.insertAdjacentHTML('beforeend','<br>'+monthStateLabel(pi));}});
+}
+
+function openCloseMonthModal(){renderCloseMonthList();document.getElementById('closeMonthModal').classList.add('open')}
+function closeCloseMonthModal(){document.getElementById('closeMonthModal').classList.remove('open')}
+function renderCloseMonthList(){ensureMonthStatusState(data);const el=document.getElementById('closeMonthList');if(!el)return;el.innerHTML=data.periods.map((p,i)=>{const ok=canCloseMonth(i);const closed=isMonthClosed(i);return `<div class="close-open-row"><div><b>${esc(p)}</b> ${monthStateLabel(i)}<br><small class="muted">${closed?'Mes cerrado':ok?'Disponible para cierre':'No ha pasado el último día calendario del mes'}</small></div><button class="danger" ${closed||!ok?'disabled':''} onclick="closeMonth(${i})">Cerrar mes</button></div>`}).join('')}
+function closeMonth(pi){pi=Number(pi); if(isMonthClosed(pi)){alert('El mes ya está cerrado.');return} if(!canCloseMonth(pi)){alert('No se puede cerrar este mes porque aún no ha pasado su último día calendario.');return} const msg=`Cerrar ${data.periods[pi]}?\n\nSe bloquearán edición manual, inputs, edición y eliminación de inputs para este mes. Se creará un respaldo independiente con corte a hoy.`; if(!confirm(msg))return; ensureMonthStatusState(data); data.monthClosed[pi]=true; const key='corte_'+data.periods[pi].replace(/\s+/g,'_').toLowerCase(); data.monthClosedBackups[key]={period:data.periods[pi],periodIndex:pi,closedAt:new Date().toLocaleString('es-CO'),model:clone(data)}; data.monthClosedMeta[pi]={closedAt:new Date().toLocaleString('es-CO'),user:currentUser?currentUser.email:''}; logInput({source:'Cierre de mes',secId:'other',ri:0,pi,mode:'close',amount:0,before:'',after:'',note:'Mes cerrado con respaldo independiente',paid:false}); saveSilent();render();renderCloseMonthList();}
+function openOpenMonthModal(){renderOpenMonthList();document.getElementById('openMonthModal').classList.add('open')}
+function closeOpenMonthModal(){document.getElementById('openMonthModal').classList.remove('open')}
+function renderOpenMonthList(){ensureMonthStatusState(data);const el=document.getElementById('openMonthList');if(!el)return;el.innerHTML=data.periods.map((p,i)=>`<div class="close-open-row"><div><b>${esc(p)}</b> ${monthStateLabel(i)}<br><small class="muted">${isMonthClosed(i)?'Puede abrirse para corrección controlada':'No está cerrado'}</small></div><button class="soft" ${!isMonthClosed(i)?'disabled':''} onclick="openMonth(${i})">Abrir mes</button></div>`).join('')}
+function openMonth(pi){pi=Number(pi); if(!isMonthClosed(pi)){alert('Este mes no está cerrado.');return} if(!confirm('ADVERTENCIA: al abrir este mes podrá editar información histórica, inputs y valores del modelo. ¿Desea continuar?'))return; data.monthClosed[pi]=false; data.monthClosedMeta[pi]=Object.assign({},data.monthClosedMeta[pi]||{},{openedAt:new Date().toLocaleString('es-CO'),openedBy:currentUser?currentUser.email:''}); logInput({source:'Apertura de mes',secId:'other',ri:0,pi,mode:'open',amount:0,before:'',after:'',note:'Mes reabierto para corrección',paid:false}); saveSilent();render();renderOpenMonthList();}
+
+function openMergeConceptModal(){refreshMergeConceptOptions();document.getElementById('mergeConceptModal').classList.add('open')}
+function closeMergeConceptModal(){document.getElementById('mergeConceptModal').classList.remove('open')}
+function refreshMergeConceptOptions(){const secId=document.getElementById('mergeSection').value;const sec=section(secId);const opts=(sec&&sec.rows?sec.rows:[]).map((r,i)=>`<option value="${i}">${esc(r[0])}</option>`).join('');document.getElementById('mergeSource').innerHTML=opts;document.getElementById('mergeTarget').innerHTML=opts;}
+function mergeConcepts(){const secId=document.getElementById('mergeSection').value;const from=Number(document.getElementById('mergeSource').value);const to=Number(document.getElementById('mergeTarget').value);const sec=section(secId);if(!sec||from===to||!sec.rows[from]||!sec.rows[to]){alert('Selecciona conceptos origen y destino distintos.');return} const fromName=sec.rows[from][0], toName=sec.rows[to][0]; if(!confirm(`Fusionar "${fromName}" dentro de "${toName}"?\n\nSe conservarán valores, notas e inputs activos asociados al concepto final.`))return;
+ for(let i=0;i<data.periods.length;i++){if(isMonthClosed(i)){alert('No se puede fusionar si existe un mes cerrado en el rango del modelo. Abre el mes cerrado si necesitas reorganizar conceptos.');return}}
+ for(let i=0;i<data.periods.length;i++){sec.rows[to][1][i]=num(sec.rows[to][1][i])+num(sec.rows[from][1][i]);}
+ data.formInputs=(data.formInputs||[]).map(r=>{if(r.secId===secId&&Number(r.ri)===from){r.ri=to;r.mergedFrom=fromName;r.conceptoFinal=toName}else if(r.secId===secId&&Number(r.ri)>from){r.ri=Number(r.ri)-1}return r});
+ const newNotes={};Object.entries(data.notes||{}).forEach(([k,v])=>{const parts=k.split('|'); if(parts[0]===secId){let ri=Number(parts[1]); if(ri===from){const nk=cellKey(secId,to,parts[2],parts[3]||'value'); newNotes[nk]=[newNotes[nk],v].filter(Boolean).join('\n')} else {if(ri>from)ri--; newNotes[cellKey(secId,ri,parts[2],parts[3]||'value')]=v}} else newNotes[k]=v}); data.notes=newNotes; sec.rows.splice(from,1); rebuildAllInputNotes(); logInput({source:'Fusión de conceptos',secId,ri:to,pi:0,mode:'merge',amount:0,before:fromName,after:toName,note:`Concepto ${fromName} fusionado en ${toName}`,paid:false}); saveSilent();render();closeMergeConceptModal();alert('Conceptos fusionados.');}
+
+const _v31_oldExport=exportVariableInputsExcel;
+exportVariableInputsExcel=function(){
+ const rows=activeFormInputs().filter(r=>['variable','other'].includes(r.secId));
+ if(!rows.length){alert('Aún no hay inputs activos registrados para exportar.');return}
+ const summary={};
+ rows.forEach(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');const key=(sec?sec.title:r.secId)+'||'+periodo+'||'+concepto;if(!summary[key])summary[key]={seccion:sec?sec.title:r.secId,periodo,concepto,total:0,cantidad:0,comentarios:[]};summary[key].total+=num(r.amount);summary[key].cantidad+=1;if(r.note)summary[key].comentarios.push(r.note);});
+ const summaryRows=Object.values(summary).sort((a,b)=>String(a.seccion).localeCompare(String(b.seccion))||String(a.periodo).localeCompare(String(b.periodo))||String(a.concepto).localeCompare(String(b.concepto)));
+ const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
+ const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
+ const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table></body></html>`;
+ const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
+}
+
 initCloud();
 </script>
 </body>
