@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v28</title>
+<title>Modelo mensual de caja v30</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -17,7 +17,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 .input-panel{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22)}
 .input-form{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:8px;padding:0 14px 14px}.input-form label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.input-form select,.input-form input,.input-form textarea{width:100%;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:8px;font-size:13px}.input-form textarea{min-height:38px;resize:vertical}.input-form .wide{grid-column:span 2}.input-form .actions{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}.paid-label{flex-direction:row!important;align-items:center;justify-content:flex-start;gap:8px!important;padding-top:18px}.paid-label input{width:auto!important}.paid-check{display:flex;align-items:center;justify-content:center;min-width:28px}.paid-check input{width:18px;height:18px;accent-color:#22c55e}.cell.paid-done input[type="text"]{border-color:#22c55e;background:#052e16}.compact-title{font-size:12px;color:var(--muted);margin:0 14px 8px}.form-status{color:var(--accent);font-size:13px;font-weight:700}.exclusive-help{padding:0 18px 12px;color:var(--muted);font-size:13px}.exclusive-help b{color:#cbd5e1}
 @media(max-width:900px){.input-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:0 10px 12px}.input-form .wide{grid-column:span 2}.input-form .actions{grid-column:span 2}.input-form select,.input-form input,.input-form textarea{padding:7px;font-size:13px}.paid-label{padding-top:0}}
-.home-panel{min-height:calc(100vh - 90px);display:none;align-items:center;justify-content:center;padding:28px}.home-card{width:min(760px,94vw);background:rgba(17,24,39,.97);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.32)}.home-card h2{margin:0 0 8px;font-size:28px;color:#fff}.home-card p{color:var(--muted);line-height:1.45}.home-actions{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:14px;margin-top:18px}.home-actions button{min-height:92px;text-align:left;font-size:16px;background:#172554}.home-actions button span{display:block;color:#94a3b8;font-size:12px;margin-top:8px;font-weight:500}.view-home #homePanel{display:flex}.view-home main{display:none}.view-input .model-only{display:none}.view-input main{max-width:760px}.view-input .input-panel{display:block}.view-input .sheet-wrap{display:none}@media(max-width:700px){.home-actions{grid-template-columns:1fr}.home-card{padding:18px}.home-card h2{font-size:23px}}
+.section-toggle{margin-right:8px;padding:3px 7px;font-size:11px;border-radius:8px;background:#1e293b}.collapsed-note{color:#94a3b8;font-style:italic;padding:8px 10px}.summary-tools{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:12px}.model-input-btn{margin-bottom:14px}.form-modal-body .input-panel{display:block!important;margin:0}.view-model #inputPanel{display:none}.edit-lock-banner{display:none;background:#451a1a;border:1px solid #7f1d1d;color:#fecaca;border-radius:12px;padding:10px 12px;margin:0 14px 12px;font-weight:700}.editing-mode .edit-lock-banner{display:block}.editing-mode #formModeWrap{display:flex!important}.normal-mode #formModeWrap{display:none!important}.concept-modal-form{display:grid;gap:10px}.concept-modal-form label{display:flex;flex-direction:column;gap:5px;color:#94a3b8;font-size:12px;font-weight:800}.concept-modal-form input,.concept-modal-form select{border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:10px}.home-panel{min-height:calc(100vh - 90px);display:none;align-items:center;justify-content:center;padding:28px}.home-card{width:min(760px,94vw);background:rgba(17,24,39,.97);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.32)}.home-card h2{margin:0 0 8px;font-size:28px;color:#fff}.home-card p{color:var(--muted);line-height:1.45}.home-actions{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:14px;margin-top:18px}.home-actions button{min-height:92px;text-align:left;font-size:16px;background:#172554}.home-actions button span{display:block;color:#94a3b8;font-size:12px;margin-top:8px;font-weight:500}.view-home #homePanel{display:flex}.view-home main{display:none}.view-input .model-only{display:none}.view-input main{max-width:760px}.view-input .input-panel{display:block}.view-input .sheet-wrap{display:none}@media(max-width:700px){.home-actions{grid-template-columns:1fr}.home-card{padding:18px}.home-card h2{font-size:23px}}
 
 #summaryTable{width:100%;min-width:900px}#summaryTable th,#summaryTable td{padding:8px 10px;text-align:right;position:static;min-width:120px;background:transparent}#summaryTable th:first-child,#summaryTable td:first-child{text-align:left;min-width:230px;background:transparent}#summaryTable thead th{background:#0b1220;color:#cbd5e1}.result td{background:#172554!important;font-weight:800}.total td{background:#042f2e!important;font-weight:800}
 
@@ -74,6 +74,10 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
       <button class="side-menu-btn" onclick="exportInputLogExcel();toggleSidePanel(false)">Historial cambios Excel</button>
     </div>
     <div class="submenu">
+      <div class="submenu-title">Conceptos</div>
+      <button class="side-menu-btn" onclick="openConceptModal(false);toggleSidePanel(false)">Crear concepto variable/otros</button>
+    </div>
+    <div class="submenu">
       <div class="submenu-title">Modelo y respaldo</div>
       <button class="side-menu-btn" onclick="saveData();toggleSidePanel(false)">Guardar</button>
       <button class="side-menu-btn" onclick="exportJSON();toggleSidePanel(false)">Exportar respaldo</button>
@@ -97,9 +101,9 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 <main>
   <div class="note"><b>Lógica del modelo:</b> ingresos negativos, gastos positivos. Saldo negativo = superávit de caja; saldo positivo = déficit/faltante. Los saldos bancarios se digitan positivos, pero el sistema los totaliza negativos para compararlos contra caja.</div>
 
-  <section class="input-panel">
+  <section class="input-panel" id="inputPanel">
     <div class="panelTitle"><h2>Formulario de inputs</h2><span>Ingreso rápido para gastos variables y otros movimientos.</span></div>
-    <div class="exclusive-help"><b>Sección y concepto son excluyentes:</b> al escoger una sección, solo aparecen los conceptos pertenecientes a esa sección.</div>
+    <div class="exclusive-help"><b>Sección y concepto son excluyentes:</b> al escoger una sección, solo aparecen los conceptos pertenecientes a esa sección.</div><div id="editLockBanner" class="edit-lock-banner">Estás editando un input registrado. Debes guardar o cancelar la edición antes de hacer otra cosa.</div>
     <form id="lineInputForm" class="input-form" onsubmit="submitLineInput(event)">
       <label>Sección
         <select id="formSection" onchange="updateConceptSelect()"><option value="variable">Gastos variables</option><option value="other">Otros movimientos</option></select>
@@ -113,7 +117,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
       <label>Valor
         <input id="formAmount" inputmode="decimal" placeholder="Ej. 1.250.000">
       </label>
-      <label>Acción
+      <label id="formModeWrap">Acción
         <select id="formMode">
           <option value="replace">Reemplazar</option>
           <option value="add">Sumar</option>
@@ -126,19 +130,25 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
         <textarea id="formNote" placeholder="Nota aclaratoria para esta celda"></textarea>
       </label>
       <div class="actions">
-        <button type="submit" class="soft">Aplicar al modelo</button>
+        <button id="inputSubmitBtn" type="submit" class="soft">Aplicar al modelo</button>
+        <button id="cancelEditBtn" type="button" class="danger" style="display:none" onclick="cancelInputEdit()">Cancelar edición</button>
         <button type="button" class="secondary" onclick="clearLineInputForm()">Limpiar</button>
+        <button type="button" class="secondary" onclick="openConceptModal(true)">Crear concepto</button>
         <button type="button" class="secondary" onclick="openInputsLedgerModal()">Ver inputs registrados</button>
         <span id="formStatus" class="form-status"></span>
       </div>
     </form>
   </section>
+  <div class="model-only model-input-btn"><button class="soft" onclick="openInputFormModal()">+ Agregar input</button></div>
   <div class="summary model-only" id="summary"></div>
-  <section class="panel model-only"><div class="panelTitle"><h2>Resumen por mes</h2><span>Se recalcula automáticamente con la lógica original del Excel.</span></div><div class="tableWrap"><table id="summaryTable"></table></div></section>
+  <section class="panel model-only"><div class="panelTitle"><h2><button class="section-toggle" onclick="toggleSummaryCollapsed()" id="summaryToggleBtn">−</button>Resumen por mes</h2><span>Se recalcula automáticamente con la lógica original del Excel.</span></div><div class="tableWrap"><table id="summaryTable"></table></div></section>
   <section class="panel model-only"><div class="panelTitle"><h2>Control presupuesto gastos variables</h2><span>Compara presupuesto inicializado contra ejecución real por inputs.</span></div><div class="tableWrap"><table id="variableBudgetSummaryTable" class="budget-summary-table"></table></div></section>
   <div class="formula-help model-only">El saldo inicial de bancos no aparece en los totales superiores; se aplica directamente al primer saldo proyectado.</div>
   <div class="sheet-wrap model-only"><table id="modelTable"></table></div>
 </main>
+<div id="inputPanelHome"></div>
+<div class="modal" id="inputFormModal"><div class="modal-card wide-modal tall-modal"><h3>Agregar input</h3><div id="inputFormModalBody" class="form-modal-body"></div><div class="modal-actions"><button class="secondary" onclick="closeInputFormModal()">Cerrar</button></div></div></div>
+<div class="modal" id="conceptModal"><div class="modal-card"><h3>Crear concepto</h3><p style="color:#94a3b8;margin-top:-8px">Agrega conceptos para Gastos variables u Otros movimientos.</p><div class="concept-modal-form"><label>Sección<select id="newConceptSection"><option value="variable">Gastos variables</option><option value="other">Otros movimientos</option></select></label><label>Nombre del concepto<input id="newConceptName" placeholder="Ej. Parqueadero"></label></div><div class="modal-actions"><button class="secondary" onclick="closeConceptModal()">Cancelar</button><button class="soft" onclick="saveNewConceptFromModal()">Crear concepto</button></div></div></div>
 <div class="modal" id="monthsModal"><div class="modal-card"><h3>Mostrar u ocultar meses</h3><p style="color:#94a3b8;margin-top:-8px">Selecciona los meses que quieres ver. Los meses ocultos conservan sus datos y siguen haciendo parte del modelo.</p><div id="monthsVisibilityList" style="display:grid;gap:8px;margin:12px 0;max-height:50vh;overflow:auto"></div><div class="modal-actions"><button class="secondary" onclick="showAllPeriods()">Mostrar todos</button><button class="secondary" onclick="closeMonthsModal(false)">Cancelar</button><button onclick="closeMonthsModal(true)">Aplicar</button></div></div></div>
 
 <div class="modal" id="inputsLedgerModal"><div class="modal-card wide-modal tall-modal"><h3>Inputs registrados activos</h3><p style="color:#94a3b8;margin-top:-8px">Consulta, edita o elimina inputs activos. Los eliminados no aparecen en el informe de inputs.</p><div class="ledger-wrap"><table id="inputsLedgerTable" class="ledger-table"></table></div><div class="modal-actions"><button class="secondary" onclick="closeInputsLedgerModal()">Cerrar</button></div></div></div>
@@ -307,6 +317,8 @@ function migrateData(d){
  if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[];
  if(!d.columnWidths)d.columnWidths={concept:250,initial:130,periods:{}};
  if(!d.columnWidths.periods)d.columnWidths.periods={};
+ if(!d.collapsedSections)d.collapsedSections={};
+ if(d.summaryCollapsed==null)d.summaryCollapsed=false;
  ensureVariableBudgetSection(d);
  ensureVariableInitState(d);
  rebuildAllInputNotesForModel(d);
@@ -378,12 +390,15 @@ function visiblePeriodIndexes(){return data.periods.map((_,i)=>i).filter(i=>!dat
 function visiblePeriods(){return visiblePeriodIndexes().map(i=>data.periods[i])}
 function isPeriodVisible(i){return !data.hiddenPeriods.includes(i)}
 function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th style="${colStyle('initial')}"><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small><span class="resizer" onmousedown="startColumnResize(event,'initial')"></span></th>`:'';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
-function sectionTitleRow(title, initialVisible){
+function sectionTitleRow(sec, initialVisible){
  const extraCells=visibleIdx.length+(initialVisible?1:0);
- return `<tr class="section-title"><td style="${colStyle('concept')}">${esc(title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
+ const collapsed=!!(data.collapsedSections&&data.collapsedSections[sec.id]);
+ return `<tr class="section-title"><td style="${colStyle('concept')}"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button>${esc(sec.title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
 }
 
- data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
+ data.sections.forEach(sec=>{html+=sectionTitleRow(sec, initialVisible);
+ const collapsed=!!(data.collapsedSections&&data.collapsedSections[sec.id]);
+ if(collapsed){html+=`<tr><td class="collapsed-note" colspan="${visibleIdx.length+(initialVisible?2:1)}">Sección contraída. Pulsa + para expandir.</td></tr>`;return;}
  sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
  if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
  for(const pi of visibleIdx){const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
@@ -396,7 +411,7 @@ function inputCell(sec,ri,pi,val){
  const shown=formatNumber(val);
  const isPaidCell=(sec==='fixed'&&pi!=='initial');
  const paid=data.paid[cellKey(sec,ri,pi,'paid')];
- const locked=(sec==='variable'&&pi!=='initial'&&isVariableInitialized(pi));
+ const locked=(['variable','other'].includes(sec)&&pi!=='initial'&&isVariableInitialized(pi));
  const readonly=locked?'readonly title="Mes inicializado: editar solo por inputs"':'';
  const focus=locked?'this.blur()':'this.value=rawEditValue(this.value);this.select()';
  const blur=locked?'':`onblur="setValue('${sec}',${ri},'${pi}',this.value)"`;
@@ -409,6 +424,8 @@ function setValue(secId,ri,pi,v){if(secId==='variableBudget'&&pi!=='initial'){al
 function togglePaid(secId,ri,pi,checked){data.paid[cellKey(secId,ri,pi,'paid')]=!!checked;logInput({source:'Check pago fijo',secId,ri,pi,mode:'paid',amount:'',before:'',after:num(section(secId).rows[ri][1][Number(pi)]),note:checked?'Pago marcado como realizado':'Pago desmarcado',paid:!!checked});saveSilent();render()}
 function logInput(entry){data.inputLog=data.inputLog||[];const sec=section(entry.secId);const period=entry.pi==='initial'?data.initialColumnLabel:data.periods[Number(entry.pi)];data.inputLog.push({fecha:new Date().toLocaleString('es-CO'),origen:entry.source||'Formulario',seccion:sec?sec.title:entry.secId,concepto:sec&&sec.rows[entry.ri]?sec.rows[entry.ri][0]:'',periodo:period,accion:entry.mode||'',valorIngresado:entry.amount,valorAnterior:entry.before,valorFinal:entry.after,comentario:entry.note||'',pagoRealizado:entry.paid?'Sí':'No'});}
 function renameRow(secId,ri,v){section(secId).rows[ri][0]=v;saveSilent();render()}function renamePeriod(i,v){data.periods[i]=v||`Mes ${i+1}`;saveSilent();render()}function renameInitialColumn(v){data.initialColumnLabel=v||'Saldo inicial bancos';saveSilent();render()}function toggleInitialColumn(){data.showInitialColumn=!data.showInitialColumn;saveSilent();render()}
+function toggleSectionCollapsed(secId){data.collapsedSections=data.collapsedSections||{};data.collapsedSections[secId]=!data.collapsedSections[secId];saveSilent();render()}
+function toggleSummaryCollapsed(){data.summaryCollapsed=!data.summaryCollapsed;saveSilent();render()}
 function addRow(secId,pos){const sec=section(secId);const row=['Nuevo concepto',Array(data.periods.length).fill(0)];if(sec.kind==='bank')row.push(0);sec.rows.splice(pos==null?sec.rows.length:pos,0,row);saveSilent();render()}
 function deleteRow(secId,ri){if(section(secId).rows.length<=1){alert('Debe quedar al menos un concepto en la sección.');return} if(confirm('¿Eliminar este concepto?')){section(secId).rows.splice(ri,1);saveSilent();render()}}
 function addPeriod(){let name=prompt('Nombre del nuevo mes/periodo:',nextMonthName(data.periods[data.periods.length-1])); if(!name)return; data.periods.push(name);data.sections.forEach(s=>s.rows.forEach(r=>r[1].push(0)));ensureVariableInitState(data);saveSilent();render()}
@@ -436,7 +453,9 @@ function renderSummary(c){
    kpi('Cuadre de caja - último mes visible',lastVisibleIdx,c.cashCheck);
  const summaryBudgetDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?0:c.variableBudget[i]);
  const summaryVariableDisplay=data.periods.map((_,i)=>isVariableInitialized(i)?c.variable[i]:0);
- const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',summaryBudgetDisplay,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
+ let rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Ppto gastos variables',summaryBudgetDisplay,'total'],['Total gastos variables',summaryVariableDisplay,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
+ const st=document.getElementById('summaryToggleBtn'); if(st)st.textContent=data.summaryCollapsed?'+':'−';
+ if(data.summaryCollapsed)rows=rows.filter(r=>['Saldo proyectado','Total saldos bancos','Cuadre de caja'].includes(r[0]));
  let html='<thead><tr><th>Concepto</th>'+visibleIdx.map(i=>`<th>${esc(data.periods[i])}</th>`).join('')+'</tr></thead><tbody>';
  rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+visibleIdx.map(i=>`<td class="${r[1][i]<0?'negative':'positive'}">${money(r[1][i])}</td>`).join('')+'</tr>'});
  html+='</tbody>';
@@ -456,7 +475,9 @@ function renderInputForm(){
  if(!secInput)return;
  if(!['variable','other'].includes(secInput.value))secInput.value='variable';
  updateConceptSelect();
+ updateInputEditUi();
 }
+
 function updateConceptSelect(){
  const secInput=document.getElementById('formSection'), conceptSelect=document.getElementById('formConcept'), periodSelect=document.getElementById('formPeriod');
  if(!secInput||!conceptSelect||!periodSelect)return;
@@ -553,7 +574,8 @@ function createInputRecordFromForm(existingId=null){
    return null;
  }
  const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]);
- const mode=document.getElementById('formMode').value;
+ const editingId=document.getElementById('lineInputForm').dataset.editingId||'';
+ const mode=editingId?'replace':'add';
  const amount=normalizeFormAmount(secId,raw);
  const note=document.getElementById('formNote').value.trim();
  return {id:existingId||makeInputId(),active:true,fecha:new Date().toLocaleString('es-CO'),secId,ri,pi,mode,amount,before,after:null,note};
@@ -575,6 +597,7 @@ function submitLineInput(ev){
  rebuildInputNotesForCell(rec.secId,rec.ri,rec.pi);
  logInput({source:'Formulario',secId:rec.secId,ri:rec.ri,pi:rec.pi,mode:rec.mode,amount:rec.amount,before:rec.before,after:rec.after,note:rec.note,paid:false});
  delete document.getElementById('lineInputForm').dataset.editingId;
+ updateInputEditUi();
  saveSilent();
  clearLineInputForm(true);
  render();
@@ -583,17 +606,29 @@ function submitLineInput(ev){
  setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
 }
 function clearLineInputForm(keepStatus=false){
+ if(isEditingInput()&&!keepStatus){alert('Primero debes guardar o cancelar la edición del input.');return}
  const amount=document.getElementById('formAmount'), note=document.getElementById('formNote'), status=document.getElementById('formStatus'), paid=document.getElementById('formPaid');
  if(amount)amount.value=''; if(note)note.value=''; if(paid)paid.checked=false; if(status&&!keepStatus)status.textContent='';
  validateInputMonthSelection();
+ updateInputEditUi();
 }
+function isEditingInput(){const f=document.getElementById('lineInputForm');return !!(f&&f.dataset.editingId)}
+function updateInputEditUi(){
+ const editing=isEditingInput(); const panel=document.getElementById('inputPanel'); if(panel){panel.classList.toggle('editing-mode',editing);panel.classList.toggle('normal-mode',!editing)}
+ const mode=document.getElementById('formMode'); if(mode)mode.value=editing?'replace':'add';
+ const submit=document.getElementById('inputSubmitBtn'); if(submit)submit.textContent=editing?'Guardar edición':'Aplicar al modelo';
+ const cancel=document.getElementById('cancelEditBtn'); if(cancel)cancel.style.display=editing?'inline-block':'none';
+}
+function cancelInputEdit(){delete document.getElementById('lineInputForm').dataset.editingId;clearLineInputForm(true);setFormStatus('Edición cancelada.','warn');updateInputEditUi();}
+function blockIfEditing(){if(isEditingInput()){alert('Termina la edición actual: guarda o cancela antes de continuar.');return true}return false}
 
 
 
 
-function openInputsLedgerModal(){renderInputsLedger();document.getElementById('inputsLedgerModal').classList.add('open')}
+
+function openInputsLedgerModal(){if(blockIfEditing())return;renderInputsLedger();document.getElementById('inputsLedgerModal').classList.add('open')}
 function closeInputsLedgerModal(){document.getElementById('inputsLedgerModal').classList.remove('open')}
-function openVariableInitModal(){renderVariableInitModal();document.getElementById('variableInitModal').classList.add('open')}
+function openVariableInitModal(){if(blockIfEditing())return;renderVariableInitModal();document.getElementById('variableInitModal').classList.add('open')}
 function closeVariableInitModal(){document.getElementById('variableInitModal').classList.remove('open')}
 function renderVariableInitModal(){
  const c=calculations(); const list=document.getElementById('variableInitList'); if(!list)return;
@@ -620,14 +655,17 @@ function renderInputsLedger(){
 }
 function editFormInput(id){
  const rec=activeFormInputs().find(x=>x.id===id); if(!rec)return;
+ closeInputsLedgerModal();
+ if(document.body.classList.contains('view-model'))openInputFormModal(); else showAppView('input');
  document.getElementById('formSection').value=rec.secId; updateConceptSelect();
  document.getElementById('formConcept').value=String(rec.ri);
  document.getElementById('formPeriod').value=String(rec.pi);
  document.getElementById('formAmount').value=formatNumber(rec.amount);
- document.getElementById('formMode').value=rec.mode||'add';
+ document.getElementById('formMode').value='replace';
  document.getElementById('formNote').value=rec.note||'';
  document.getElementById('lineInputForm').dataset.editingId=id;
- document.getElementById('formStatus').textContent='Editando input existente';
+ updateInputEditUi();
+ setFormStatus('Editando input existente. Guarda o cancela la edición antes de continuar.','warn');
  window.scrollTo({top:0,behavior:'smooth'});
 }
 function deleteFormInput(id){
@@ -664,6 +702,7 @@ function promptColumnWidths(){
  saveSilent();render();
 }
 function openMonthsModal(){
+ if(blockIfEditing())return;
  const list=document.getElementById('monthsVisibilityList');
  list.innerHTML=data.periods.map((p,i)=>`<label style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px"><input type="checkbox" data-period-index="${i}" ${isPeriodVisible(i)?'checked':''} style="width:18px;height:18px;accent-color:#22c55e"><span>${esc(p)}</span></label>`).join('');
  document.getElementById('monthsModal').classList.add('open');
@@ -707,14 +746,53 @@ function exportInputLogExcel(){
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='historial-cambios-modelo.xls';a.click();URL.revokeObjectURL(a.href);
 }
 function toggleSidePanel(show){
+ if(show&&blockIfEditing())return;
  const panel=document.getElementById('sidePanel'), backdrop=document.getElementById('sideBackdrop');
  const open=show==null?!panel.classList.contains('open'):!!show;
  panel.classList.toggle('open',open);backdrop.classList.toggle('open',open);
 }
 
 
+
+function openInputFormModal(){
+ if(blockIfEditing())return;
+ const panel=document.getElementById('inputPanel'), body=document.getElementById('inputFormModalBody');
+ if(panel&&body){body.appendChild(panel);document.getElementById('inputFormModal').classList.add('open');renderInputForm();}
+}
+function closeInputFormModal(){
+ if(blockIfEditing())return;
+ const panel=document.getElementById('inputPanel'), main=document.querySelector('main'), note=document.querySelector('main .note');
+ if(panel&&main){main.insertBefore(panel, note?note.nextSibling:main.firstChild);}
+ document.getElementById('inputFormModal').classList.remove('open');
+}
+let conceptReturnToInput=false;
+function openConceptModal(returnToInput=false){
+ if(blockIfEditing())return;
+ conceptReturnToInput=!!returnToInput;
+ const n=document.getElementById('newConceptName'); if(n)n.value='';
+ document.getElementById('conceptModal').classList.add('open');
+ setTimeout(()=>{const el=document.getElementById('newConceptName'); if(el)el.focus();},50);
+}
+function closeConceptModal(){document.getElementById('conceptModal').classList.remove('open')}
+function saveNewConceptFromModal(){
+ const secId=document.getElementById('newConceptSection').value;
+ const name=(document.getElementById('newConceptName').value||'').trim();
+ if(!['variable','other'].includes(secId)){alert('Sección inválida.');return}
+ if(!name){alert('Escribe el nombre del concepto.');return}
+ const sec=section(secId); if(!sec)return;
+ sec.rows.push([name,Array(data.periods.length).fill(0)]);
+ saveSilent();render();
+ document.getElementById('formSection').value=secId;updateConceptSelect();document.getElementById('formConcept').value=String(sec.rows.length-1);
+ closeConceptModal();
+ if(conceptReturnToInput)setFormStatus('Concepto creado y seleccionado.','ok');
+}
+
 function showAppView(view){
+ if(blockIfEditing())return;
  const allowed=['home','model','input']; if(!allowed.includes(view))view='home';
+ const panel=document.getElementById('inputPanel'), main=document.querySelector('main'), note=document.querySelector('main .note');
+ if(panel&&main&&!document.getElementById('inputFormModal').classList.contains('open'))main.insertBefore(panel, note?note.nextSibling:main.firstChild);
+ document.getElementById('inputFormModal').classList.remove('open');
  document.body.classList.remove('view-home','view-model','view-input');
  document.body.classList.add('view-'+view);
  if(view==='input')renderInputForm();
