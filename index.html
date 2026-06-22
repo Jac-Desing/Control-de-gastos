@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v32</title>
+<title>Modelo mensual de caja v35</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -58,6 +58,19 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 .input-form .actions .edit-only{display:none}
 .editing-mode .input-form .actions .edit-only{display:inline-flex}
 .editing-mode #formModeWrap select{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.15)}
+
+/* v35 - indicadores 3D de estado de mes */
+.month-state{display:inline-flex!important;align-items:center;gap:6px;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid #475569;background:#1e293b;color:#cbd5e1;vertical-align:middle}
+.month-state-dot{display:inline-block;width:13px;height:13px;border-radius:50%;flex:0 0 13px;box-shadow:inset 0 2px 4px rgba(255,255,255,.85),inset 0 -3px 5px rgba(0,0,0,.35),0 0 5px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.25);vertical-align:-2px}
+.month-state-dot.sin{background:radial-gradient(circle at 35% 28%,#ffffff 0,#e5e7eb 26%,#94a3b8 70%,#475569 100%)}
+.month-state-dot.init{background:radial-gradient(circle at 35% 28%,#e0f2fe 0,#60a5fa 28%,#2563eb 70%,#1e3a8a 100%);box-shadow:inset 0 2px 4px rgba(255,255,255,.85),inset 0 -3px 5px rgba(0,0,0,.35),0 0 8px rgba(59,130,246,.65)}
+.month-state-dot.open{background:radial-gradient(circle at 35% 28%,#dcfce7 0,#4ade80 28%,#16a34a 70%,#14532d 100%);box-shadow:inset 0 2px 4px rgba(255,255,255,.85),inset 0 -3px 5px rgba(0,0,0,.35),0 0 8px rgba(34,197,94,.65)}
+.month-state-dot.closed{background:radial-gradient(circle at 35% 28%,#fee2e2 0,#f87171 28%,#dc2626 70%,#7f1d1d 100%);box-shadow:inset 0 2px 4px rgba(255,255,255,.85),inset 0 -3px 5px rgba(0,0,0,.35),0 0 8px rgba(239,68,68,.65)}
+.month-name-with-dot{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.month-status-help{display:inline-flex;align-items:center;gap:7px;color:#cbd5e1;font-size:12px;margin-left:8px}
+.month-status-help .month-state-dot{width:12px;height:12px;flex-basis:12px}
+select option{background:#020617;color:#e5e7eb}
+
 </style>
 </head>
 <body class="locked">
@@ -190,9 +203,267 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 <div class="modal" id="openMonthModal"><div class="modal-card tall-modal"><h3>Abrir mes cerrado</h3><p style="color:#fecaca;margin-top:-8px">Advertencia: al abrir un mes cerrado se permitirá editar información histórica. Úsalo solo para correcciones controladas.</p><div id="openMonthList" class="close-open-list"></div><div class="modal-actions"><button class="secondary" onclick="closeOpenMonthModal()">Cerrar</button></div></div></div>
 <div class="modal" id="mergeConceptModal"><div class="modal-card"><h3>Fusionar conceptos</h3><p style="color:#94a3b8;margin-top:-8px">Mueve valores, inputs y notas del concepto origen al concepto destino. El informe de inputs quedará relacionado al concepto final.</p><div class="merge-grid"><label>Sección<select id="mergeSection" onchange="refreshMergeConceptOptions()"><option value="variable">Gastos variables</option><option value="other">Otros movimientos</option></select></label><label>Concepto origen<select id="mergeSource"></select></label><label>Concepto destino<select id="mergeTarget"></select></label></div><div class="modal-actions"><button class="secondary" onclick="closeMergeConceptModal()">Cancelar</button><button class="soft" onclick="mergeConcepts()">Fusionar</button></div></div></div>
 <div class="modal" id="noteModal"><div class="modal-card"><h3>Comentario de celda</h3><p id="noteTarget" style="color:#64748b;margin-top:-8px"></p><textarea id="noteText" placeholder="Escribe una nota aclaratoria..."></textarea><div class="modal-actions"><button class="secondary" onclick="closeNote(false)">Cancelar</button><button onclick="closeNote(true)">Guardar nota</button></div></div></div>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js">
+
+/* v35 - bolitas 3D de estado sin tocar Firebase ni estructura de datos */
+(function(){
+  function safeEnsure(){
+    try{ if(typeof ensureMonthStatusState==='function') ensureMonthStatusState(data); }catch(e){}
+  }
+  window.monthStateText = function(pi){
+    safeEnsure();
+    pi = Number(pi);
+    try{
+      if(typeof isMonthClosed==='function' && isMonthClosed(pi)) return 'Cerrado';
+      if(typeof isVariableInitialized==='function' && isVariableInitialized(pi)){
+        const hasInputs = Array.isArray(data.formInputs) && data.formInputs.some(function(r){return r && r.active!==false && Number(r.pi)===pi && (r.secId==='variable' || r.secId==='other');});
+        return hasInputs ? 'Abierto' : 'Inicializado';
+      }
+    }catch(e){}
+    return 'Sin inicializar';
+  };
+  window.monthStateClass = function(pi){
+    var t = window.monthStateText(pi);
+    if(t==='Cerrado') return 'closed';
+    if(t==='Abierto') return 'open';
+    if(t==='Inicializado') return 'init';
+    return 'sin';
+  };
+  window.monthStateDot = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state-dot '+cls+'" title="'+esc(txt)+'" aria-label="'+esc(txt)+'"></span>';
+  };
+  window.monthStateLabel = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state '+cls+'" title="'+esc(txt)+'"><span class="month-state-dot '+cls+'"></span>'+esc(txt)+'</span>';
+  };
+  window.monthNameWithDot = function(pi){
+    return '<span class="month-name-with-dot">'+window.monthStateDot(pi)+'<span>'+esc(data.periods[Number(pi)]||'')+'</span></span>';
+  };
+  window.periodOptionsWithState = function(){
+    return data.periods.map(function(p,i){ return '<option value="'+i+'">'+monthStateText(i)+' - '+esc(p)+'</option>'; }).join('');
+  };
+  function decorateSelectHelp(){
+    var fp=document.getElementById('formPeriod');
+    if(!fp || !fp.parentElement) return;
+    var old=fp.parentElement.querySelector('.month-status-help');
+    if(old) old.remove();
+    var pi=Number(fp.value||0);
+    fp.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'<span>'+esc(monthStateText(pi))+'</span></span>');
+  }
+  var oldValidate = window.validateInputMonthSelection;
+  if(typeof oldValidate==='function'){
+    window.validateInputMonthSelection = function(){ var res=oldValidate.apply(this,arguments); try{decorateSelectHelp();}catch(e){} return res; };
+  }
+  var oldSummary = window.renderSummary;
+  if(typeof oldSummary==='function'){
+    window.renderSummary = function(c){
+      oldSummary(c);
+      try{
+        document.querySelectorAll('#summaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+        document.querySelectorAll('#variableBudgetSummaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+      }catch(e){console.warn('v35 summary dots',e);}
+    };
+  }
+  function decorateModelPeriodHeaders(){
+    try{
+      var vis=visiblePeriodIndexes();
+      document.querySelectorAll('#modelTable .section-period-row').forEach(function(row){
+        row.querySelectorAll('td').forEach(function(td,idx){ if(idx>0){ var offset=data.showInitialColumn?1:0; if(data.showInitialColumn && idx===1) return; var pi=vis[idx-1-offset]; if(pi!=null) td.innerHTML=monthNameWithDot(pi); }});
+      });
+      document.querySelectorAll('#modelTable thead th').forEach(function(th,idx){
+        if(idx===0) return;
+        if(data.showInitialColumn && idx===1) return;
+        var offset=data.showInitialColumn?1:0;
+        var pi=vis[idx-1-offset];
+        var input=th.querySelector('input.month-input');
+        if(input && pi!=null && !th.querySelector('.month-status-help')) input.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'</span>');
+      });
+    }catch(e){console.warn('v35 header dots',e);}
+  }
+  var oldRender = window.render;
+  if(typeof oldRender==='function'){
+    window.render = function(){ oldRender.apply(this,arguments); decorateModelPeriodHeaders(); decorateSelectHelp(); };
+  }
+})();
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js">
+
+/* v35 - bolitas 3D de estado sin tocar Firebase ni estructura de datos */
+(function(){
+  function safeEnsure(){
+    try{ if(typeof ensureMonthStatusState==='function') ensureMonthStatusState(data); }catch(e){}
+  }
+  window.monthStateText = function(pi){
+    safeEnsure();
+    pi = Number(pi);
+    try{
+      if(typeof isMonthClosed==='function' && isMonthClosed(pi)) return 'Cerrado';
+      if(typeof isVariableInitialized==='function' && isVariableInitialized(pi)){
+        const hasInputs = Array.isArray(data.formInputs) && data.formInputs.some(function(r){return r && r.active!==false && Number(r.pi)===pi && (r.secId==='variable' || r.secId==='other');});
+        return hasInputs ? 'Abierto' : 'Inicializado';
+      }
+    }catch(e){}
+    return 'Sin inicializar';
+  };
+  window.monthStateClass = function(pi){
+    var t = window.monthStateText(pi);
+    if(t==='Cerrado') return 'closed';
+    if(t==='Abierto') return 'open';
+    if(t==='Inicializado') return 'init';
+    return 'sin';
+  };
+  window.monthStateDot = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state-dot '+cls+'" title="'+esc(txt)+'" aria-label="'+esc(txt)+'"></span>';
+  };
+  window.monthStateLabel = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state '+cls+'" title="'+esc(txt)+'"><span class="month-state-dot '+cls+'"></span>'+esc(txt)+'</span>';
+  };
+  window.monthNameWithDot = function(pi){
+    return '<span class="month-name-with-dot">'+window.monthStateDot(pi)+'<span>'+esc(data.periods[Number(pi)]||'')+'</span></span>';
+  };
+  window.periodOptionsWithState = function(){
+    return data.periods.map(function(p,i){ return '<option value="'+i+'">'+monthStateText(i)+' - '+esc(p)+'</option>'; }).join('');
+  };
+  function decorateSelectHelp(){
+    var fp=document.getElementById('formPeriod');
+    if(!fp || !fp.parentElement) return;
+    var old=fp.parentElement.querySelector('.month-status-help');
+    if(old) old.remove();
+    var pi=Number(fp.value||0);
+    fp.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'<span>'+esc(monthStateText(pi))+'</span></span>');
+  }
+  var oldValidate = window.validateInputMonthSelection;
+  if(typeof oldValidate==='function'){
+    window.validateInputMonthSelection = function(){ var res=oldValidate.apply(this,arguments); try{decorateSelectHelp();}catch(e){} return res; };
+  }
+  var oldSummary = window.renderSummary;
+  if(typeof oldSummary==='function'){
+    window.renderSummary = function(c){
+      oldSummary(c);
+      try{
+        document.querySelectorAll('#summaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+        document.querySelectorAll('#variableBudgetSummaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+      }catch(e){console.warn('v35 summary dots',e);}
+    };
+  }
+  function decorateModelPeriodHeaders(){
+    try{
+      var vis=visiblePeriodIndexes();
+      document.querySelectorAll('#modelTable .section-period-row').forEach(function(row){
+        row.querySelectorAll('td').forEach(function(td,idx){ if(idx>0){ var offset=data.showInitialColumn?1:0; if(data.showInitialColumn && idx===1) return; var pi=vis[idx-1-offset]; if(pi!=null) td.innerHTML=monthNameWithDot(pi); }});
+      });
+      document.querySelectorAll('#modelTable thead th').forEach(function(th,idx){
+        if(idx===0) return;
+        if(data.showInitialColumn && idx===1) return;
+        var offset=data.showInitialColumn?1:0;
+        var pi=vis[idx-1-offset];
+        var input=th.querySelector('input.month-input');
+        if(input && pi!=null && !th.querySelector('.month-status-help')) input.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'</span>');
+      });
+    }catch(e){console.warn('v35 header dots',e);}
+  }
+  var oldRender = window.render;
+  if(typeof oldRender==='function'){
+    window.render = function(){ oldRender.apply(this,arguments); decorateModelPeriodHeaders(); decorateSelectHelp(); };
+  }
+})();
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js">
+
+/* v35 - bolitas 3D de estado sin tocar Firebase ni estructura de datos */
+(function(){
+  function safeEnsure(){
+    try{ if(typeof ensureMonthStatusState==='function') ensureMonthStatusState(data); }catch(e){}
+  }
+  window.monthStateText = function(pi){
+    safeEnsure();
+    pi = Number(pi);
+    try{
+      if(typeof isMonthClosed==='function' && isMonthClosed(pi)) return 'Cerrado';
+      if(typeof isVariableInitialized==='function' && isVariableInitialized(pi)){
+        const hasInputs = Array.isArray(data.formInputs) && data.formInputs.some(function(r){return r && r.active!==false && Number(r.pi)===pi && (r.secId==='variable' || r.secId==='other');});
+        return hasInputs ? 'Abierto' : 'Inicializado';
+      }
+    }catch(e){}
+    return 'Sin inicializar';
+  };
+  window.monthStateClass = function(pi){
+    var t = window.monthStateText(pi);
+    if(t==='Cerrado') return 'closed';
+    if(t==='Abierto') return 'open';
+    if(t==='Inicializado') return 'init';
+    return 'sin';
+  };
+  window.monthStateDot = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state-dot '+cls+'" title="'+esc(txt)+'" aria-label="'+esc(txt)+'"></span>';
+  };
+  window.monthStateLabel = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state '+cls+'" title="'+esc(txt)+'"><span class="month-state-dot '+cls+'"></span>'+esc(txt)+'</span>';
+  };
+  window.monthNameWithDot = function(pi){
+    return '<span class="month-name-with-dot">'+window.monthStateDot(pi)+'<span>'+esc(data.periods[Number(pi)]||'')+'</span></span>';
+  };
+  window.periodOptionsWithState = function(){
+    return data.periods.map(function(p,i){ return '<option value="'+i+'">'+monthStateText(i)+' - '+esc(p)+'</option>'; }).join('');
+  };
+  function decorateSelectHelp(){
+    var fp=document.getElementById('formPeriod');
+    if(!fp || !fp.parentElement) return;
+    var old=fp.parentElement.querySelector('.month-status-help');
+    if(old) old.remove();
+    var pi=Number(fp.value||0);
+    fp.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'<span>'+esc(monthStateText(pi))+'</span></span>');
+  }
+  var oldValidate = window.validateInputMonthSelection;
+  if(typeof oldValidate==='function'){
+    window.validateInputMonthSelection = function(){ var res=oldValidate.apply(this,arguments); try{decorateSelectHelp();}catch(e){} return res; };
+  }
+  var oldSummary = window.renderSummary;
+  if(typeof oldSummary==='function'){
+    window.renderSummary = function(c){
+      oldSummary(c);
+      try{
+        document.querySelectorAll('#summaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+        document.querySelectorAll('#variableBudgetSummaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+      }catch(e){console.warn('v35 summary dots',e);}
+    };
+  }
+  function decorateModelPeriodHeaders(){
+    try{
+      var vis=visiblePeriodIndexes();
+      document.querySelectorAll('#modelTable .section-period-row').forEach(function(row){
+        row.querySelectorAll('td').forEach(function(td,idx){ if(idx>0){ var offset=data.showInitialColumn?1:0; if(data.showInitialColumn && idx===1) return; var pi=vis[idx-1-offset]; if(pi!=null) td.innerHTML=monthNameWithDot(pi); }});
+      });
+      document.querySelectorAll('#modelTable thead th').forEach(function(th,idx){
+        if(idx===0) return;
+        if(data.showInitialColumn && idx===1) return;
+        var offset=data.showInitialColumn?1:0;
+        var pi=vis[idx-1-offset];
+        var input=th.querySelector('input.month-input');
+        if(input && pi!=null && !th.querySelector('.month-status-help')) input.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'</span>');
+      });
+    }catch(e){console.warn('v35 header dots',e);}
+  }
+  var oldRender = window.render;
+  if(typeof oldRender==='function'){
+    window.render = function(){ oldRender.apply(this,arguments); decorateModelPeriodHeaders(); decorateSelectHelp(); };
+  }
+})();
+
+</script>
 <script>
 const STORAGE_KEY='gastosModeloV21';
 const LEGACY_STORAGE_KEYS=['gastosModeloV20','gastosModeloV19'];
@@ -1130,6 +1401,92 @@ exportVariableInputsExcel=function(){
 };
 
 initCloud();
+
+
+/* v35 - bolitas 3D de estado sin tocar Firebase ni estructura de datos */
+(function(){
+  function safeEnsure(){
+    try{ if(typeof ensureMonthStatusState==='function') ensureMonthStatusState(data); }catch(e){}
+  }
+  window.monthStateText = function(pi){
+    safeEnsure();
+    pi = Number(pi);
+    try{
+      if(typeof isMonthClosed==='function' && isMonthClosed(pi)) return 'Cerrado';
+      if(typeof isVariableInitialized==='function' && isVariableInitialized(pi)){
+        const hasInputs = Array.isArray(data.formInputs) && data.formInputs.some(function(r){return r && r.active!==false && Number(r.pi)===pi && (r.secId==='variable' || r.secId==='other');});
+        return hasInputs ? 'Abierto' : 'Inicializado';
+      }
+    }catch(e){}
+    return 'Sin inicializar';
+  };
+  window.monthStateClass = function(pi){
+    var t = window.monthStateText(pi);
+    if(t==='Cerrado') return 'closed';
+    if(t==='Abierto') return 'open';
+    if(t==='Inicializado') return 'init';
+    return 'sin';
+  };
+  window.monthStateDot = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state-dot '+cls+'" title="'+esc(txt)+'" aria-label="'+esc(txt)+'"></span>';
+  };
+  window.monthStateLabel = function(pi){
+    var cls = window.monthStateClass(pi);
+    var txt = window.monthStateText(pi);
+    return '<span class="month-state '+cls+'" title="'+esc(txt)+'"><span class="month-state-dot '+cls+'"></span>'+esc(txt)+'</span>';
+  };
+  window.monthNameWithDot = function(pi){
+    return '<span class="month-name-with-dot">'+window.monthStateDot(pi)+'<span>'+esc(data.periods[Number(pi)]||'')+'</span></span>';
+  };
+  window.periodOptionsWithState = function(){
+    return data.periods.map(function(p,i){ return '<option value="'+i+'">'+monthStateText(i)+' - '+esc(p)+'</option>'; }).join('');
+  };
+  function decorateSelectHelp(){
+    var fp=document.getElementById('formPeriod');
+    if(!fp || !fp.parentElement) return;
+    var old=fp.parentElement.querySelector('.month-status-help');
+    if(old) old.remove();
+    var pi=Number(fp.value||0);
+    fp.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'<span>'+esc(monthStateText(pi))+'</span></span>');
+  }
+  var oldValidate = window.validateInputMonthSelection;
+  if(typeof oldValidate==='function'){
+    window.validateInputMonthSelection = function(){ var res=oldValidate.apply(this,arguments); try{decorateSelectHelp();}catch(e){} return res; };
+  }
+  var oldSummary = window.renderSummary;
+  if(typeof oldSummary==='function'){
+    window.renderSummary = function(c){
+      oldSummary(c);
+      try{
+        document.querySelectorAll('#summaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+        document.querySelectorAll('#variableBudgetSummaryTable thead th').forEach(function(th,idx){ if(idx>0){ var vis=visiblePeriodIndexes(); var pi=vis[idx-1]; if(pi!=null) th.innerHTML=monthNameWithDot(pi); }});
+      }catch(e){console.warn('v35 summary dots',e);}
+    };
+  }
+  function decorateModelPeriodHeaders(){
+    try{
+      var vis=visiblePeriodIndexes();
+      document.querySelectorAll('#modelTable .section-period-row').forEach(function(row){
+        row.querySelectorAll('td').forEach(function(td,idx){ if(idx>0){ var offset=data.showInitialColumn?1:0; if(data.showInitialColumn && idx===1) return; var pi=vis[idx-1-offset]; if(pi!=null) td.innerHTML=monthNameWithDot(pi); }});
+      });
+      document.querySelectorAll('#modelTable thead th').forEach(function(th,idx){
+        if(idx===0) return;
+        if(data.showInitialColumn && idx===1) return;
+        var offset=data.showInitialColumn?1:0;
+        var pi=vis[idx-1-offset];
+        var input=th.querySelector('input.month-input');
+        if(input && pi!=null && !th.querySelector('.month-status-help')) input.insertAdjacentHTML('afterend','<span class="month-status-help">'+monthStateDot(pi)+'</span>');
+      });
+    }catch(e){console.warn('v35 header dots',e);}
+  }
+  var oldRender = window.render;
+  if(typeof oldRender==='function'){
+    window.render = function(){ oldRender.apply(this,arguments); decorateModelPeriodHeaders(); decorateSelectHelp(); };
+  }
+})();
+
 </script>
 </body>
 </html>
