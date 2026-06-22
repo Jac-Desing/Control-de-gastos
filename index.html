@@ -13,7 +13,11 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 .summary{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:14px;margin-bottom:18px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.18)}.kpi small{color:var(--muted);display:block;margin-bottom:8px}.kpi strong{font-size:22px}.superavit,.negative{color:var(--accent)!important}.deficit,.positive{color:var(--bad)!important}.neutral{color:var(--blue)!important}
 .panel{background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22)}.panelTitle{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:18px 18px 10px}.panelTitle h2{margin:0;font-size:18px}.panelTitle span{color:var(--muted);font-size:13px}.tableWrap{overflow:auto;padding:0 18px 18px}
 .sheet-wrap{overflow:auto;max-height:72vh;position:relative;background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.22)}.sheet-wrap thead th{box-shadow:0 8px 18px rgba(0,0,0,.28)}table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}th,td{border:1px solid var(--line);padding:0;min-width:130px;height:36px;white-space:nowrap;color:var(--text)}th:first-child,td:first-child{min-width:250px;position:sticky;left:0;background:var(--panel);z-index:2}thead th{background:var(--head);color:#cbd5e1;position:sticky;top:0;z-index:5;text-align:center;padding:8px 10px}thead th:first-child{z-index:7}.sheet-wrap tbody td:first-child{z-index:4}.sheet-wrap thead th:first-child{left:0;z-index:8}.section-title td{background:#334155!important;color:#fff;font-weight:800;text-transform:uppercase;text-align:left;padding:9px 10px}.section-title td:first-child{position:sticky;left:0;z-index:6;min-width:250px}.section-title td:not(:first-child){color:transparent}.total-row td{background:#042f2e!important;font-weight:800}.calc-row td{background:#172554!important;font-weight:800}.bank-row td{background:#1f2937}.add-row td{background:#0f172a!important}.add-row button{margin:7px}.concept{display:flex;align-items:center;gap:7px;padding:5px 7px}.concept input{width:100%;border:0;background:transparent;color:var(--text);font-weight:inherit;font-size:13px;text-align:left}.concept input:focus{outline:2px solid var(--blue);background:var(--input);border-radius:8px}.cell{display:flex;align-items:center;height:100%;gap:6px;padding:3px 5px}.cell input,.month-input{width:100%;height:30px;border:1px solid transparent;padding:7px 8px;background:var(--input);color:var(--text);text-align:right;font-size:13px;border-radius:8px}.cell input:focus,.month-input:focus{outline:2px solid var(--blue);border-color:var(--blue)}.month-input{color:#e5e7eb;text-align:center;font-weight:800;background:#0b1220}.money{font-variant-numeric:tabular-nums;text-align:right;padding:8px 10px}.muted{color:var(--muted)!important;font-style:italic}.note-btn{width:28px;height:28px;min-width:28px;padding:0;border-radius:999px;background:#1e293b;border-color:#475569;color:#cbd5e1;flex:0 0 28px}.has-note{background:#78350f!important;border-color:#f59e0b!important;color:#fde68a!important}.row-actions{display:flex;gap:4px}.row-actions button{font-size:11px;padding:6px 8px}.modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;z-index:20}.modal.open{display:flex}.modal-card{background:#111827;border:1px solid var(--line);color:var(--text);border-radius:16px;max-width:520px;width:92%;padding:18px;box-shadow:0 20px 60px #0008}.modal-card h3{margin-top:0}.modal-card textarea{width:100%;height:160px;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--input);color:var(--text)}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
-#summaryTable{width:max-content;min-width:100%}#summaryTable th,#summaryTable td{padding:8px 10px;text-align:right;min-width:120px;background:transparent}#summaryTable th:first-child,#summaryTable td:first-child{text-align:left;min-width:230px;position:sticky;left:0;z-index:4;background:#111827;box-shadow:8px 0 18px rgba(0,0,0,.22)}#summaryTable thead th{background:#0b1220;color:#cbd5e1;position:sticky;top:0;z-index:5}#summaryTable thead th:first-child{left:0;z-index:7;background:#0b1220}.result td{background:#172554!important;font-weight:800}.result td:first-child{background:#172554!important}.total td{background:#042f2e!important;font-weight:800}.total td:first-child{background:#042f2e!important}
+.input-panel{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;margin-bottom:18px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22)}
+.input-form{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:8px;padding:0 14px 14px}.input-form label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.input-form select,.input-form input,.input-form textarea{width:100%;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:8px;font-size:13px}.input-form textarea{min-height:38px;resize:vertical}.input-form .wide{grid-column:span 2}.input-form .actions{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}.paid-label{flex-direction:row!important;align-items:center;justify-content:flex-start;gap:8px!important;padding-top:18px}.paid-label input{width:auto!important}.paid-check{display:flex;align-items:center;justify-content:center;min-width:28px}.paid-check input{width:18px;height:18px;accent-color:#22c55e}.cell.paid-done input[type="text"]{border-color:#22c55e;background:#052e16}.compact-title{font-size:12px;color:var(--muted);margin:0 14px 8px}.form-status{color:var(--accent);font-size:13px;font-weight:700}.exclusive-help{padding:0 18px 12px;color:var(--muted);font-size:13px}.exclusive-help b{color:#cbd5e1}
+@media(max-width:900px){.input-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:0 10px 12px}.input-form .wide{grid-column:span 2}.input-form .actions{grid-column:span 2}.input-form select,.input-form input,.input-form textarea{padding:7px;font-size:13px}.paid-label{padding-top:0}}
+
+#summaryTable{width:100%;min-width:900px}#summaryTable th,#summaryTable td{padding:8px 10px;text-align:right;position:static;min-width:120px;background:transparent}#summaryTable th:first-child,#summaryTable td:first-child{text-align:left;min-width:230px;background:transparent}#summaryTable thead th{background:#0b1220;color:#cbd5e1}.result td{background:#172554!important;font-weight:800}.total td{background:#042f2e!important;font-weight:800}
 @media(max-width:900px){header{display:block}.toolbar{justify-content:flex-start;margin-top:14px}.summary{grid-template-columns:1fr}.panelTitle{display:block}main{padding:14px}th:first-child,td:first-child{min-width:210px}}
 </style>
 </head>
@@ -22,9 +26,11 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
   <h1>Modelo mensual de caja</h1>
   <div class="toolbar">
     <button onclick="addPeriod()">+ Agregar mes</button>
+    <button class="secondary" onclick="openMonthsModal()">Mostrar/ocultar meses</button>
     <button class="secondary" onclick="toggleInitialColumn()" id="toggleInitialBtn">Ocultar saldo inicial</button>
     <button class="secondary" onclick="saveData()">Guardar</button>
     <button class="secondary" onclick="exportJSON()">Exportar respaldo</button>
+    <button class="secondary" onclick="exportInputLogExcel()">Informe inputs Excel</button>
     <button class="secondary" onclick="document.getElementById('importFile').click()">Importar respaldo</button>
     <button class="danger" onclick="resetData()">Restaurar modelo base</button>
     <input id="importFile" type="file" accept="application/json" hidden onchange="importJSON(event)">
@@ -32,11 +38,49 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 </header>
 <main>
   <div class="note"><b>Lógica del modelo:</b> ingresos negativos, gastos positivos. Saldo negativo = superávit de caja; saldo positivo = déficit/faltante. Los saldos bancarios se digitan positivos, pero el sistema los totaliza negativos para compararlos contra caja.</div>
+
+  <section class="input-panel">
+    <div class="panelTitle"><h2>Formulario de gastos variables</h2><span>Ingreso rápido solo para gastos variables.</span></div>
+    <div class="exclusive-help"><b>Sección y concepto son excluyentes:</b> al escoger una sección, solo aparecen los conceptos pertenecientes a esa sección.</div>
+    <form id="lineInputForm" class="input-form" onsubmit="submitLineInput(event)">
+      <label>Sección
+        <input id="formSectionLabel" value="Gastos variables" readonly>
+        <input id="formSection" type="hidden" value="variable">
+      </label>
+      <label>Concepto
+        <select id="formConcept"></select>
+      </label>
+      <label>Mes / columna
+        <select id="formPeriod" onchange="updateConceptSelect()"></select>
+      </label>
+      <label>Valor
+        <input id="formAmount" inputmode="decimal" placeholder="Ej. 1.250.000">
+      </label>
+      <label>Acción
+        <select id="formMode">
+          <option value="replace">Reemplazar</option>
+          <option value="add">Sumar</option>
+        </select>
+      </label>
+      <label id="formPaidWrap" class="paid-label" style="display:none">
+        <input id="formPaid" type="checkbox"> Pago hecho
+      </label>
+      <label class="wide">Comentario opcional
+        <textarea id="formNote" placeholder="Nota aclaratoria para esta celda"></textarea>
+      </label>
+      <div class="actions">
+        <button type="submit" class="soft">Aplicar al modelo</button>
+        <button type="button" class="secondary" onclick="clearLineInputForm()">Limpiar</button>
+        <span id="formStatus" class="form-status"></span>
+      </div>
+    </form>
+  </section>
   <div class="summary" id="summary"></div>
   <section class="panel"><div class="panelTitle"><h2>Resumen por mes</h2><span>Se recalcula automáticamente con la lógica original del Excel.</span></div><div class="tableWrap"><table id="summaryTable"></table></div></section>
   <div class="formula-help">El saldo inicial de bancos no aparece en los totales superiores; se aplica directamente al primer saldo proyectado.</div>
   <div class="sheet-wrap"><table id="modelTable"></table></div>
 </main>
+<div class="modal" id="monthsModal"><div class="modal-card"><h3>Mostrar u ocultar meses</h3><p style="color:#94a3b8;margin-top:-8px">Selecciona los meses que quieres ver. Los meses ocultos conservan sus datos y siguen haciendo parte del modelo.</p><div id="monthsVisibilityList" style="display:grid;gap:8px;margin:12px 0;max-height:50vh;overflow:auto"></div><div class="modal-actions"><button class="secondary" onclick="showAllPeriods()">Mostrar todos</button><button class="secondary" onclick="closeMonthsModal(false)">Cancelar</button><button onclick="closeMonthsModal(true)">Aplicar</button></div></div></div>
 <div class="modal" id="noteModal"><div class="modal-card"><h3>Comentario de celda</h3><p id="noteTarget" style="color:#64748b;margin-top:-8px"></p><textarea id="noteText" placeholder="Escribe una nota aclaratoria..."></textarea><div class="modal-actions"><button class="secondary" onclick="closeNote(false)">Cancelar</button><button onclick="closeNote(true)">Guardar nota</button></div></div></div>
 <script>
 const STORAGE_KEY='gastosModeloV12';
@@ -53,12 +97,12 @@ const baseData={
     {id:'variable',title:'Gastos variables',kind:'normal',rows:[['Gasolina',[200000,200000,200000,200000,200000,200000,200000]],['Salidas',[400000,400000,400000,400000,400000,400000,400000]],['Mascotas',[170000,170000,170000,170000,170000,170000,170000]],['Regalos',[0,0,0,0,0,0,1000000]],['Almuerzos',[100000,100000,100000,100000,100000,100000,100000]],['Transporte',[0,0,0,0,0,0,0]],['Moto',[0,0,0,0,0,0,0]],['Mecato',[0,0,0,0,0,0,0]],['Tienda',[0,0,0,0,0,0,0]],['Medicamentos y belleza',[0,0,0,0,0,0,0]],['Mercado',[0,0,0,0,0,0,0]],['Seguros',[70000,70000,70000,70000,70000,70000,70000]],['GMF',[54773,26100,26100,26100,26100,26100,26100]],['Viajes',[0,0,0,0,0,0,0]],['Otros gastos',[0,0,0,0,0,0,0]]]},
     {id:'other',title:'Otros movimientos',kind:'normal',rows:[['CXC',[0,0,0,0,0,0,0]]]},
     {id:'banks',title:'Saldos bancos',kind:'bank',initialDate:'01-jun-2026',rows:[['Bancolombia',[0,0,0,0,0,0,0],188030],['Nequi',[0,0,0,0,0,0,0],924.17],['Nu',[0,0,0,0,0,0,0],1063],['Efectivo',[0,0,0,0,0,0,0],25000]]}
-  ],notes:{}
+  ],notes:{},paid:{},inputLog:[],hiddenPeriods:[]
 };
 let data=loadData(); let noteCell=null;
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function loadData(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));return migrateData(saved||clone(baseData))}catch(e){return clone(baseData)}}
-function migrateData(d){d=d||clone(baseData); if(d.initialColumnLabel==null)d.initialColumnLabel='Saldo inicial bancos'; if(d.initialColumnDate==null)d.initialColumnDate='01-jun-2026'; if(d.showInitialColumn==null)d.showInitialColumn=true; if(!d.notes)d.notes={}; return d}
+function migrateData(d){d=d||clone(baseData); if(d.initialColumnLabel==null)d.initialColumnLabel='Saldo inicial bancos'; if(d.initialColumnDate==null)d.initialColumnDate='01-jun-2026'; if(d.showInitialColumn==null)d.showInitialColumn=true; if(!d.notes)d.notes={}; if(!d.paid)d.paid={}; if(!Array.isArray(d.inputLog))d.inputLog=[]; if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[]; return d}
 function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data)); toast('Modelo guardado en este navegador.')}function toast(msg){alert(msg)}
 function money(n){n=Number(n)||0;return n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})}
 function formatNumber(n){n=Number(n)||0;return n.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:2})}
@@ -71,25 +115,30 @@ function calculations(){ensureLengths();let c={fixed:[],income:[],store:[],varia
  for(let i=0;i<data.periods.length;i++){c.fixed[i]=rowSum(section('fixed'),i);c.income[i]=rowSum(section('income'),i);c.store[i]=rowSum(section('store'),i);c.variable[i]=rowSum(section('variable'),i);c.other[i]=rowSum(section('other'),i);c.netFree[i]=c.fixed[i]+c.income[i];c.netOther[i]=c.netFree[i]+c.store[i];c.monthlyNet[i]=c.netOther[i]+c.variable[i];c.projected[i]=(i===0?initialBankTotal():c.projected[i-1])+c.monthlyNet[i]+c.other[i];c.banks[i]=bankTotal(i);c.cashCheck[i]=c.projected[i]-c.banks[i];}
  return c;}
 function cellKey(sec,ri,pi,type='value'){return `${sec}|${ri}|${pi}|${type}`}
-function render(){ensureLengths();const c=calculations();renderSummary(c);const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small></th>`:'';let html='<thead><tr><th>Concepto</th>'+initialHeader+data.periods.map((p,i)=>`<th><input class="month-input" value="${esc(p)}" onchange="renamePeriod(${i},this.value)"></th>`).join('')+'</tr></thead><tbody>';
+function visiblePeriodIndexes(){return data.periods.map((_,i)=>i).filter(i=>!data.hiddenPeriods.includes(i))}
+function visiblePeriods(){return visiblePeriodIndexes().map(i=>data.periods[i])}
+function isPeriodVisible(i){return !data.hiddenPeriods.includes(i)}
+function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small></th>`:'';let html='<thead><tr><th>Concepto</th>'+initialHeader+visibleIdx.map(i=>`<th><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"></th>`).join('')+'</tr></thead><tbody>';
 function sectionTitleRow(title, initialVisible){
- const extraCells=data.periods.length+(initialVisible?1:0);
+ const extraCells=visibleIdx.length+(initialVisible?1:0);
  return `<tr class="section-title"><td>${esc(title)}</td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
  sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
  if(initialVisible){if(sec.kind==='bank'){html+=`<td>${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+='<td class="money muted">—</td>'}}
- for(let pi=0;pi<data.periods.length;pi++)html+=`<td>${inputCell(sec.id,ri,pi,r[1][pi])}</td>`;
+ for(const pi of visibleIdx)html+=`<td>${inputCell(sec.id,ri,pi,r[1][pi])}</td>`;
  html+='</tr>'});
- html+=`<tr class="add-row"><td colspan="${data.periods.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
+ html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
  html+='</tbody>';t.innerHTML=html;}
-function inputCell(sec,ri,pi,val){const has=data.notes[cellKey(sec,ri,pi)]?'has-note':'';const shown=formatNumber(val);return `<div class="cell"><input inputmode="decimal" value="${esc(shown)}" onfocus="this.value=rawEditValue(this.value);this.select()" onblur="setValue('${sec}',${ri},'${pi}',this.value)"><button title="Comentario" class="note-btn ${has}" onclick="openNote('${sec}',${ri},'${pi}')">●</button></div>`}
+function inputCell(sec,ri,pi,val){const has=data.notes[cellKey(sec,ri,pi)]?'has-note':'';const shown=formatNumber(val);const isPaidCell=(sec==='fixed'&&pi!=='initial');const paid=data.paid[cellKey(sec,ri,pi,'paid')];return `<div class="cell ${paid?'paid-done':''}">${isPaidCell?`<span class="paid-check"><input type="checkbox" ${paid?'checked':''} title="Pago realizado" onchange="togglePaid('${sec}',${ri},'${pi}',this.checked)"></span>`:''}<input type="text" inputmode="decimal" value="${esc(shown)}" onfocus="this.value=rawEditValue(this.value);this.select()" onblur="setValue('${sec}',${ri},'${pi}',this.value)"><button title="Comentario" class="note-btn ${has}" onclick="openNote('${sec}',${ri},'${pi}')">●</button></div>`}
 function totalRow(label,arr){return `<tr class="total-row"><td>${label}</td><td></td>`+arr.map(v=>`<td class="money ${v<0?'negative':'positive'}">${money(v)}</td>`).join('')+'</tr>'}
 function calcRow(label,arr,flag=false){return `<tr class="calc-row"><td>${label}</td><td></td>`+arr.map(v=>`<td class="money ${v<0?'negative':'positive'}">${money(v)}${flag?`<br><small>${v<0?'Superávit':'Déficit'}</small>`:''}</td>`).join('')+'</tr>'}
 function bankTotalRows(c){return `<tr class="total-row"><td>Total saldos bancos reales</td><td class="money negative">${money(initialBankTotal())}</td>`+c.banks.map(v=>`<td class="money negative">${money(v)}</td>`).join('')+'</tr>'}
-function setValue(secId,ri,pi,v){const sec=section(secId); if(pi==='initial')sec.rows[ri][2]=num(v); else sec.rows[ri][1][Number(pi)]=num(v); saveSilent(); render()}
+function setValue(secId,ri,pi,v){const sec=section(secId); const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]); const after=num(v); if(pi==='initial')sec.rows[ri][2]=after; else sec.rows[ri][1][Number(pi)]=after; logInput({source:'Edición directa',secId,ri,pi,mode:'replace',amount:after,before,after,note:data.notes[cellKey(secId,ri,pi)]||'',paid:data.paid[cellKey(secId,ri,pi,'paid')]||false}); saveSilent(); render()}
+function togglePaid(secId,ri,pi,checked){data.paid[cellKey(secId,ri,pi,'paid')]=!!checked;logInput({source:'Check pago fijo',secId,ri,pi,mode:'paid',amount:'',before:'',after:num(section(secId).rows[ri][1][Number(pi)]),note:checked?'Pago marcado como realizado':'Pago desmarcado',paid:!!checked});saveSilent();render()}
+function logInput(entry){data.inputLog=data.inputLog||[];const sec=section(entry.secId);const period=entry.pi==='initial'?data.initialColumnLabel:data.periods[Number(entry.pi)];data.inputLog.push({fecha:new Date().toLocaleString('es-CO'),origen:entry.source||'Formulario',seccion:sec?sec.title:entry.secId,concepto:sec&&sec.rows[entry.ri]?sec.rows[entry.ri][0]:'',periodo:period,accion:entry.mode||'',valorIngresado:entry.amount,valorAnterior:entry.before,valorFinal:entry.after,comentario:entry.note||'',pagoRealizado:entry.paid?'Sí':'No'});}
 function renameRow(secId,ri,v){section(secId).rows[ri][0]=v;saveSilent();render()}function renamePeriod(i,v){data.periods[i]=v||`Mes ${i+1}`;saveSilent();render()}function renameInitialColumn(v){data.initialColumnLabel=v||'Saldo inicial bancos';saveSilent();render()}function toggleInitialColumn(){data.showInitialColumn=!data.showInitialColumn;saveSilent();render()}
 function addRow(secId,pos){const sec=section(secId);const row=['Nuevo concepto',Array(data.periods.length).fill(0)];if(sec.kind==='bank')row.push(0);sec.rows.splice(pos==null?sec.rows.length:pos,0,row);saveSilent();render()}
 function deleteRow(secId,ri){if(section(secId).rows.length<=1){alert('Debe quedar al menos un concepto en la sección.');return} if(confirm('¿Eliminar este concepto?')){section(secId).rows.splice(ri,1);saveSilent();render()}}
@@ -98,16 +147,104 @@ function nextMonthName(last){const meses=['Enero','Febrero','Marzo','Abril','May
 function openNote(sec,ri,pi){noteCell={sec,ri,pi};document.getElementById('noteTarget').textContent=`${section(sec).title} / ${section(sec).rows[ri][0]} / ${pi==='initial'?data.initialColumnLabel:data.periods[Number(pi)]}`;document.getElementById('noteText').value=data.notes[cellKey(sec,ri,pi)]||'';document.getElementById('noteModal').classList.add('open')}
 function closeNote(save){if(save&&noteCell){const k=cellKey(noteCell.sec,noteCell.ri,noteCell.pi);const v=document.getElementById('noteText').value.trim();if(v)data.notes[k]=v;else delete data.notes[k];saveSilent();render()}document.getElementById('noteModal').classList.remove('open');noteCell=null}
 function renderSummary(c){
- const last=data.periods.length-1;
- const worst=Math.max(...c.projected);
- const worstIndex=c.projected.indexOf(worst);
- document.getElementById('summary').innerHTML=`<div class="kpi"><small>Saldo proyectado final (${esc(data.periods[last])})</small><strong class="${c.projected[last]<0?'superavit':'deficit'}">${money(c.projected[last])}</strong></div><div class="kpi"><small>Cuadre de caja final</small><strong class="${c.cashCheck[last]<0?'superavit':'deficit'}">${money(c.cashCheck[last])}</strong></div><div class="kpi"><small>Mes más deficitario</small><strong class="deficit">${esc(data.periods[worstIndex])}: ${money(worst)}</strong></div>`;
+ const visibleIdx=visiblePeriodIndexes();
+ const kpiIdx=visibleIdx.length?visibleIdx[visibleIdx.length-1]:data.periods.length-1;
+ const worst=Math.max(...visibleIdx.map(i=>c.projected[i]));
+ const worstIndex=visibleIdx.find(i=>c.projected[i]===worst) ?? kpiIdx;
+ document.getElementById('summary').innerHTML=`<div class="kpi"><small>Saldo proyectado (${esc(data.periods[kpiIdx])})</small><strong class="${c.projected[kpiIdx]<0?'superavit':'deficit'}">${money(c.projected[kpiIdx])}</strong></div><div class="kpi"><small>Cuadre de caja (${esc(data.periods[kpiIdx])})</small><strong class="${c.cashCheck[kpiIdx]<0?'superavit':'deficit'}">${money(c.cashCheck[kpiIdx])}</strong></div><div class="kpi"><small>Mes más deficitario visible</small><strong class="deficit">${esc(data.periods[worstIndex])}: ${money(c.projected[worstIndex])}</strong></div>`;
  const rows=[['Total gastos fijos',c.fixed,'total'],['Total ingresos',c.income,'total'],['Tienda neto',c.store,'total'],['Total gastos variables',c.variable,'total'],['Otros movimientos',c.other,'total'],['Saldo neto mensual',c.monthlyNet,'result'],['Saldo proyectado',c.projected,'result'],['Total saldos bancos',c.banks,'total'],['Cuadre de caja',c.cashCheck,'result']];
- let html='<thead><tr><th>Concepto</th>'+data.periods.map(p=>`<th>${esc(p)}</th>`).join('')+'</tr></thead><tbody>';
- rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+r[1].map(v=>`<td class="${v<0?'negative':'positive'}">${money(v)}</td>`).join('')+'</tr>'});
+ let html='<thead><tr><th>Concepto</th>'+visibleIdx.map(i=>`<th>${esc(data.periods[i])}</th>`).join('')+'</tr></thead><tbody>';
+ rows.forEach(r=>{html+=`<tr class="${r[2]}"><td>${r[0]}</td>`+visibleIdx.map(i=>`<td class="${r[1][i]<0?'negative':'positive'}">${money(r[1][i])}</td>`).join('')+'</tr>'});
  html+='</tbody>';
  const tbl=document.getElementById('summaryTable'); if(tbl) tbl.innerHTML=html;
 }
+function renderInputForm(){
+ const secInput=document.getElementById('formSection');
+ if(!secInput)return;
+ secInput.value='variable';
+ updateConceptSelect();
+}
+function updateConceptSelect(){
+ const secInput=document.getElementById('formSection'), conceptSelect=document.getElementById('formConcept'), periodSelect=document.getElementById('formPeriod');
+ if(!secInput||!conceptSelect||!periodSelect)return;
+ secInput.value='variable';
+ const prevConcept=conceptSelect.value;
+ const prevPeriod=periodSelect.value;
+ const sec=section('variable');
+ conceptSelect.innerHTML=sec.rows.map((r,i)=>`<option value="${i}">${esc(r[0])}</option>`).join('');
+ if([...conceptSelect.options].some(o=>o.value===prevConcept))conceptSelect.value=prevConcept;
+ periodSelect.innerHTML=data.periods.map((p,i)=>`<option value="${i}">${esc(p)}</option>`).join('');
+ if([...periodSelect.options].some(o=>o.value===prevPeriod))periodSelect.value=prevPeriod;
+ const paidWrap=document.getElementById('formPaidWrap');
+ if(paidWrap)paidWrap.style.display='none';
+}
+function normalizeFormAmount(secId,value){
+ let v=num(value);
+ const sec=section(secId);
+ if(secId==='income' && v>0)v=-v;
+ if(sec && sec.kind==='bank')v=Math.abs(v);
+ return v;
+}
+function submitLineInput(ev){
+ ev.preventDefault();
+ const secId='variable';
+ const ri=Number(document.getElementById('formConcept').value);
+ const pi=document.getElementById('formPeriod').value;
+ const raw=document.getElementById('formAmount').value;
+ if(String(raw).trim()===''){alert('Ingresa un valor.');return}
+ const sec=section(secId);
+ let v=normalizeFormAmount(secId,raw);
+ if(document.getElementById('formMode').value==='add'){
+   const current=pi==='initial'?sec.rows[ri][2]:sec.rows[ri][1][Number(pi)];
+   v=num(current)+v;
+ }
+ const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]);
+ if(pi==='initial')sec.rows[ri][2]=v; else sec.rows[ri][1][Number(pi)]=v;
+ const note=document.getElementById('formNote').value.trim();
+ if(note)data.notes[cellKey(secId,ri,pi)]=note;
+ const paid=(secId==='fixed'&&pi!=='initial')?!!document.getElementById('formPaid').checked:false;
+ if(secId==='fixed'&&pi!=='initial')data.paid[cellKey(secId,ri,pi,'paid')]=paid;
+ logInput({source:'Formulario',secId,ri,pi,mode:document.getElementById('formMode').value,amount:normalizeFormAmount(secId,raw),before,after:v,note,paid});
+ saveSilent();
+ clearLineInputForm(true);
+ render();
+ document.getElementById('formStatus').textContent='Valor aplicado y formulario limpio';
+ setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
+}
+function clearLineInputForm(keepStatus=false){
+ const amount=document.getElementById('formAmount'), note=document.getElementById('formNote'), status=document.getElementById('formStatus'), paid=document.getElementById('formPaid');
+ if(amount)amount.value=''; if(note)note.value=''; if(paid)paid.checked=false; if(status&&!keepStatus)status.textContent='';
+}
+
+
+
+function openMonthsModal(){
+ const list=document.getElementById('monthsVisibilityList');
+ list.innerHTML=data.periods.map((p,i)=>`<label style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px"><input type="checkbox" data-period-index="${i}" ${isPeriodVisible(i)?'checked':''} style="width:18px;height:18px;accent-color:#22c55e"><span>${esc(p)}</span></label>`).join('');
+ document.getElementById('monthsModal').classList.add('open');
+}
+function closeMonthsModal(apply){
+ if(apply){
+   const checks=[...document.querySelectorAll('#monthsVisibilityList input[data-period-index]')];
+   const visible=checks.filter(ch=>ch.checked).map(ch=>Number(ch.dataset.periodIndex));
+   if(!visible.length){alert('Debe quedar visible al menos un mes.');return}
+   data.hiddenPeriods=checks.filter(ch=>!ch.checked).map(ch=>Number(ch.dataset.periodIndex));
+   saveSilent();render();
+ }
+ document.getElementById('monthsModal').classList.remove('open');
+}
+function showAllPeriods(){data.hiddenPeriods=[];saveSilent();render();document.getElementById('monthsModal').classList.remove('open')}
+
+function exportInputLogExcel(){
+ const rows=data.inputLog||[];
+ if(!rows.length){alert('Aún no hay inputs registrados para exportar.');return}
+ const headers=['Fecha','Origen','Sección','Concepto','Periodo','Acción','Valor ingresado','Valor anterior','Valor final','Comentario','Pago realizado'];
+ const tr=rows.map(r=>`<tr><td>${esc(r.fecha)}</td><td>${esc(r.origen)}</td><td>${esc(r.seccion)}</td><td>${esc(r.concepto)}</td><td>${esc(r.periodo)}</td><td>${esc(r.accion)}</td><td>${esc(r.valorIngresado)}</td><td>${esc(r.valorAnterior)}</td><td>${esc(r.valorFinal)}</td><td>${esc(r.comentario)}</td><td>${esc(r.pagoRealizado)}</td></tr>`).join('');
+ const html=`<html><head><meta charset="utf-8"></head><body><table border="1"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></body></html>`;
+ const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-detallado-inputs.xls';a.click();URL.revokeObjectURL(a.href);
+}
+
 function saveSilent(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
 function resetData(){if(confirm('Esto borrará los cambios guardados en este navegador. ¿Continuar?')){data=clone(baseData);saveSilent();render()}}
 function exportJSON(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo-modelo-caja.json';a.click();URL.revokeObjectURL(a.href)}
