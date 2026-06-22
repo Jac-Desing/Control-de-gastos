@@ -18,12 +18,35 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 @media(max-width:900px){.input-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:0 10px 12px}.input-form .wide{grid-column:span 2}.input-form .actions{grid-column:span 2}.input-form select,.input-form input,.input-form textarea{padding:7px;font-size:13px}.paid-label{padding-top:0}}
 
 #summaryTable{width:100%;min-width:900px}#summaryTable th,#summaryTable td{padding:8px 10px;text-align:right;position:static;min-width:120px;background:transparent}#summaryTable th:first-child,#summaryTable td:first-child{text-align:left;min-width:230px;background:transparent}#summaryTable thead th{background:#0b1220;color:#cbd5e1}.result td{background:#172554!important;font-weight:800}.total td{background:#042f2e!important;font-weight:800}
+
+.auth-panel{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f172a,#111827)}
+.auth-card{width:min(440px,94vw);background:rgba(17,24,39,.98);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.auth-card h1{margin:0 0 8px;color:#fff;font-size:28px}.auth-card p{color:var(--muted);font-size:14px;line-height:1.45}.auth-card label{display:block;color:var(--muted);font-weight:700;font-size:12px;margin:12px 0 6px}.auth-card input{width:100%;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:12px;padding:12px;font-size:15px}.auth-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.auth-status{min-height:20px;margin-top:12px;color:#fca5a5;font-weight:700;font-size:13px}.cloudbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px}.cloudbar strong{color:#e5e7eb}.sync-ok{color:#86efac}.sync-warn{color:#fde68a}.sync-bad{color:#fca5a5}body.locked header,body.locked main{display:none}body:not(.locked) #authPanel{display:none}
+
 @media(max-width:900px){header{display:block}.toolbar{justify-content:flex-start;margin-top:14px}.summary{grid-template-columns:1fr}.panelTitle{display:block}main{padding:14px}th:first-child,td:first-child{min-width:210px}}
 </style>
 </head>
-<body>
+<body class="locked">
+
+<section id="authPanel" class="auth-panel">
+  <div class="auth-card">
+    <h1>Control de gastos</h1>
+    <p>Inicia sesión para guardar el modelo en la nube y usarlo desde el celular, PC o cualquier navegador.</p>
+    <label>Correo electrónico</label>
+    <input id="authEmail" type="email" autocomplete="email" placeholder="tu-correo@gmail.com">
+    <label>Contraseña</label>
+    <input id="authPassword" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres">
+    <div class="auth-actions">
+      <button onclick="signInCloud()">Entrar</button>
+      <button class="secondary" onclick="createCloudAccount()">Crear cuenta</button>
+    </div>
+    <div id="authStatus" class="auth-status"></div>
+  </div>
+</section>
 <header>
   <h1>Modelo mensual de caja</h1>
+  <div>
+    <div class="cloudbar"><span>Usuario: <strong id="cloudUser">—</strong></span><span id="syncStatus" class="sync-warn">Conectando...</span><button class="secondary" onclick="signOutCloud()">Cerrar sesión</button></div>
   <div class="toolbar">
     <button onclick="addPeriod()">+ Agregar mes</button>
     <button class="secondary" onclick="openMonthsModal()">Mostrar/ocultar meses</button>
@@ -34,6 +57,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
     <button class="secondary" onclick="document.getElementById('importFile').click()">Importar respaldo</button>
     <button class="danger" onclick="resetData()">Restaurar modelo base</button>
     <input id="importFile" type="file" accept="application/json" hidden onchange="importJSON(event)">
+  </div>
   </div>
 </header>
 <main>
@@ -82,8 +106,12 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
 </main>
 <div class="modal" id="monthsModal"><div class="modal-card"><h3>Mostrar u ocultar meses</h3><p style="color:#94a3b8;margin-top:-8px">Selecciona los meses que quieres ver. Los meses ocultos conservan sus datos y siguen haciendo parte del modelo.</p><div id="monthsVisibilityList" style="display:grid;gap:8px;margin:12px 0;max-height:50vh;overflow:auto"></div><div class="modal-actions"><button class="secondary" onclick="showAllPeriods()">Mostrar todos</button><button class="secondary" onclick="closeMonthsModal(false)">Cancelar</button><button onclick="closeMonthsModal(true)">Aplicar</button></div></div></div>
 <div class="modal" id="noteModal"><div class="modal-card"><h3>Comentario de celda</h3><p id="noteTarget" style="color:#64748b;margin-top:-8px"></p><textarea id="noteText" placeholder="Escribe una nota aclaratoria..."></textarea><div class="modal-actions"><button class="secondary" onclick="closeNote(false)">Cancelar</button><button onclick="closeNote(true)">Guardar nota</button></div></div></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script>
-const STORAGE_KEY='gastosModeloV12';
+const STORAGE_KEY='gastosModeloV20';
+const LEGACY_STORAGE_KEYS=['gastosModeloV20','gastosModeloV12'];
 const baseData={
   initialColumnLabel:'Saldo inicial bancos',
   initialColumnDate:'01-jun-2026',
@@ -100,10 +128,83 @@ const baseData={
   ],notes:{},paid:{},inputLog:[],hiddenPeriods:[]
 };
 let data=loadData(); let noteCell=null;
+
+const firebaseConfig={
+  apiKey:"AIzaSyDP_27lnSixe9Khe-aGsd_IGh9NSw3F9QI",
+  authDomain:"control-de-gastos-34de9.firebaseapp.com",
+  projectId:"control-de-gastos-34de9",
+  storageBucket:"control-de-gastos-34de9.firebasestorage.app",
+  messagingSenderId:"284253882078",
+  appId:"1:284253882078:web:e6c80d0b0320351864e44f"
+};
+let auth=null, db=null, currentUser=null, unsubscribeCloud=null, saveTimer=null, applyingCloud=false;
+function cloudDoc(){return db.collection('users').doc(currentUser.uid).collection('models').doc('main')}
+function setSync(msg,cls='sync-warn'){const el=document.getElementById('syncStatus');if(el){el.textContent=msg;el.className=cls}}
+function authStatus(msg){const el=document.getElementById('authStatus');if(el)el.textContent=msg||''}
+function initCloud(){
+ try{
+   firebase.initializeApp(firebaseConfig);
+   auth=firebase.auth(); db=firebase.firestore();
+   auth.onAuthStateChanged(user=>{ if(user) onSignedIn(user); else onSignedOut(); });
+ }catch(e){authStatus('No se pudo iniciar Firebase: '+e.message);}
+}
+async function onSignedIn(user){
+ currentUser=user; document.body.classList.remove('locked');
+ const u=document.getElementById('cloudUser'); if(u)u.textContent=user.email||user.uid;
+ setSync('Cargando nube...','sync-warn');
+ if(unsubscribeCloud)unsubscribeCloud();
+ unsubscribeCloud=cloudDoc().onSnapshot(async snap=>{
+   if(snap.exists){
+     const cloud=snap.data();
+     if(cloud && cloud.data){applyingCloud=true;data=migrateData(cloud.data);localStorage.setItem(STORAGE_KEY,JSON.stringify(data));render();applyingCloud=false;setSync('Sincronizado en la nube','sync-ok');}
+   }else{
+     await cloudDoc().set({data:migrateData(data),version:'v20',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+     setSync('Modelo creado en la nube','sync-ok');
+   }
+ },err=>{setSync('Error de sincronización','sync-bad');console.error(err);alert('Firestore no permitió sincronizar. Revisa las reglas de seguridad.');});
+}
+function onSignedOut(){
+ currentUser=null; if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null;}
+ document.body.classList.add('locked'); setSync('Sin sesión','sync-warn');
+ const u=document.getElementById('cloudUser'); if(u)u.textContent='—';
+}
+async function signInCloud(){
+ const email=document.getElementById('authEmail').value.trim(); const pass=document.getElementById('authPassword').value;
+ if(!email||!pass){authStatus('Ingresa correo y contraseña.');return}
+ authStatus('Ingresando...');
+ try{await auth.signInWithEmailAndPassword(email,pass);authStatus('');}catch(e){authStatus(firebaseError(e));}
+}
+async function createCloudAccount(){
+ const email=document.getElementById('authEmail').value.trim(); const pass=document.getElementById('authPassword').value;
+ if(!email||!pass){authStatus('Ingresa correo y contraseña.');return}
+ if(pass.length<6){authStatus('La contraseña debe tener mínimo 6 caracteres.');return}
+ authStatus('Creando cuenta...');
+ try{await auth.createUserWithEmailAndPassword(email,pass);authStatus('');}catch(e){authStatus(firebaseError(e));}
+}
+function signOutCloud(){if(auth)auth.signOut()}
+function firebaseError(e){
+ const code=e&&e.code?e.code:'';
+ if(code.includes('wrong-password')||code.includes('invalid-credential'))return 'Correo o contraseña incorrectos.';
+ if(code.includes('user-not-found'))return 'Ese correo no está registrado.';
+ if(code.includes('email-already-in-use'))return 'Ese correo ya tiene cuenta. Usa Entrar.';
+ if(code.includes('weak-password'))return 'La contraseña es demasiado corta.';
+ if(code.includes('invalid-email'))return 'Correo electrónico inválido.';
+ return (e&&e.message)||'Error de autenticación.';
+}
+function queueCloudSave(){
+ if(applyingCloud||!currentUser||!db)return;
+ setSync('Guardando...','sync-warn'); clearTimeout(saveTimer); saveTimer=setTimeout(saveCloudNow,650);
+}
+async function saveCloudNow(){
+ if(!currentUser||!db)return;
+ try{await cloudDoc().set({data:migrateData(data),version:'v20',updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});setSync('Sincronizado en la nube','sync-ok');}
+ catch(e){setSync('No se pudo guardar','sync-bad');console.error(e);}
+}
+
 function clone(o){return JSON.parse(JSON.stringify(o))}
-function loadData(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));return migrateData(saved||clone(baseData))}catch(e){return clone(baseData)}}
+function loadData(){try{for(const key of LEGACY_STORAGE_KEYS){const raw=localStorage.getItem(key);if(raw)return migrateData(JSON.parse(raw)||clone(baseData));}return clone(baseData)}catch(e){return clone(baseData)}}
 function migrateData(d){d=d||clone(baseData); if(d.initialColumnLabel==null)d.initialColumnLabel='Saldo inicial bancos'; if(d.initialColumnDate==null)d.initialColumnDate='01-jun-2026'; if(d.showInitialColumn==null)d.showInitialColumn=true; if(!d.notes)d.notes={}; if(!d.paid)d.paid={}; if(!Array.isArray(d.inputLog))d.inputLog=[]; if(!Array.isArray(d.hiddenPeriods))d.hiddenPeriods=[]; return d}
-function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data)); toast('Modelo guardado en este navegador.')}function toast(msg){alert(msg)}
+async function saveData(){saveSilent();await saveCloudNow();toast('Modelo guardado y sincronizado.')}function toast(msg){alert(msg)}
 function money(n){n=Number(n)||0;return n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})}
 function formatNumber(n){n=Number(n)||0;return n.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:2})}
 function num(v){if(typeof v==='number')return v; let s=String(v||'').replace(/\./g,'').replace(/,/g,'.').replace(/[^0-9.\-]/g,''); return Number(s)||0}
@@ -240,17 +341,17 @@ function exportInputLogExcel(){
  if(!rows.length){alert('Aún no hay inputs registrados para exportar.');return}
  const headers=['Fecha','Origen','Sección','Concepto','Periodo','Acción','Valor ingresado','Valor anterior','Valor final','Comentario','Pago realizado'];
  const tr=rows.map(r=>`<tr><td>${esc(r.fecha)}</td><td>${esc(r.origen)}</td><td>${esc(r.seccion)}</td><td>${esc(r.concepto)}</td><td>${esc(r.periodo)}</td><td>${esc(r.accion)}</td><td>${esc(r.valorIngresado)}</td><td>${esc(r.valorAnterior)}</td><td>${esc(r.valorFinal)}</td><td>${esc(r.comentario)}</td><td>${esc(r.pagoRealizado)}</td></tr>`).join('');
- const html=`<html><head><meta charset="utf-8"></head><body><table border="1"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></body></html>`;
+ const html=`<html><head><meta charset="utf-8"></head><body class="locked"><table border="1"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table></body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-detallado-inputs.xls';a.click();URL.revokeObjectURL(a.href);
 }
 
-function saveSilent(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
-function resetData(){if(confirm('Esto borrará los cambios guardados en este navegador. ¿Continuar?')){data=clone(baseData);saveSilent();render()}}
+function saveSilent(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));queueCloudSave()}
+function resetData(){if(confirm('Esto restaurará el modelo base y sincronizará el cambio en la nube. ¿Continuar?')){data=clone(baseData);saveSilent();render()}}
 function exportJSON(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo-modelo-caja.json';a.click();URL.revokeObjectURL(a.href)}
-function importJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);saveSilent();render()}catch(e){alert('Archivo de respaldo inválido')}};r.readAsText(f)}
+function importJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{data=migrateData(JSON.parse(r.result));saveSilent();render()}catch(e){alert('Archivo de respaldo inválido')}};r.readAsText(f)}
 function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
-render();
+initCloud();
 </script>
 </body>
 </html>
