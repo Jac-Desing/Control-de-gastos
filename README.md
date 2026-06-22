@@ -1,11 +1,11 @@
-# App web modelo v36.2
+# App web modelo v37
 
-Versión corregida sobre v36 ajustada.
+Versión basada en la v36 corregida.
 
 Incluye:
-- Menú lateral con submenús desplegables por categoría.
-- Cuadro resumen contraíble: al contraerse muestra encabezado, saldo proyectado, total bancos y cuadre de caja.
-- Control presupuestal contraíble: al contraerse muestra solo diferencia presupuesto vs real.
-- Reordenamiento manual de conceptos dentro de cada sección mediante arrastre o control táctil.
+- Bolitas/estado dentro de los desplegables, sin línea adicional que desordene el formulario.
+- Cuadro resumen contraíble: encabezado, saldo proyectado, total bancos y cuadre de caja.
+- Control presupuestal contraíble: diferencia presupuesto vs real.
+- Reordenamiento de conceptos dentro de cada sección por arrastre con mouse o dedo.
 - Cierre de mes condicionado a que el cuadre de caja sea cero.
-- Mantiene Firebase, datos en la nube y compatibilidad con versiones anteriores.
+- Submenús desplegables conservados.

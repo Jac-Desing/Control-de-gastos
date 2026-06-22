@@ -1173,7 +1173,7 @@ function exportVariableInputsExcel(){
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
 <script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
+/* v37 final: se aplica al final para no perder mejoras por overrides posteriores */
 (function(){
   function safeEsc(x){
     if(typeof esc==='function') return esc(x);
@@ -1319,7 +1319,7 @@ function exportInputLogExcel(){
  const tr=rows.map(r=>`<tr><td>${esc(r.fecha)}</td><td>${esc(r.origen)}</td><td>${esc(r.seccion)}</td><td>${esc(r.concepto)}</td><td>${esc(r.periodo)}</td><td>${esc(r.accion)}</td><td>${esc(r.valorIngresado)}</td><td>${esc(r.valorAnterior)}</td><td>${esc(r.valorFinal)}</td><td>${esc(r.comentario)}</td><td>${esc(r.pagoRealizado)}</td></tr>`).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Historial de cambios del modelo</h2><table border="1"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table>
 <script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
+/* v37 final: se aplica al final para no perder mejoras por overrides posteriores */
 (function(){
   function safeEsc(x){
     if(typeof esc==='function') return esc(x);
@@ -1575,7 +1575,7 @@ exportVariableInputsExcel=function(){
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
 <script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
+/* v37 final: se aplica al final para no perder mejoras por overrides posteriores */
 (function(){
   function safeEsc(x){
     if(typeof esc==='function') return esc(x);
@@ -1946,7 +1946,7 @@ exportVariableInputsExcel=function(){
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(actionLabel(r))}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
 <script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
+/* v37 final: se aplica al final para no perder mejoras por overrides posteriores */
 (function(){
   function safeEsc(x){
     if(typeof esc==='function') return esc(x);
@@ -2175,7 +2175,7 @@ initCloud();
 </script>
 
 <script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
+/* v37 final: se aplica al final para no perder mejoras por overrides posteriores */
 (function(){
   function safeEsc(x){
     if(typeof esc==='function') return esc(x);
@@ -2307,6 +2307,191 @@ initCloud();
     if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+safeMoney(check));return;}
     if(typeof previousCloseMonth==='function')return previousCloseMonth(pi);
   };
+})();
+</script>
+
+
+
+<style id="v37-style">
+/* v37: ajustes visuales y funcionales finales sobre v37 */
+.input-form .month-status-help{display:none!important}
+select option{background:#111827;color:#e5e7eb}
+.drag-row{touch-action:none}
+.drag-row.drag-over{outline:2px solid #38bdf8;outline-offset:-2px;background:rgba(14,165,233,.10)!important}
+.drag-hint{cursor:grab;user-select:none;touch-action:none;background:#1e293b;border:1px solid #475569;color:#cbd5e1;border-radius:8px;padding:3px 7px;margin-left:4px;font-weight:900}
+.drag-hint:active{cursor:grabbing}
+.compact-summary tbody tr td:first-child,.compact-budget tbody tr td:first-child{font-weight:900;color:#e5e7eb}
+</style>
+<script id="v37-patch">
+/* v37: bolitas dentro de desplegables, cuadros contraibles, drag/touch y cierre con cuadre cero */
+(function(){
+  function sEsc(x){
+    if(typeof esc==='function') return esc(x);
+    return String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});
+  }
+  function sMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
+  function vis(){try{return visiblePeriodIndexes()}catch(e){return (data.periods||[]).map(function(_,i){return i;});}}
+  function stateText(pi){try{return monthStateText(pi)}catch(e){return 'Sin inicializar';}}
+  function stateClass(pi){try{return monthStateClass(pi)}catch(e){return 'sin';}}
+  function stateEmoji(pi){var t=stateText(pi); if(t==='Cerrado')return '🔴'; if(t==='Abierto')return '🟢'; if(t==='Inicializado')return '🔵'; return '⚪';}
+  function stateOption(pi){return stateEmoji(pi)+' '+stateText(pi)+' - '+(data.periods[Number(pi)]||'');}
+  function mHead(pi){
+    if(typeof monthNameWithDot==='function') return monthNameWithDot(pi);
+    return '<span class="month-name-with-dot"><span class="month-state-dot '+stateClass(pi)+'"></span><span>'+sEsc(data.periods[Number(pi)]||'')+'</span></span>';
+  }
+  function removeExternalMonthHelp(){
+    document.querySelectorAll('.input-form .month-status-help, #inputPanel .month-status-help, .form-modal-body .month-status-help').forEach(function(n){n.remove();});
+  }
+  function fillPeriodSelect(sel, keep){
+    if(!sel)return;
+    var prev=keep!=null?String(keep):String(sel.value||'0');
+    sel.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+sEsc(stateOption(i))+'</option>';}).join('');
+    if(Array.prototype.some.call(sel.options,function(o){return o.value===prev;})) sel.value=prev;
+  }
+
+  var oldUpdateConcept=window.updateConceptSelect;
+  window.updateConceptSelect=function(){
+    var secInput=document.getElementById('formSection'), conceptSelect=document.getElementById('formConcept'), periodSelect=document.getElementById('formPeriod');
+    var prevPeriod=periodSelect?periodSelect.value:null;
+    var prevConcept=conceptSelect?conceptSelect.value:null;
+    if(secInput && !['variable','other'].includes(secInput.value)) secInput.value='variable';
+    if(conceptSelect && typeof section==='function' && secInput){
+      var sec=section(secInput.value);
+      conceptSelect.innerHTML=(sec&&sec.rows?sec.rows:[]).map(function(r,i){return '<option value="'+i+'">'+sEsc(r[0])+'</option>';}).join('');
+      if(Array.prototype.some.call(conceptSelect.options,function(o){return o.value===prevConcept;})) conceptSelect.value=prevConcept;
+    }else if(typeof oldUpdateConcept==='function'){
+      oldUpdateConcept.apply(this,arguments);
+    }
+    fillPeriodSelect(periodSelect,prevPeriod);
+    var paidWrap=document.getElementById('formPaidWrap'); if(paidWrap)paidWrap.style.display='none';
+    if(typeof validateInputMonthSelection==='function')validateInputMonthSelection();
+    removeExternalMonthHelp();
+  };
+
+  window.validateInputMonthSelection=function(){
+    var periodSelect=document.getElementById('formPeriod');
+    var submitBtn=document.querySelector('#lineInputForm button[type="submit"]');
+    if(!periodSelect)return true;
+    var pi=Number(periodSelect.value);
+    var initialized=typeof isVariableInitialized==='function'?isVariableInitialized(pi):false;
+    var closed=typeof isMonthClosed==='function'?isMonthClosed(pi):false;
+    var ok=initialized && !closed;
+    if(submitBtn)submitBtn.disabled=!ok;
+    if(!initialized){ if(typeof setFormStatus==='function')setFormStatus('Mes no inicializado. Inicialízalo antes de registrar inputs.','error'); return false; }
+    if(closed){ if(typeof setFormStatus==='function')setFormStatus('Mes cerrado. No permite nuevos inputs.','error'); return false; }
+    if(typeof setFormStatus==='function')setFormStatus('');
+    removeExternalMonthHelp();
+    return true;
+  };
+
+  function tableRows(first, rows, idx){
+    var html='<thead><tr><th>'+sEsc(first)+'</th>'+idx.map(function(i){return '<th>'+mHead(i)+'</th>';}).join('')+'</tr></thead><tbody>';
+    rows.forEach(function(r){
+      html+='<tr class="'+(r.rowClass||'')+'"><td>'+sEsc(r.label)+'</td>'+idx.map(function(i){var v=Number((r.arr||[])[i]||0);return '<td class="'+(v<0?'negative':'positive')+'">'+sMoney(v)+'</td>';}).join('')+'</tr>';
+    });
+    return html+'</tbody>';
+  }
+  window.toggleSummaryCollapsed=function(){data.summaryCollapsed=!data.summaryCollapsed; if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();};
+  window.toggleBudgetCollapsed=function(){data.budgetCollapsed=!data.budgetCollapsed; if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();};
+
+  window.renderSummary=function(c){
+    var idx=vis();
+    var currentIdx=(typeof currentPeriodIndex==='function')?currentPeriodIndex():idx[0]||0;
+    var lastIdx=idx.length?idx[idx.length-1]:(data.periods.length-1);
+    var kpi=function(label,pi,arr){return '<div class="kpi"><small>'+sEsc(label)+' ('+sEsc(data.periods[pi]||'')+')</small><strong class="'+(Number(arr[pi]||0)<0?'superavit':'deficit')+'">'+sMoney(arr[pi])+'</strong></div>';};
+    var summary=document.getElementById('summary');
+    if(summary)summary.innerHTML=kpi('Saldo proyectado - mes actual',currentIdx,c.projected)+kpi('Cuadre de caja - mes actual',currentIdx,c.cashCheck)+kpi('Saldo proyectado - último mes visible',lastIdx,c.projected)+kpi('Cuadre de caja - último mes visible',lastIdx,c.cashCheck);
+    var btn=document.getElementById('summaryToggleBtn'); if(btn)btn.textContent=data.summaryCollapsed?'+':'−';
+    var tbl=document.getElementById('summaryTable');
+    if(tbl){
+      if(data.summaryCollapsed){
+        tbl.classList.add('compact-summary');
+        tbl.innerHTML=tableRows('Resumen',[{label:'Saldo proyectado',arr:c.projected,rowClass:'result'},{label:'Total saldos bancos',arr:c.banks,rowClass:'total'},{label:'Cuadre de caja',arr:c.cashCheck,rowClass:'result'}],idx);
+      }else{
+        tbl.classList.remove('compact-summary');
+        var budgetDisplay=(data.periods||[]).map(function(_,i){return (typeof isVariableInitialized==='function'&&isVariableInitialized(i))?0:c.variableBudget[i];});
+        var variableDisplay=(data.periods||[]).map(function(_,i){return (typeof isVariableInitialized==='function'&&isVariableInitialized(i))?c.variable[i]:0;});
+        tbl.innerHTML=tableRows('Concepto',[{label:'Total gastos fijos',arr:c.fixed,rowClass:'total'},{label:'Total ingresos',arr:c.income,rowClass:'total'},{label:'Tienda neto',arr:c.store,rowClass:'total'},{label:'Ppto gastos variables',arr:budgetDisplay,rowClass:'total'},{label:'Total gastos variables',arr:variableDisplay,rowClass:'total'},{label:'Otros movimientos',arr:c.other,rowClass:'total'},{label:'Saldo neto mensual',arr:c.monthlyNet,rowClass:'result'},{label:'Saldo proyectado',arr:c.projected,rowClass:'result'},{label:'Total saldos bancos',arr:c.banks,rowClass:'total'},{label:'Cuadre de caja',arr:c.cashCheck,rowClass:'result'}],idx);
+      }
+    }
+    if(typeof renderVariableBudgetSummary==='function')renderVariableBudgetSummary(c);
+  };
+
+  window.renderVariableBudgetSummary=function(c){
+    var idx=vis();
+    var tbl=document.getElementById('variableBudgetSummaryTable'); if(!tbl)return;
+    var body=document.getElementById('budgetPanelBody'); if(body)body.classList.remove('panel-body-collapsed');
+    var btn=document.getElementById('budgetToggleBtn'); if(btn)btn.textContent=data.budgetCollapsed?'+':'−';
+    if(data.budgetCollapsed){
+      tbl.classList.add('compact-budget');
+      tbl.innerHTML=tableRows('Control presupuestal',[{label:'Diferencia ppto - real',arr:c.variableDiff,rowClass:'result'}],idx);
+      return;
+    }
+    tbl.classList.remove('compact-budget');
+    var html='<thead><tr><th>Indicador</th>'+idx.map(function(i){return '<th>'+mHead(i)+'</th>';}).join('')+'</tr></thead><tbody>';
+    var rows=[
+      ['Estado',idx.map(function(i){return stateEmoji(i)+' '+stateText(i);})],
+      ['Ppto gastos variables',idx.map(function(i){return sMoney(c.variableBudget[i]);})],
+      ['Total gastos variables real',idx.map(function(i){return sMoney(c.variable[i]);})],
+      ['Diferencia ppto - real',idx.map(function(i){return sMoney(c.variableDiff[i]);})]
+    ];
+    rows.forEach(function(r){
+      html+='<tr><td>'+sEsc(r[0])+'</td>'+r[1].map(function(v,j){var pi=idx[j];var cl=r[0].indexOf('Diferencia')>=0?(Number(c.variableDiff[pi]||0)<0?'positive':'negative'):'';return '<td class="'+cl+'">'+sEsc(v)+'</td>';}).join('')+'</tr>';
+    });
+    tbl.innerHTML=html+'</tbody>';
+  };
+
+  function remapIndexAfterMove(idx,from,to){idx=Number(idx);from=Number(from);to=Number(to);if(idx===from)return to;if(from<to&&idx>from&&idx<=to)return idx-1;if(from>to&&idx>=to&&idx<from)return idx+1;return idx;}
+  window.moveConceptRow=function(secId,from,to){
+    from=Number(from);to=Number(to);if(from===to)return;
+    var sec=(typeof section==='function')?section(secId):null;if(!sec||!sec.rows||!sec.rows[from]||!sec.rows[to])return;
+    var moved=sec.rows.splice(from,1)[0];sec.rows.splice(to,0,moved);
+    var newNotes={};Object.keys(data.notes||{}).forEach(function(k){var parts=k.split('|');if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to));newNotes[parts.join('|')]=data.notes[k];}else newNotes[k]=data.notes[k];});data.notes=newNotes;
+    var newPaid={};Object.keys(data.paid||{}).forEach(function(k){var parts=k.split('|');if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to));newPaid[parts.join('|')]=data.paid[k];}else newPaid[k]=data.paid[k];});data.paid=newPaid;
+    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndexAfterMove(r.ri,from,to);});
+    (data.inputLog=data.inputLog||[]).push({fecha:new Date().toLocaleString('es-CO'),origen:'Orden manual de conceptos',seccion:sec.title,concepto:moved[0],periodo:'',accion:'move',valorIngresado:'',valorAnterior:from,valorFinal:to,comentario:'Concepto movido dentro de su sección',pagoRealizado:'No'});
+    if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();
+  };
+  function enhanceDragRows(){
+    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
+    var secIndex=-1,rowIndex=-1,currentSec=null;
+    Array.from(tbody.children).forEach(function(tr){
+      if(tr.classList.contains('section-title')){secIndex++;currentSec=(data.sections||[])[secIndex];rowIndex=-1;return;}
+      if(!currentSec||tr.classList.contains('section-period-row')||tr.classList.contains('collapsed-section-row')||tr.classList.contains('add-row'))return;
+      if(!currentSec.rows||rowIndex+1>=currentSec.rows.length)return;
+      rowIndex++;tr.classList.add('drag-row');tr.draggable=true;tr.dataset.secId=currentSec.id;tr.dataset.ri=rowIndex;
+      var first=tr.querySelector('td:first-child .concept');
+      if(first&&!first.querySelector('.drag-hint'))first.insertAdjacentHTML('beforeend','<span class="drag-hint" title="Arrastra para ordenar">↕</span>');
+      tr.ondragstart=function(ev){ev.dataTransfer.setData('text/plain',tr.dataset.secId+'|'+tr.dataset.ri);};
+      tr.ondragover=function(ev){ev.preventDefault();tr.classList.add('drag-over');};
+      tr.ondragleave=function(){tr.classList.remove('drag-over');};
+      tr.ondrop=function(ev){ev.preventDefault();tr.classList.remove('drag-over');var raw=ev.dataTransfer.getData('text/plain').split('|');if(raw[0]===tr.dataset.secId)moveConceptRow(raw[0],raw[1],tr.dataset.ri);};
+      var hint=tr.querySelector('.drag-hint');
+      if(hint&&!hint.dataset.v37){
+        hint.dataset.v37='1';
+        hint.addEventListener('pointerdown',function(ev){
+          ev.preventDefault();ev.stopPropagation();hint.setPointerCapture&&hint.setPointerCapture(ev.pointerId);window.__v37Drag={secId:tr.dataset.secId,ri:Number(tr.dataset.ri)};tr.classList.add('drag-over');
+        });
+        hint.addEventListener('pointerup',function(ev){
+          ev.preventDefault();ev.stopPropagation();var start=window.__v37Drag;window.__v37Drag=null;document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});
+          if(!start)return;var target=document.elementFromPoint(ev.clientX,ev.clientY);var targetRow=target&&target.closest?target.closest('tr.drag-row'):null;
+          if(targetRow&&targetRow.dataset.secId===start.secId)moveConceptRow(start.secId,start.ri,targetRow.dataset.ri);
+        });
+        hint.onclick=function(ev){ev.stopPropagation();};
+      }
+    });
+  }
+  var oldRender=window.render;
+  window.render=function(){if(typeof oldRender==='function')oldRender.apply(this,arguments);try{enhanceDragRows();removeExternalMonthHelp();fillPeriodSelect(document.getElementById('formPeriod'));}catch(e){console.warn('v37 render',e);}};
+
+  var oldClose=window.closeMonth;
+  window.closeMonth=function(pi){
+    pi=Number(pi);var c=(typeof calculations==='function')?calculations():null;var check=c&&c.cashCheck?Number(c.cashCheck[pi]||0):0;
+    if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+sMoney(check));return;}
+    if(typeof oldClose==='function')return oldClose(pi);
+  };
+
+  document.addEventListener('change',function(ev){if(ev.target&&ev.target.id==='formPeriod'){validateInputMonthSelection();removeExternalMonthHelp();}});
 })();
 </script>
 
