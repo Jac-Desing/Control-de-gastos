@@ -1,25 +1,12 @@
-# App web modelo v24
+# App web modelo v25
 
-Versión basada en la v23 cloud y compatible con los datos ya guardados en Firebase.
+Versión basada en la v24 cloud, compatible con el modelo guardado en Firebase.
 
-## Cambios v24
-
-- Los inputs del formulario quedan registrados como entradas activas con ID propio.
-- Los inputs activos se pueden consultar, editar y eliminar desde la app.
-- Al eliminar un input, se retira del modelo y deja de aparecer en el informe de inputs.
-- El formulario permite registrar inputs en:
-  - Gastos variables
-  - Otros movimientos
-- El informe de inputs Excel se basa en los inputs activos del formulario, no en el historial general de cambios.
-- El historial de cambios se conserva como informe separado.
-- Se puede ajustar el ancho de columnas:
-  - arrastrando el borde derecho de los encabezados
-  - o desde el panel lateral con la opción Ajustar ancho columnas
-
-## Nube
-
-Mantiene la misma ruta de Firestore:
-
-users/{uid}/models/principal
-
-El modelo continúa guardándose como JSON serializado en el campo `data`, por lo que conserva compatibilidad con v22 y v23.
+Cambios principales:
+- Vista de inputs registrados en ventana/modal consultable desde el menú lateral.
+- Inicialización independiente por mes para Gastos variables.
+- Nueva sección Presupuestos Gastos variables con la línea Ppto Gastos Variables.
+- Al inicializar un mes, el presupuesto se toma del total existente de Gastos variables, luego esos valores quedan en cero y bloqueados para edición manual.
+- Para meses sin inicializar, el flujo usa el presupuesto de gastos variables; para meses inicializados, usa el total real de gastos variables.
+- Resumen adicional por mes: presupuesto, gasto real y diferencia.
+- Mantiene inputs editables/eliminables, Otros movimientos en formulario, ajustes de ancho de columnas, Firebase/Firestore y compatibilidad con datos existentes.
