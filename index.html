@@ -108,7 +108,7 @@ main{padding:24px;max-width:1500px;margin:auto}.note{background:#451a03;border:1
         <select id="formConcept"></select>
       </label>
       <label>Mes / columna
-        <select id="formPeriod" onchange="updateConceptSelect()"></select>
+        <select id="formPeriod" onchange="validateInputMonthSelection()"></select>
       </label>
       <label>Valor
         <input id="formAmount" inputmode="decimal" placeholder="Ej. 1.250.000">
@@ -384,11 +384,11 @@ function sectionTitleRow(title, initialVisible){
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec.title, initialVisible);
- sec.rows.forEach((r,ri)=>{const budgetConceptLocked=sec.id==='variableBudget';html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" ${budgetConceptLocked?'readonly title="Concepto automático"':''} onchange="renameRow('${sec.id}',${ri},this.value)">${budgetConceptLocked?'':`<span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span>`}</div></td>`;
+ sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
  if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
  for(const pi of visibleIdx){const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
  html+='</tr>'});
- if(sec.id!=='variableBudget')html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
+ html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
  html+='</tbody>';t.innerHTML=html;}
 function inputCell(sec,ri,pi,val){
@@ -396,11 +396,8 @@ function inputCell(sec,ri,pi,val){
  const shown=formatNumber(val);
  const isPaidCell=(sec==='fixed'&&pi!=='initial');
  const paid=data.paid[cellKey(sec,ri,pi,'paid')];
- const isBudgetCell=(sec==='variableBudget'&&pi!=='initial');
- const isInitLocked=(pi!=='initial'&&isVariableInitialized(pi)&&(sec==='variable'||sec==='other'));
- const locked=isBudgetCell||isInitLocked;
- const lockTitle=isBudgetCell?'Presupuesto automático: se calcula desde gastos variables antes de inicializar y queda fijo después':'Mes inicializado: editar solo por inputs';
- const readonly=locked?`readonly title="${lockTitle}"`:'';
+ const locked=(sec==='variable'&&pi!=='initial'&&isVariableInitialized(pi));
+ const readonly=locked?'readonly title="Mes inicializado: editar solo por inputs"':'';
  const focus=locked?'this.blur()':'this.value=rawEditValue(this.value);this.select()';
  const blur=locked?'':`onblur="setValue('${sec}',${ri},'${pi}',this.value)"`;
  return `<div class="cell ${paid?'paid-done':''}${locked?' locked-cell':''}">${isPaidCell?`<span class="paid-check"><input type="checkbox" ${paid?'checked':''} title="Pago realizado" onchange="togglePaid('${sec}',${ri},'${pi}',this.checked)"></span>`:''}<input type="text" inputmode="decimal" value="${esc(shown)}" ${readonly} onfocus="${focus}" ${blur}><button title="Comentario" class="note-btn ${has}" onclick="openNote('${sec}',${ri},'${pi}')">●</button></div>`
@@ -473,6 +470,26 @@ function updateConceptSelect(){
  if([...periodSelect.options].some(o=>o.value===prevPeriod))periodSelect.value=prevPeriod;
  const paidWrap=document.getElementById('formPaidWrap');
  if(paidWrap)paidWrap.style.display='none';
+ validateInputMonthSelection();
+}
+function setFormStatus(message,type='ok'){
+ const status=document.getElementById('formStatus'); if(!status)return;
+ status.textContent=message||'';
+ status.style.color=type==='error'?'#fca5a5':(type==='warn'?'#fde68a':'#86efac');
+}
+function validateInputMonthSelection(){
+ const periodSelect=document.getElementById('formPeriod');
+ const submitBtn=document.querySelector('#lineInputForm button[type="submit"]');
+ if(!periodSelect)return true;
+ const pi=Number(periodSelect.value);
+ const ok=isVariableInitialized(pi);
+ if(submitBtn)submitBtn.disabled=!ok;
+ if(!ok){
+   setFormStatus('Mes no inicializado. Inicialízalo en Gestión meses antes de registrar inputs.','error');
+   return false;
+ }
+ setFormStatus('');
+ return true;
 }
 function normalizeFormAmount(secId,value){
  let v=num(value);
@@ -530,6 +547,11 @@ function createInputRecordFromForm(existingId=null){
  const raw=document.getElementById('formAmount').value;
  if(String(raw).trim()===''){alert('Ingresa un valor.');return null}
  const sec=section(secId); if(!sec||!sec.rows[ri]){alert('Selecciona un concepto válido.');return null}
+ if(!isVariableInitialized(Number(pi))){
+   alert('No es posible registrar inputs en este mes. Primero debes inicializarlo desde Gestión meses → Inicializar mes gastos variables.');
+   setFormStatus('No se puede registrar: el mes seleccionado no está inicializado.','error');
+   return null;
+ }
  const before=pi==='initial'?num(sec.rows[ri][2]):num(sec.rows[ri][1][Number(pi)]);
  const mode=document.getElementById('formMode').value;
  const amount=normalizeFormAmount(secId,raw);
@@ -541,6 +563,7 @@ function submitLineInput(ev){
  const editingId=document.getElementById('lineInputForm').dataset.editingId||'';
  data.formInputs=data.formInputs||[];
  let oldRec=null;
+ if(!validateInputMonthSelection())return;
  if(editingId){
    const idx=data.formInputs.findIndex(x=>x.id===editingId&&x.active!==false);
    if(idx>=0){oldRec=clone(data.formInputs[idx]);applyInputRecordToModel(data.formInputs[idx],true);data.formInputs[idx].active=false;data.formInputs[idx].deletedAt=new Date().toLocaleString('es-CO');}
@@ -556,12 +579,13 @@ function submitLineInput(ev){
  clearLineInputForm(true);
  render();
  if(document.getElementById('inputsLedgerModal')&&document.getElementById('inputsLedgerModal').classList.contains('open'))renderInputsLedger();
- document.getElementById('formStatus').textContent='Input aplicado y formulario limpio';
+ setFormStatus('Input aplicado y formulario limpio','ok');
  setTimeout(()=>{const s=document.getElementById('formStatus'); if(s)s.textContent=''},2500);
 }
 function clearLineInputForm(keepStatus=false){
  const amount=document.getElementById('formAmount'), note=document.getElementById('formNote'), status=document.getElementById('formStatus'), paid=document.getElementById('formPaid');
  if(amount)amount.value=''; if(note)note.value=''; if(paid)paid.checked=false; if(status&&!keepStatus)status.textContent='';
+ validateInputMonthSelection();
 }
 
 
