@@ -1,18 +1,13 @@
-# App web modelo v38
+# App web modelo v39
 
-Versión construida sobre la **v36.2 corregida** suministrada por el usuario.
+Versión generada desde la v36 corregida entregada por el usuario.
 
-Incluye estas correcciones:
+Correcciones incluidas:
+- Reparación de Crear concepto desde formulario de inputs y menú/informe completo.
+- Submenús desplegables por categoría.
+- Validación de cuadre de caja igual a cero antes de cerrar mes.
+- Columna Saldo inicial bancos visible únicamente en la sección Bancos y controlable con el botón existente.
+- Reemplazo del drag & drop por orden numérico editable por sección, ordenado de menor a mayor al guardar orden.
+- Se eliminaron scripts incrustados dentro de exportaciones Excel para evitar errores de sintaxis.
 
-- Reparación del formulario **Crear concepto**, disponible solo para:
-  - Gastos variables.
-  - Otros movimientos.
-- Submenús laterales desplegables por categoría.
-- Cierre de mes con validación previa: el **cuadre de caja debe ser cero**.
-- La columna **Saldo inicial bancos** se muestra únicamente en la sección **Saldos bancos** y conserva el botón de ocultar/mostrar.
-- Se elimina el drag & drop de conceptos.
-- Se agrega campo **Orden** por concepto dentro de cada sección.
-- Cada sección tiene botón **Orden / Guardar orden**.
-- El orden se guarda de **menor a mayor** y persiste en Firebase.
-
-No se modifica Firebase Auth, Firestore, login ni estructura principal del modelo.
+No se modifica Firebase, Authentication ni la ruta de datos en Firestore.

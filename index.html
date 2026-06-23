@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v38</title>
+<title>Modelo mensual de caja v39</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -77,16 +77,6 @@ select option{background:#020617;color:#e5e7eb}
 .drag-row.drag-over td{outline:2px dashed #60a5fa;outline-offset:-3px}
 .drag-hint{font-size:11px;color:#93c5fd;margin-left:auto;font-weight:700}
 #summaryTable.compact-summary tbody tr td:first-child,#variableBudgetSummaryTable.compact-budget tbody tr td:first-child{font-weight:900;color:#e5e7eb}
-
-
-/* v38 fixes */
-.order-chip{display:inline-flex;align-items:center;gap:4px;margin-right:8px;background:#0b1220;border:1px solid #334155;border-radius:8px;padding:2px 5px;color:#bfdbfe;font-size:11px;font-weight:800}
-.order-chip input{width:48px!important;height:24px!important;text-align:center!important;border:1px solid #475569!important;background:#020617!important;color:#e5e7eb!important;border-radius:6px!important;padding:2px 4px!important;font-size:12px!important}
-.order-chip input:disabled{opacity:.45;cursor:not-allowed}
-.order-section-btn{margin-left:8px;padding:4px 8px;font-size:11px;border-radius:8px;background:#172554!important}
-.drag-hint{display:none!important}.drag-row{cursor:default!important}.drag-row.drag-over td{outline:none!important}
-.submenu-content{display:none}.submenu.open .submenu-content{display:block}
-
 </style>
 </head>
 <body class="locked">
@@ -836,28 +826,28 @@ function cellKey(sec,ri,pi,type='value'){return `${sec}|${ri}|${pi}|${type}`}
 function visiblePeriodIndexes(){return data.periods.map((_,i)=>i).filter(i=>!data.hiddenPeriods.includes(i))}
 function visiblePeriods(){return visiblePeriodIndexes().map(i=>data.periods[i])}
 function isPeriodVisible(i){return !data.hiddenPeriods.includes(i)}
-function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader='';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
+function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th style="${colStyle('initial')}"><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small><span class="resizer" onmousedown="startColumnResize(event,'initial')"></span></th>`:'';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
 function isSectionCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId]}
 function sectionTitleRow(sec, initialVisible){
- const extraCells=visibleIdx.length+((initialVisible&&sec.kind==='bank')?1:0);
+ const extraCells=visibleIdx.length+(initialVisible?1:0);
  const collapsed=isSectionCollapsed(sec.id);
  return `<tr class="section-title"><td style="${colStyle('concept')}"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button><span>${esc(sec.title)}</span></div></td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
 }
 function repeatedMonthHeader(sec, initialVisible){
  let row=`<tr class="section-period-row"><td style="${colStyle('concept')}">${esc(sec.title)}</td>`;
- if(initialVisible&&sec.kind==='bank')row+=`<td style="${colStyle('initial')}">${esc(data.initialColumnLabel)}</td>`;
+ if(initialVisible)row+=`<td style="${colStyle('initial')}">${esc(data.initialColumnLabel)}</td>`;
  visibleIdx.forEach(i=>row+=`<td style="${colStyle('p'+i)}">${esc(data.periods[i])}</td>`);
  return row+'</tr>';
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec, initialVisible);
- if(isSectionCollapsed(sec.id)){html+=`<tr class="collapsed-section-row"><td colspan="${visibleIdx.length+((initialVisible&&sec.kind==='bank')?2:1)}">Sección contraída. Usa el botón + para expandir.</td></tr>`;return;}
+ if(isSectionCollapsed(sec.id)){html+=`<tr class="collapsed-section-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}">Sección contraída. Usa el botón + para expandir.</td></tr>`;return;}
  html+=repeatedMonthHeader(sec, initialVisible);
  sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
- if(initialVisible&&sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}
+ if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
  for(const pi of visibleIdx){const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
  html+='</tr>'});
- html+=`<tr class="add-row"><td colspan="${visibleIdx.length+((initialVisible&&sec.kind==='bank')?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
+ html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
  html+='</tbody>';t.innerHTML=html;}
 function inputCell(sec,ri,pi,val){
@@ -1182,142 +1172,6 @@ function exportVariableInputsExcel(){
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
-<script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
-(function(){
-  function safeEsc(x){
-    if(typeof esc==='function') return esc(x);
-    return String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});
-  }
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function visibleIdx(){
-    try{return (typeof visiblePeriodIndexes==='function')?visiblePeriodIndexes():data.periods.map(function(_,i){return i;});}
-    catch(e){return data.periods.map(function(_,i){return i;});}
-  }
-  function monthHead(i){
-    try{return (typeof monthNameWithDot==='function')?monthNameWithDot(i):safeEsc(data.periods[i]);}
-    catch(e){return safeEsc(data.periods[i]);}
-  }
-  function cls(v){return Number(v)<0?'negative':'positive';}
-  function tableFromRows(first, rows, vis){
-    var html='<thead><tr><th>'+safeEsc(first)+'</th>'+vis.map(function(i){return '<th>'+monthHead(i)+'</th>';}).join('')+'</tr></thead><tbody>';
-    rows.forEach(function(r){
-      html+='<tr class="'+(r.rowClass||'')+'"><td>'+safeEsc(r.label)+'</td>'+vis.map(function(i){var v=Number((r.arr||[])[i]||0);return '<td class="'+cls(v)+'">'+safeMoney(v)+'</td>';}).join('')+'</tr>';
-    });
-    return html+'</tbody>';
-  }
-
-  window.toggleSummaryCollapsed=function(){
-    data.summaryCollapsed=!data.summaryCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-  window.toggleBudgetCollapsed=function(){
-    data.budgetCollapsed=!data.budgetCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  var previousSummary=window.renderSummary;
-  window.renderSummary=function(c){
-    var vis=visibleIdx();
-    var btn=document.getElementById('summaryToggleBtn');
-    if(btn)btn.textContent=data.summaryCollapsed?'+':'−';
-    var tbl=document.getElementById('summaryTable');
-    if(data.summaryCollapsed && tbl){
-      tbl.classList.add('compact-summary');
-      tbl.innerHTML=tableFromRows('Resumen',[
-        {label:'Saldo proyectado',arr:c.projected,rowClass:'result'},
-        {label:'Total saldos bancos',arr:c.banks,rowClass:'total'},
-        {label:'Cuadre de caja',arr:c.cashCheck,rowClass:'result'}
-      ],vis);
-      if(typeof renderVariableBudgetSummary==='function')renderVariableBudgetSummary(c);
-      return;
-    }
-    if(tbl)tbl.classList.remove('compact-summary');
-    if(typeof previousSummary==='function')previousSummary(c);
-  };
-
-  var previousBudget=window.renderVariableBudgetSummary;
-  window.renderVariableBudgetSummary=function(c){
-    var vis=visibleIdx();
-    var tbl=document.getElementById('variableBudgetSummaryTable');
-    if(!tbl)return;
-    var body=document.getElementById('budgetPanelBody');
-    var btn=document.getElementById('budgetToggleBtn');
-    if(btn)btn.textContent=data.budgetCollapsed?'+':'−';
-    if(body)body.classList.remove('panel-body-collapsed');
-    if(data.budgetCollapsed){
-      tbl.classList.add('compact-budget');
-      tbl.innerHTML=tableFromRows('Control presupuestal',[
-        {label:'Diferencia ppto - real',arr:c.variableDiff,rowClass:'result'}
-      ],vis);
-      return;
-    }
-    tbl.classList.remove('compact-budget');
-    if(typeof previousBudget==='function')previousBudget(c);
-  };
-
-  function remapIndexAfterMove(idx,from,to){
-    idx=Number(idx);from=Number(from);to=Number(to);
-    if(idx===from)return to;
-    if(from<to && idx>from && idx<=to)return idx-1;
-    if(from>to && idx>=to && idx<from)return idx+1;
-    return idx;
-  }
-  window.moveConceptRow=function(secId,from,to){
-    from=Number(from);to=Number(to); if(from===to)return;
-    var sec=(typeof section==='function')?section(secId):null;
-    if(!sec||!sec.rows||!sec.rows[from]||!sec.rows[to])return;
-    var moved=sec.rows.splice(from,1)[0]; sec.rows.splice(to,0,moved);
-    var newNotes={};
-    Object.keys(data.notes||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newNotes[parts.join('|')]=data.notes[k];} else newNotes[k]=data.notes[k];});
-    data.notes=newNotes;
-    var newPaid={};
-    Object.keys(data.paid||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newPaid[parts.join('|')]=data.paid[k];} else newPaid[k]=data.paid[k];});
-    data.paid=newPaid;
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndexAfterMove(r.ri,from,to);});
-    (data.inputLog=data.inputLog||[]).push({fecha:new Date().toLocaleString('es-CO'),origen:'Orden manual de conceptos',seccion:sec.title,concepto:moved[0],periodo:'',accion:'move',valorIngresado:'',valorAnterior:from,valorFinal:to,comentario:'Concepto movido dentro de su sección',pagoRealizado:'No'});
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  function markDragRows(){
-    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
-    var secIndex=-1,rowIndex=-1,currentSec=null;
-    Array.from(tbody.children).forEach(function(tr){
-      if(tr.classList.contains('section-title')){secIndex++; currentSec=(data.sections||[])[secIndex]; rowIndex=-1; return;}
-      if(!currentSec || tr.classList.contains('section-period-row') || tr.classList.contains('collapsed-section-row') || tr.classList.contains('add-row'))return;
-      if(!currentSec.rows || rowIndex+1>=currentSec.rows.length)return;
-      rowIndex++;
-      tr.classList.add('drag-row'); tr.draggable=true; tr.dataset.secId=currentSec.id; tr.dataset.ri=rowIndex;
-      var first=tr.querySelector('td:first-child .concept');
-      if(first && !first.querySelector('.drag-hint'))first.insertAdjacentHTML('beforeend','<span class="drag-hint" title="Arrastra para ordenar">↕</span>');
-      tr.ondragstart=function(ev){ev.dataTransfer.setData('text/plain',tr.dataset.secId+'|'+tr.dataset.ri);};
-      tr.ondragover=function(ev){ev.preventDefault();tr.classList.add('drag-over');};
-      tr.ondragleave=function(){tr.classList.remove('drag-over');};
-      tr.ondrop=function(ev){ev.preventDefault();tr.classList.remove('drag-over');var raw=ev.dataTransfer.getData('text/plain').split('|'); if(raw[0]===tr.dataset.secId)moveConceptRow(raw[0],raw[1],tr.dataset.ri);};
-      var hint=tr.querySelector('.drag-hint');
-      if(hint){hint.onclick=function(ev){ev.stopPropagation();var current=Number(tr.dataset.ri);var up=confirm('Aceptar: subir concepto\nCancelar: bajar concepto');var dest=current+(up?-1:1);if(dest>=0&&currentSec&&dest<currentSec.rows.length)moveConceptRow(currentSec.id,current,dest);};}
-    });
-  }
-  var previousRender=window.render;
-  window.render=function(){
-    if(typeof previousRender==='function')previousRender.apply(this,arguments);
-    try{markDragRows();}catch(e){console.warn('reordenamiento conceptos',e);}
-  };
-
-  var previousCloseMonth=window.closeMonth;
-  window.closeMonth=function(pi){
-    pi=Number(pi);
-    var c=(typeof calculations==='function')?calculations():null;
-    var check=c&&c.cashCheck?Number(c.cashCheck[pi]||0):0;
-    if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+safeMoney(check));return;}
-    if(typeof previousCloseMonth==='function')return previousCloseMonth(pi);
-  };
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
@@ -1328,142 +1182,6 @@ function exportInputLogExcel(){
  const headers=['Fecha','Origen','Sección','Concepto','Periodo','Acción','Valor ingresado','Valor anterior','Valor final','Comentario','Pago realizado'];
  const tr=rows.map(r=>`<tr><td>${esc(r.fecha)}</td><td>${esc(r.origen)}</td><td>${esc(r.seccion)}</td><td>${esc(r.concepto)}</td><td>${esc(r.periodo)}</td><td>${esc(r.accion)}</td><td>${esc(r.valorIngresado)}</td><td>${esc(r.valorAnterior)}</td><td>${esc(r.valorFinal)}</td><td>${esc(r.comentario)}</td><td>${esc(r.pagoRealizado)}</td></tr>`).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Historial de cambios del modelo</h2><table border="1"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table>
-<script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
-(function(){
-  function safeEsc(x){
-    if(typeof esc==='function') return esc(x);
-    return String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});
-  }
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function visibleIdx(){
-    try{return (typeof visiblePeriodIndexes==='function')?visiblePeriodIndexes():data.periods.map(function(_,i){return i;});}
-    catch(e){return data.periods.map(function(_,i){return i;});}
-  }
-  function monthHead(i){
-    try{return (typeof monthNameWithDot==='function')?monthNameWithDot(i):safeEsc(data.periods[i]);}
-    catch(e){return safeEsc(data.periods[i]);}
-  }
-  function cls(v){return Number(v)<0?'negative':'positive';}
-  function tableFromRows(first, rows, vis){
-    var html='<thead><tr><th>'+safeEsc(first)+'</th>'+vis.map(function(i){return '<th>'+monthHead(i)+'</th>';}).join('')+'</tr></thead><tbody>';
-    rows.forEach(function(r){
-      html+='<tr class="'+(r.rowClass||'')+'"><td>'+safeEsc(r.label)+'</td>'+vis.map(function(i){var v=Number((r.arr||[])[i]||0);return '<td class="'+cls(v)+'">'+safeMoney(v)+'</td>';}).join('')+'</tr>';
-    });
-    return html+'</tbody>';
-  }
-
-  window.toggleSummaryCollapsed=function(){
-    data.summaryCollapsed=!data.summaryCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-  window.toggleBudgetCollapsed=function(){
-    data.budgetCollapsed=!data.budgetCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  var previousSummary=window.renderSummary;
-  window.renderSummary=function(c){
-    var vis=visibleIdx();
-    var btn=document.getElementById('summaryToggleBtn');
-    if(btn)btn.textContent=data.summaryCollapsed?'+':'−';
-    var tbl=document.getElementById('summaryTable');
-    if(data.summaryCollapsed && tbl){
-      tbl.classList.add('compact-summary');
-      tbl.innerHTML=tableFromRows('Resumen',[
-        {label:'Saldo proyectado',arr:c.projected,rowClass:'result'},
-        {label:'Total saldos bancos',arr:c.banks,rowClass:'total'},
-        {label:'Cuadre de caja',arr:c.cashCheck,rowClass:'result'}
-      ],vis);
-      if(typeof renderVariableBudgetSummary==='function')renderVariableBudgetSummary(c);
-      return;
-    }
-    if(tbl)tbl.classList.remove('compact-summary');
-    if(typeof previousSummary==='function')previousSummary(c);
-  };
-
-  var previousBudget=window.renderVariableBudgetSummary;
-  window.renderVariableBudgetSummary=function(c){
-    var vis=visibleIdx();
-    var tbl=document.getElementById('variableBudgetSummaryTable');
-    if(!tbl)return;
-    var body=document.getElementById('budgetPanelBody');
-    var btn=document.getElementById('budgetToggleBtn');
-    if(btn)btn.textContent=data.budgetCollapsed?'+':'−';
-    if(body)body.classList.remove('panel-body-collapsed');
-    if(data.budgetCollapsed){
-      tbl.classList.add('compact-budget');
-      tbl.innerHTML=tableFromRows('Control presupuestal',[
-        {label:'Diferencia ppto - real',arr:c.variableDiff,rowClass:'result'}
-      ],vis);
-      return;
-    }
-    tbl.classList.remove('compact-budget');
-    if(typeof previousBudget==='function')previousBudget(c);
-  };
-
-  function remapIndexAfterMove(idx,from,to){
-    idx=Number(idx);from=Number(from);to=Number(to);
-    if(idx===from)return to;
-    if(from<to && idx>from && idx<=to)return idx-1;
-    if(from>to && idx>=to && idx<from)return idx+1;
-    return idx;
-  }
-  window.moveConceptRow=function(secId,from,to){
-    from=Number(from);to=Number(to); if(from===to)return;
-    var sec=(typeof section==='function')?section(secId):null;
-    if(!sec||!sec.rows||!sec.rows[from]||!sec.rows[to])return;
-    var moved=sec.rows.splice(from,1)[0]; sec.rows.splice(to,0,moved);
-    var newNotes={};
-    Object.keys(data.notes||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newNotes[parts.join('|')]=data.notes[k];} else newNotes[k]=data.notes[k];});
-    data.notes=newNotes;
-    var newPaid={};
-    Object.keys(data.paid||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newPaid[parts.join('|')]=data.paid[k];} else newPaid[k]=data.paid[k];});
-    data.paid=newPaid;
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndexAfterMove(r.ri,from,to);});
-    (data.inputLog=data.inputLog||[]).push({fecha:new Date().toLocaleString('es-CO'),origen:'Orden manual de conceptos',seccion:sec.title,concepto:moved[0],periodo:'',accion:'move',valorIngresado:'',valorAnterior:from,valorFinal:to,comentario:'Concepto movido dentro de su sección',pagoRealizado:'No'});
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  function markDragRows(){
-    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
-    var secIndex=-1,rowIndex=-1,currentSec=null;
-    Array.from(tbody.children).forEach(function(tr){
-      if(tr.classList.contains('section-title')){secIndex++; currentSec=(data.sections||[])[secIndex]; rowIndex=-1; return;}
-      if(!currentSec || tr.classList.contains('section-period-row') || tr.classList.contains('collapsed-section-row') || tr.classList.contains('add-row'))return;
-      if(!currentSec.rows || rowIndex+1>=currentSec.rows.length)return;
-      rowIndex++;
-      tr.classList.add('drag-row'); tr.draggable=true; tr.dataset.secId=currentSec.id; tr.dataset.ri=rowIndex;
-      var first=tr.querySelector('td:first-child .concept');
-      if(first && !first.querySelector('.drag-hint'))first.insertAdjacentHTML('beforeend','<span class="drag-hint" title="Arrastra para ordenar">↕</span>');
-      tr.ondragstart=function(ev){ev.dataTransfer.setData('text/plain',tr.dataset.secId+'|'+tr.dataset.ri);};
-      tr.ondragover=function(ev){ev.preventDefault();tr.classList.add('drag-over');};
-      tr.ondragleave=function(){tr.classList.remove('drag-over');};
-      tr.ondrop=function(ev){ev.preventDefault();tr.classList.remove('drag-over');var raw=ev.dataTransfer.getData('text/plain').split('|'); if(raw[0]===tr.dataset.secId)moveConceptRow(raw[0],raw[1],tr.dataset.ri);};
-      var hint=tr.querySelector('.drag-hint');
-      if(hint){hint.onclick=function(ev){ev.stopPropagation();var current=Number(tr.dataset.ri);var up=confirm('Aceptar: subir concepto\nCancelar: bajar concepto');var dest=current+(up?-1:1);if(dest>=0&&currentSec&&dest<currentSec.rows.length)moveConceptRow(currentSec.id,current,dest);};}
-    });
-  }
-  var previousRender=window.render;
-  window.render=function(){
-    if(typeof previousRender==='function')previousRender.apply(this,arguments);
-    try{markDragRows();}catch(e){console.warn('reordenamiento conceptos',e);}
-  };
-
-  var previousCloseMonth=window.closeMonth;
-  window.closeMonth=function(pi){
-    pi=Number(pi);
-    var c=(typeof calculations==='function')?calculations():null;
-    var check=c&&c.cashCheck?Number(c.cashCheck[pi]||0):0;
-    if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+safeMoney(check));return;}
-    if(typeof previousCloseMonth==='function')return previousCloseMonth(pi);
-  };
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='historial-cambios-modelo.xls';a.click();URL.revokeObjectURL(a.href);
@@ -1584,142 +1302,6 @@ exportVariableInputsExcel=function(){
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
-<script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
-(function(){
-  function safeEsc(x){
-    if(typeof esc==='function') return esc(x);
-    return String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});
-  }
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function visibleIdx(){
-    try{return (typeof visiblePeriodIndexes==='function')?visiblePeriodIndexes():data.periods.map(function(_,i){return i;});}
-    catch(e){return data.periods.map(function(_,i){return i;});}
-  }
-  function monthHead(i){
-    try{return (typeof monthNameWithDot==='function')?monthNameWithDot(i):safeEsc(data.periods[i]);}
-    catch(e){return safeEsc(data.periods[i]);}
-  }
-  function cls(v){return Number(v)<0?'negative':'positive';}
-  function tableFromRows(first, rows, vis){
-    var html='<thead><tr><th>'+safeEsc(first)+'</th>'+vis.map(function(i){return '<th>'+monthHead(i)+'</th>';}).join('')+'</tr></thead><tbody>';
-    rows.forEach(function(r){
-      html+='<tr class="'+(r.rowClass||'')+'"><td>'+safeEsc(r.label)+'</td>'+vis.map(function(i){var v=Number((r.arr||[])[i]||0);return '<td class="'+cls(v)+'">'+safeMoney(v)+'</td>';}).join('')+'</tr>';
-    });
-    return html+'</tbody>';
-  }
-
-  window.toggleSummaryCollapsed=function(){
-    data.summaryCollapsed=!data.summaryCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-  window.toggleBudgetCollapsed=function(){
-    data.budgetCollapsed=!data.budgetCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  var previousSummary=window.renderSummary;
-  window.renderSummary=function(c){
-    var vis=visibleIdx();
-    var btn=document.getElementById('summaryToggleBtn');
-    if(btn)btn.textContent=data.summaryCollapsed?'+':'−';
-    var tbl=document.getElementById('summaryTable');
-    if(data.summaryCollapsed && tbl){
-      tbl.classList.add('compact-summary');
-      tbl.innerHTML=tableFromRows('Resumen',[
-        {label:'Saldo proyectado',arr:c.projected,rowClass:'result'},
-        {label:'Total saldos bancos',arr:c.banks,rowClass:'total'},
-        {label:'Cuadre de caja',arr:c.cashCheck,rowClass:'result'}
-      ],vis);
-      if(typeof renderVariableBudgetSummary==='function')renderVariableBudgetSummary(c);
-      return;
-    }
-    if(tbl)tbl.classList.remove('compact-summary');
-    if(typeof previousSummary==='function')previousSummary(c);
-  };
-
-  var previousBudget=window.renderVariableBudgetSummary;
-  window.renderVariableBudgetSummary=function(c){
-    var vis=visibleIdx();
-    var tbl=document.getElementById('variableBudgetSummaryTable');
-    if(!tbl)return;
-    var body=document.getElementById('budgetPanelBody');
-    var btn=document.getElementById('budgetToggleBtn');
-    if(btn)btn.textContent=data.budgetCollapsed?'+':'−';
-    if(body)body.classList.remove('panel-body-collapsed');
-    if(data.budgetCollapsed){
-      tbl.classList.add('compact-budget');
-      tbl.innerHTML=tableFromRows('Control presupuestal',[
-        {label:'Diferencia ppto - real',arr:c.variableDiff,rowClass:'result'}
-      ],vis);
-      return;
-    }
-    tbl.classList.remove('compact-budget');
-    if(typeof previousBudget==='function')previousBudget(c);
-  };
-
-  function remapIndexAfterMove(idx,from,to){
-    idx=Number(idx);from=Number(from);to=Number(to);
-    if(idx===from)return to;
-    if(from<to && idx>from && idx<=to)return idx-1;
-    if(from>to && idx>=to && idx<from)return idx+1;
-    return idx;
-  }
-  window.moveConceptRow=function(secId,from,to){
-    from=Number(from);to=Number(to); if(from===to)return;
-    var sec=(typeof section==='function')?section(secId):null;
-    if(!sec||!sec.rows||!sec.rows[from]||!sec.rows[to])return;
-    var moved=sec.rows.splice(from,1)[0]; sec.rows.splice(to,0,moved);
-    var newNotes={};
-    Object.keys(data.notes||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newNotes[parts.join('|')]=data.notes[k];} else newNotes[k]=data.notes[k];});
-    data.notes=newNotes;
-    var newPaid={};
-    Object.keys(data.paid||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newPaid[parts.join('|')]=data.paid[k];} else newPaid[k]=data.paid[k];});
-    data.paid=newPaid;
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndexAfterMove(r.ri,from,to);});
-    (data.inputLog=data.inputLog||[]).push({fecha:new Date().toLocaleString('es-CO'),origen:'Orden manual de conceptos',seccion:sec.title,concepto:moved[0],periodo:'',accion:'move',valorIngresado:'',valorAnterior:from,valorFinal:to,comentario:'Concepto movido dentro de su sección',pagoRealizado:'No'});
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  function markDragRows(){
-    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
-    var secIndex=-1,rowIndex=-1,currentSec=null;
-    Array.from(tbody.children).forEach(function(tr){
-      if(tr.classList.contains('section-title')){secIndex++; currentSec=(data.sections||[])[secIndex]; rowIndex=-1; return;}
-      if(!currentSec || tr.classList.contains('section-period-row') || tr.classList.contains('collapsed-section-row') || tr.classList.contains('add-row'))return;
-      if(!currentSec.rows || rowIndex+1>=currentSec.rows.length)return;
-      rowIndex++;
-      tr.classList.add('drag-row'); tr.draggable=true; tr.dataset.secId=currentSec.id; tr.dataset.ri=rowIndex;
-      var first=tr.querySelector('td:first-child .concept');
-      if(first && !first.querySelector('.drag-hint'))first.insertAdjacentHTML('beforeend','<span class="drag-hint" title="Arrastra para ordenar">↕</span>');
-      tr.ondragstart=function(ev){ev.dataTransfer.setData('text/plain',tr.dataset.secId+'|'+tr.dataset.ri);};
-      tr.ondragover=function(ev){ev.preventDefault();tr.classList.add('drag-over');};
-      tr.ondragleave=function(){tr.classList.remove('drag-over');};
-      tr.ondrop=function(ev){ev.preventDefault();tr.classList.remove('drag-over');var raw=ev.dataTransfer.getData('text/plain').split('|'); if(raw[0]===tr.dataset.secId)moveConceptRow(raw[0],raw[1],tr.dataset.ri);};
-      var hint=tr.querySelector('.drag-hint');
-      if(hint){hint.onclick=function(ev){ev.stopPropagation();var current=Number(tr.dataset.ri);var up=confirm('Aceptar: subir concepto\nCancelar: bajar concepto');var dest=current+(up?-1:1);if(dest>=0&&currentSec&&dest<currentSec.rows.length)moveConceptRow(currentSec.id,current,dest);};}
-    });
-  }
-  var previousRender=window.render;
-  window.render=function(){
-    if(typeof previousRender==='function')previousRender.apply(this,arguments);
-    try{markDragRows();}catch(e){console.warn('reordenamiento conceptos',e);}
-  };
-
-  var previousCloseMonth=window.closeMonth;
-  window.closeMonth=function(pi){
-    pi=Number(pi);
-    var c=(typeof calculations==='function')?calculations():null;
-    var check=c&&c.cashCheck?Number(c.cashCheck[pi]||0):0;
-    if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+safeMoney(check));return;}
-    if(typeof previousCloseMonth==='function')return previousCloseMonth(pi);
-  };
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 }
@@ -1955,142 +1537,6 @@ exportVariableInputsExcel=function(){
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(actionLabel(r))}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
-<script>
-/* v36 corregida final: se aplica al final para no perder mejoras por overrides posteriores */
-(function(){
-  function safeEsc(x){
-    if(typeof esc==='function') return esc(x);
-    return String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});
-  }
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function visibleIdx(){
-    try{return (typeof visiblePeriodIndexes==='function')?visiblePeriodIndexes():data.periods.map(function(_,i){return i;});}
-    catch(e){return data.periods.map(function(_,i){return i;});}
-  }
-  function monthHead(i){
-    try{return (typeof monthNameWithDot==='function')?monthNameWithDot(i):safeEsc(data.periods[i]);}
-    catch(e){return safeEsc(data.periods[i]);}
-  }
-  function cls(v){return Number(v)<0?'negative':'positive';}
-  function tableFromRows(first, rows, vis){
-    var html='<thead><tr><th>'+safeEsc(first)+'</th>'+vis.map(function(i){return '<th>'+monthHead(i)+'</th>';}).join('')+'</tr></thead><tbody>';
-    rows.forEach(function(r){
-      html+='<tr class="'+(r.rowClass||'')+'"><td>'+safeEsc(r.label)+'</td>'+vis.map(function(i){var v=Number((r.arr||[])[i]||0);return '<td class="'+cls(v)+'">'+safeMoney(v)+'</td>';}).join('')+'</tr>';
-    });
-    return html+'</tbody>';
-  }
-
-  window.toggleSummaryCollapsed=function(){
-    data.summaryCollapsed=!data.summaryCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-  window.toggleBudgetCollapsed=function(){
-    data.budgetCollapsed=!data.budgetCollapsed;
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  var previousSummary=window.renderSummary;
-  window.renderSummary=function(c){
-    var vis=visibleIdx();
-    var btn=document.getElementById('summaryToggleBtn');
-    if(btn)btn.textContent=data.summaryCollapsed?'+':'−';
-    var tbl=document.getElementById('summaryTable');
-    if(data.summaryCollapsed && tbl){
-      tbl.classList.add('compact-summary');
-      tbl.innerHTML=tableFromRows('Resumen',[
-        {label:'Saldo proyectado',arr:c.projected,rowClass:'result'},
-        {label:'Total saldos bancos',arr:c.banks,rowClass:'total'},
-        {label:'Cuadre de caja',arr:c.cashCheck,rowClass:'result'}
-      ],vis);
-      if(typeof renderVariableBudgetSummary==='function')renderVariableBudgetSummary(c);
-      return;
-    }
-    if(tbl)tbl.classList.remove('compact-summary');
-    if(typeof previousSummary==='function')previousSummary(c);
-  };
-
-  var previousBudget=window.renderVariableBudgetSummary;
-  window.renderVariableBudgetSummary=function(c){
-    var vis=visibleIdx();
-    var tbl=document.getElementById('variableBudgetSummaryTable');
-    if(!tbl)return;
-    var body=document.getElementById('budgetPanelBody');
-    var btn=document.getElementById('budgetToggleBtn');
-    if(btn)btn.textContent=data.budgetCollapsed?'+':'−';
-    if(body)body.classList.remove('panel-body-collapsed');
-    if(data.budgetCollapsed){
-      tbl.classList.add('compact-budget');
-      tbl.innerHTML=tableFromRows('Control presupuestal',[
-        {label:'Diferencia ppto - real',arr:c.variableDiff,rowClass:'result'}
-      ],vis);
-      return;
-    }
-    tbl.classList.remove('compact-budget');
-    if(typeof previousBudget==='function')previousBudget(c);
-  };
-
-  function remapIndexAfterMove(idx,from,to){
-    idx=Number(idx);from=Number(from);to=Number(to);
-    if(idx===from)return to;
-    if(from<to && idx>from && idx<=to)return idx-1;
-    if(from>to && idx>=to && idx<from)return idx+1;
-    return idx;
-  }
-  window.moveConceptRow=function(secId,from,to){
-    from=Number(from);to=Number(to); if(from===to)return;
-    var sec=(typeof section==='function')?section(secId):null;
-    if(!sec||!sec.rows||!sec.rows[from]||!sec.rows[to])return;
-    var moved=sec.rows.splice(from,1)[0]; sec.rows.splice(to,0,moved);
-    var newNotes={};
-    Object.keys(data.notes||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newNotes[parts.join('|')]=data.notes[k];} else newNotes[k]=data.notes[k];});
-    data.notes=newNotes;
-    var newPaid={};
-    Object.keys(data.paid||{}).forEach(function(k){var parts=k.split('|'); if(parts[0]===secId){parts[1]=String(remapIndexAfterMove(parts[1],from,to)); newPaid[parts.join('|')]=data.paid[k];} else newPaid[k]=data.paid[k];});
-    data.paid=newPaid;
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndexAfterMove(r.ri,from,to);});
-    (data.inputLog=data.inputLog||[]).push({fecha:new Date().toLocaleString('es-CO'),origen:'Orden manual de conceptos',seccion:sec.title,concepto:moved[0],periodo:'',accion:'move',valorIngresado:'',valorAnterior:from,valorFinal:to,comentario:'Concepto movido dentro de su sección',pagoRealizado:'No'});
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-
-  function markDragRows(){
-    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
-    var secIndex=-1,rowIndex=-1,currentSec=null;
-    Array.from(tbody.children).forEach(function(tr){
-      if(tr.classList.contains('section-title')){secIndex++; currentSec=(data.sections||[])[secIndex]; rowIndex=-1; return;}
-      if(!currentSec || tr.classList.contains('section-period-row') || tr.classList.contains('collapsed-section-row') || tr.classList.contains('add-row'))return;
-      if(!currentSec.rows || rowIndex+1>=currentSec.rows.length)return;
-      rowIndex++;
-      tr.classList.add('drag-row'); tr.draggable=true; tr.dataset.secId=currentSec.id; tr.dataset.ri=rowIndex;
-      var first=tr.querySelector('td:first-child .concept');
-      if(first && !first.querySelector('.drag-hint'))first.insertAdjacentHTML('beforeend','<span class="drag-hint" title="Arrastra para ordenar">↕</span>');
-      tr.ondragstart=function(ev){ev.dataTransfer.setData('text/plain',tr.dataset.secId+'|'+tr.dataset.ri);};
-      tr.ondragover=function(ev){ev.preventDefault();tr.classList.add('drag-over');};
-      tr.ondragleave=function(){tr.classList.remove('drag-over');};
-      tr.ondrop=function(ev){ev.preventDefault();tr.classList.remove('drag-over');var raw=ev.dataTransfer.getData('text/plain').split('|'); if(raw[0]===tr.dataset.secId)moveConceptRow(raw[0],raw[1],tr.dataset.ri);};
-      var hint=tr.querySelector('.drag-hint');
-      if(hint){hint.onclick=function(ev){ev.stopPropagation();var current=Number(tr.dataset.ri);var up=confirm('Aceptar: subir concepto\nCancelar: bajar concepto');var dest=current+(up?-1:1);if(dest>=0&&currentSec&&dest<currentSec.rows.length)moveConceptRow(currentSec.id,current,dest);};}
-    });
-  }
-  var previousRender=window.render;
-  window.render=function(){
-    if(typeof previousRender==='function')previousRender.apply(this,arguments);
-    try{markDragRows();}catch(e){console.warn('reordenamiento conceptos',e);}
-  };
-
-  var previousCloseMonth=window.closeMonth;
-  window.closeMonth=function(pi){
-    pi=Number(pi);
-    var c=(typeof calculations==='function')?calculations():null;
-    var check=c&&c.cashCheck?Number(c.cashCheck[pi]||0):0;
-    if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+safeMoney(check));return;}
-    if(typeof previousCloseMonth==='function')return previousCloseMonth(pi);
-  };
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 };
@@ -2321,186 +1767,49 @@ initCloud();
 </script>
 
 
-<script>
-/* ===================== v38 sobre v36.2 corregida =====================
-   Correcciones acotadas: crear conceptos, submenues, cierre con cuadre 0,
-   saldo inicial solo en bancos y orden por prioridad ascendente.
-*/
+<style id="v39-styles">
+.order-input{width:58px!important;min-width:58px;height:28px;text-align:center!important;margin-right:6px;border:1px solid #60a5fa!important;background:#020617!important;color:#e5e7eb!important;border-radius:8px;font-weight:800}.order-badge{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:24px;margin-right:6px;border:1px solid #334155;border-radius:999px;background:#0b1220;color:#93c5fd;font-size:11px;font-weight:900}.order-toggle{font-size:11px;padding:5px 8px;margin-left:8px}.submenu-content{display:none}.submenu.open .submenu-content{display:block}.submenu-toggle{cursor:pointer}.concept-modal-form{display:grid;gap:10px}.concept-modal-form select,.concept-modal-form input{width:100%;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:10px;padding:10px}
+</style>
+
+<script id="v39-fixes">
 (function(){
-  function v38Esc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-  function v38Money(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function v38Sec(secId){return (typeof section==='function')?section(secId):null;}
+  const V39='v39';
+  function safeEsc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
+  function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(s=>s.id===secId);}
+  function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map((_,i)=>i);}}
+  function orderState(){data.rowOrders=data.rowOrders||{};data.orderUnlocked=data.orderUnlocked||{};return data.rowOrders;}
+  function ensureRowOrders(){orderState();(data.sections||[]).forEach(sec=>{data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];(sec.rows||[]).forEach((r,i)=>{if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=(i+1)*10;});data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);});}
+  function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
+  function remapKeys(obj,secId,map){const out={};Object.keys(obj||{}).forEach(k=>{const p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
+  function sortSectionByOrder(secId){ensureRowOrders();const sec=getSection(secId);if(!sec||!Array.isArray(sec.rows))return;const oldRows=sec.rows.slice();const oldOrders=(data.rowOrders[secId]||[]).slice();const items=oldRows.map((row,i)=>({row,old:i,ord:Number(oldOrders[i]||0)}));items.sort((a,b)=>a.ord-b.ord||a.old-b.old);const map={};items.forEach((it,newIdx)=>map[it.old]=newIdx);sec.rows=items.map(it=>it.row);data.rowOrders[secId]=items.map((it,i)=>Number.isFinite(it.ord)?it.ord:(i+1)*10);data.notes=remapKeys(data.notes||{},secId,map);data.paid=remapKeys(data.paid||{},secId,map);(data.formInputs||[]).forEach(r=>{if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});}
+  window.toggleSectionOrder=function(secId){ensureRowOrders();data.orderUnlocked=data.orderUnlocked||{};if(data.orderUnlocked[secId]){sortSectionByOrder(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}if(typeof saveSilent==='function')saveSilent();if(typeof render==='function')render();};
+  window.setRowOrder=function(secId,ri,value){ensureRowOrders();data.rowOrders[secId][Number(ri)]=Number(value)||0;if(typeof saveSilent==='function')saveSilent();};
 
-  window.openConceptModal=function(fromInput){
-    if(typeof requireNoInputEdit==='function' && !requireNoInputEdit())return;
-    var modal=document.getElementById('conceptModal');
-    var sec=document.getElementById('newConceptSection');
-    var name=document.getElementById('newConceptName');
-    if(!modal||!sec||!name){alert('No se encontró el formulario de creación de conceptos.');return;}
-    modal.dataset.returnToInput=fromInput?'1':'0';
-    var current=document.getElementById('formSection');
-    sec.value=(current && ['variable','other'].includes(current.value))?current.value:'variable';
-    name.value='';
-    modal.classList.add('open');
-    setTimeout(function(){name.focus();},50);
-  };
-  window.closeConceptModal=function(){
-    var modal=document.getElementById('conceptModal');
-    if(modal)modal.classList.remove('open');
-  };
-  window.saveNewConceptFromModal=function(){
-    var secId=(document.getElementById('newConceptSection')||{}).value;
-    var name=(document.getElementById('newConceptName')||{}).value||'';
-    name=name.trim();
-    if(!['variable','other'].includes(secId)){alert('Solo puedes crear conceptos en Gastos variables u Otros movimientos.');return;}
-    if(!name){alert('Escribe el nombre del concepto.');return;}
-    var sec=v38Sec(secId);
-    if(!sec){alert('No se encontró la sección seleccionada.');return;}
-    if(sec.rows.some(function(r){return String(r[0]||'').trim().toLowerCase()===name.toLowerCase();})){
-      alert('Ya existe un concepto con ese nombre en esta sección.');return;
-    }
-    sec.rows.push([name,Array(data.periods.length).fill(0)]);
-    ensureOrderState();
-    var arr=data.rowOrder[secId];
-    arr.push(nextOrderValue(arr));
-    logInput({source:'Creación de concepto',secId:secId,ri:sec.rows.length-1,pi:0,mode:'createConcept',amount:0,before:'',after:name,note:'Concepto creado desde formulario',paid:false});
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-    var formSec=document.getElementById('formSection');
-    if(formSec){formSec.value=secId; if(typeof updateConceptSelect==='function')updateConceptSelect(); var formConcept=document.getElementById('formConcept'); if(formConcept)formConcept.value=String(sec.rows.length-1);}
-    closeConceptModal();
-  };
+  // Crear concepto: solo Gastos variables y Otros movimientos.
+  window.openConceptModal=function(fromInput){const modal=document.getElementById('conceptModal');if(!modal){alert('No se encontró el formulario de crear concepto.');return;}const sel=document.getElementById('newConceptSection');const name=document.getElementById('newConceptName');if(sel){sel.innerHTML='<option value="variable">Gastos variables</option><option value="other">Otros movimientos</option>';const fs=document.getElementById('formSection');sel.value=(fs&&['variable','other'].includes(fs.value))?fs.value:'variable';}if(name){name.value='';setTimeout(()=>name.focus(),50);}modal.dataset.fromInput=fromInput?'1':'0';modal.classList.add('open');};
+  window.closeConceptModal=function(){const modal=document.getElementById('conceptModal');if(modal)modal.classList.remove('open');};
+  window.saveNewConceptFromModal=function(){const secId=(document.getElementById('newConceptSection')||{}).value;const name=(document.getElementById('newConceptName')||{}).value||'';const clean=name.trim();if(!['variable','other'].includes(secId)){alert('Solo se pueden crear conceptos en Gastos variables u Otros movimientos.');return;}if(!clean){alert('Escribe el nombre del concepto.');return;}const sec=getSection(secId);if(!sec){alert('No se encontró la sección.');return;}if((sec.rows||[]).some(r=>String(r[0]||'').trim().toLowerCase()===clean.toLowerCase())){alert('Ese concepto ya existe en la sección.');return;}sec.rows.push([clean,Array(data.periods.length).fill(0)]);ensureRowOrders();data.rowOrders[secId][sec.rows.length-1]=sec.rows.length*10;if(typeof logInput==='function')logInput({source:'Crear concepto',secId,ri:sec.rows.length-1,pi:0,mode:'create-concept',amount:0,before:'',after:clean,note:'Concepto creado desde formulario',paid:false});if(typeof saveSilent==='function')saveSilent();closeConceptModal();if(typeof render==='function')render();const fs=document.getElementById('formSection'), fc=document.getElementById('formConcept');if(fs&&fc){fs.value=secId;if(typeof updateConceptSelect==='function')updateConceptSelect();fc.value=String(sec.rows.length-1);}alert('Concepto creado: '+clean);};
 
-  window.toggleSubmenu=function(btn){
-    var box=btn&&btn.closest?btn.closest('.submenu'):null;
-    if(!box)return;
-    box.classList.toggle('open');
-  };
+  // Submenús desplegables por categoría.
+  window.toggleSubmenu=function(btn){const box=btn&&btn.closest?btn.closest('.submenu'):null;if(!box)return;box.classList.toggle('open');};
 
-  function ensureOrderState(){
-    data.rowOrder=data.rowOrder||{};
-    data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      if(!data.rowOrder[sec.id])data.rowOrder[sec.id]=[];
-      while(data.rowOrder[sec.id].length<(sec.rows||[]).length)data.rowOrder[sec.id].push((data.rowOrder[sec.id].length+1)*10);
-      if(data.rowOrder[sec.id].length>(sec.rows||[]).length)data.rowOrder[sec.id]=data.rowOrder[sec.id].slice(0,(sec.rows||[]).length);
-      if(data.orderUnlocked[sec.id]==null)data.orderUnlocked[sec.id]=false;
-    });
-  }
-  function nextOrderValue(arr){
-    var nums=(arr||[]).map(Number).filter(function(v){return isFinite(v);});
-    return nums.length?Math.max.apply(null,nums)+10:10;
-  }
-  function remapKeyObject(obj,secId,map){
-    var out={};
-    Object.keys(obj||{}).forEach(function(k){
-      var parts=k.split('|');
-      if(parts[0]===secId && map[parts[1]]!=null){parts[1]=String(map[parts[1]]);out[parts.join('|')]=obj[k];}
-      else out[k]=obj[k];
-    });
-    return out;
-  }
-  function sortSectionByOrder(secId){
-    ensureOrderState();
-    var sec=v38Sec(secId); if(!sec||!sec.rows)return;
-    var pairs=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(data.rowOrder[secId][i]||0)};});
-    pairs.sort(function(a,b){return a.ord-b.ord || a.old-b.old;});
-    var map={}; pairs.forEach(function(p,i){map[String(p.old)]=i;});
-    sec.rows=pairs.map(function(p){return p.row;});
-    data.rowOrder[secId]=pairs.map(function(p){return p.ord;});
-    data.notes=remapKeyObject(data.notes,secId,map);
-    data.paid=remapKeyObject(data.paid,secId,map);
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId&&map[String(r.ri)]!=null)r.ri=map[String(r.ri)];});
-    if(typeof rebuildAllInputNotes==='function')rebuildAllInputNotes();
-  }
-  window.toggleOrderEdit=function(secId){
-    ensureOrderState();
-    if(data.orderUnlocked[secId]){
-      sortSectionByOrder(secId);
-      data.orderUnlocked[secId]=false;
-      var sec=v38Sec(secId);
-      logInput({source:'Ordenamiento de conceptos',secId:secId,ri:0,pi:0,mode:'sort',amount:0,before:'',after:'',note:'Conceptos ordenados de menor a mayor por prioridad',paid:false});
-    }else{
-      data.orderUnlocked[secId]=true;
-    }
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-  };
-  window.setRowOrderValue=function(secId,ri,val){
-    ensureOrderState();
-    data.rowOrder[secId][Number(ri)]=Number(val)||0;
-    if(typeof saveSilent==='function')saveSilent();
-  };
+  function monthHead(pi){try{return typeof monthNameWithDot==='function'?monthNameWithDot(pi):safeEsc(data.periods[pi]);}catch(e){return safeEsc(data.periods[pi]);}}
+  function initialHeader(){return `<th style="${colStyle('initial')}"><input class="month-input" value="${safeEsc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${safeEsc(data.initialColumnDate)}</small><span class="resizer" onmousedown="startColumnResize(event,'initial')"></span></th>`;}
+  function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
+  function sectionTitle(sec, visibleCount, initialForBank){const collapsed=isCollapsed(sec.id);const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const span=1+visibleCount+(initialForBank?1:0);return `<tr class="section-title"><td style="${colStyle('concept')}"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button><span>${safeEsc(sec.title)}</span><button class="secondary order-toggle" onclick="toggleSectionOrder('${sec.id}')">${unlocked?'🔓 Guardar orden':'🔒 Orden'}</button></div></td>`+Array.from({length:span-1},()=>'<td></td>').join('')+'</tr>';}
+  function repeatedHeader(sec, vis, showBankInitial){let row=`<tr class="section-period-row"><td style="${colStyle('concept')}">${safeEsc(sec.title)}</td>`;if(showBankInitial)row+=`<td style="${colStyle('initial')}">${safeEsc(data.initialColumnLabel)}</td>`;vis.forEach(i=>row+=`<td style="${colStyle('p'+i)}">${monthHead(i)}</td>`);return row+'</tr>';}
+  function conceptCell(sec,ri,row){ensureRowOrders();const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const ord=(data.rowOrders[sec.id]||[])[ri]??((ri+1)*10);const orderHtml=unlocked?`<input class="order-input" type="number" value="${safeEsc(ord)}" onchange="setRowOrder('${sec.id}',${ri},this.value)" title="Orden de menor a mayor">`:`<span class="order-badge" title="Orden">${safeEsc(ord)}</span>`;return `<td style="${colStyle('concept')}"><div class="concept">${orderHtml}<input value="${safeEsc(row[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;}
 
-  function applyOrderControls(){
-    ensureOrderState();
-    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
-    var secIndex=-1,rowIndex=-1,currentSec=null;
-    Array.from(tbody.children).forEach(function(tr){
-      tr.draggable=false;tr.ondragstart=null;tr.ondragover=null;tr.ondragleave=null;tr.ondrop=null;
-      tr.classList.remove('drag-row','drag-over');
-      tr.querySelectorAll('.drag-hint').forEach(function(x){x.remove();});
-      if(tr.classList.contains('section-title')){
-        secIndex++;currentSec=(data.sections||[])[secIndex];rowIndex=-1;
-        var head=tr.querySelector('.section-head');
-        if(head&&currentSec&&!head.querySelector('.order-section-btn')){
-          var btn=document.createElement('button');
-          btn.className='order-section-btn';
-          btn.type='button';
-          btn.textContent=data.orderUnlocked[currentSec.id]?'🔓 Guardar orden':'🔒 Orden';
-          btn.onclick=function(ev){ev.stopPropagation();toggleOrderEdit(currentSec.id);};
-          head.appendChild(btn);
-        }
-        return;
-      }
-      if(!currentSec || tr.classList.contains('section-period-row') || tr.classList.contains('collapsed-section-row') || tr.classList.contains('add-row'))return;
-      if(!currentSec.rows || rowIndex+1>=currentSec.rows.length)return;
-      rowIndex++;
-      var concept=tr.querySelector('td:first-child .concept');
-      if(concept&&!concept.querySelector('.order-chip')){
-        var wrap=document.createElement('span');wrap.className='order-chip';wrap.title='Orden de menor a mayor dentro de la sección';
-        var inp=document.createElement('input');inp.type='number';inp.value=data.rowOrder[currentSec.id][rowIndex];inp.disabled=!data.orderUnlocked[currentSec.id];
-        (function(secId,ri){inp.onchange=function(){setRowOrderValue(secId,ri,this.value);};})(currentSec.id,rowIndex);
-        wrap.appendChild(document.createTextNode('Orden'));wrap.appendChild(inp);concept.insertBefore(wrap,concept.firstChild);
-      }
-    });
-  }
+  // Render corregido: saldo inicial solo en bancos; orden por número; sin drag & drop.
+  window.render=function(){ensureLengths();ensureRowOrders();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');if(!t)return;const showInit=!!data.showInitialColumn;const vis=periodIndexes();const btn=document.getElementById('toggleInitialBtn');if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+vis.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${safeEsc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
+    (data.sections||[]).forEach(sec=>{const showBankInitial=showInit&&sec.kind==='bank';html+=sectionTitle(sec,vis.length,showBankInitial);if(isCollapsed(sec.id)){html+=`<tr class="collapsed-section-row"><td colspan="${1+vis.length+(showBankInitial?1:0)}">Sección contraída. Usa el botón + para expandir.</td></tr>`;return;}html+=repeatedHeader(sec,vis,showBankInitial);(sec.rows||[]).forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}">`+conceptCell(sec,ri,r);if(showBankInitial)html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`;vis.forEach(pi=>{const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;});html+='</tr>';});html+=`<tr class="add-row"><td colspan="${1+vis.length+(showBankInitial?1:0)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${safeEsc(sec.title)}</button></td></tr>`;});html+='</tbody>';t.innerHTML=html;};
 
-  function cashCheckValue(pi){
-    var c=(typeof calculations==='function')?calculations():null;
-    return c&&c.cashCheck?Number(c.cashCheck[Number(pi)]||0):0;
-  }
-  window.closeMonth=function(pi){
-    pi=Number(pi);
-    if(typeof isMonthClosed==='function' && isMonthClosed(pi)){alert('El mes ya está cerrado.');return;}
-    var check=cashCheckValue(pi);
-    if(Math.abs(check)>=1){alert('No es posible cerrar '+(data.periods[pi]||'este mes')+'.\n\nEl cuadre de caja debe ser cero.\nCuadre actual: '+v38Money(check));return;}
-    if(typeof canCloseMonth==='function' && !canCloseMonth(pi)){alert('No se puede cerrar este mes porque aún no ha pasado su último día calendario.');return;}
-    var msg='Cerrar '+(data.periods[pi]||'este mes')+'?\n\nSe bloquearán edición manual, inputs, edición y eliminación de inputs para este mes. Se creará un respaldo independiente con corte a hoy.';
-    if(!confirm(msg))return;
-    if(typeof ensureMonthStatusState==='function')ensureMonthStatusState(data);
-    data.monthClosed[pi]=true;
-    var key='corte_'+String(data.periods[pi]||('mes_'+pi)).replace(/\s+/g,'_').toLowerCase();
-    data.monthClosedBackups=data.monthClosedBackups||{};
-    data.monthClosedMeta=data.monthClosedMeta||{};
-    data.monthClosedBackups[key]={period:data.periods[pi],periodIndex:pi,closedAt:new Date().toLocaleString('es-CO'),model:clone(data)};
-    data.monthClosedMeta[pi]={closedAt:new Date().toLocaleString('es-CO'),user:currentUser?currentUser.email:''};
-    logInput({source:'Cierre de mes',secId:'other',ri:0,pi:pi,mode:'close',amount:0,before:'',after:'',note:'Mes cerrado con cuadre de caja en cero y respaldo independiente',paid:false});
-    if(typeof saveSilent==='function')saveSilent();
-    if(typeof render==='function')render();
-    if(typeof renderCloseMonthList==='function')renderCloseMonthList();
-  };
+  // Cerrar mes: primero cuadre de caja cero; si no, no cierra.
+  window.closeMonth=function(pi){pi=Number(pi);if(typeof isMonthClosed==='function'&&isMonthClosed(pi)){alert('El mes ya está cerrado.');return;}const c=calculations();const check=Number((c.cashCheck||[])[pi]||0);if(Math.abs(check)>=1){alert('No es posible cerrar '+(data.periods[pi]||'este mes')+'.\n\nEl cuadre de caja debe ser cero.\nCuadre actual: '+safeMoney(check));return;}if(typeof canCloseMonth==='function'&&!canCloseMonth(pi)){alert('No se puede cerrar este mes porque aún no ha pasado su último día calendario.');return;}const msg=`Cerrar ${data.periods[pi]}?\n\nSe bloquearán edición manual, inputs, edición y eliminación de inputs para este mes. Se creará un respaldo independiente con corte a hoy.`;if(!confirm(msg))return;if(typeof ensureMonthStatusState==='function')ensureMonthStatusState(data);data.monthClosed[pi]=true;const key='corte_'+String(data.periods[pi]||pi).replace(/\s+/g,'_').toLowerCase();data.monthClosedBackups=data.monthClosedBackups||{};data.monthClosedMeta=data.monthClosedMeta||{};data.monthClosedBackups[key]={period:data.periods[pi],periodIndex:pi,closedAt:new Date().toLocaleString('es-CO'),model:clone(data)};data.monthClosedMeta[pi]={closedAt:new Date().toLocaleString('es-CO'),user:currentUser?currentUser.email:''};if(typeof logInput==='function')logInput({source:'Cierre de mes',secId:'other',ri:0,pi,mode:'close',amount:0,before:'',after:'',note:'Mes cerrado con respaldo independiente',paid:false});if(typeof saveSilent==='function')saveSilent();render();if(typeof renderCloseMonthList==='function')renderCloseMonthList();};
 
-  var oldMigrate=window.migrateData;
-  if(typeof oldMigrate==='function'){
-    window.migrateData=function(d){d=oldMigrate(d); try{var old=data;data=d;ensureOrderState();data=old;}catch(e){} return d;};
-  }
-  var oldRender=window.render;
-  window.render=function(){
-    if(typeof oldRender==='function')oldRender.apply(this,arguments);
-    try{applyOrderControls();}catch(e){console.warn('v38 orden',e);}
-  };
-  document.addEventListener('DOMContentLoaded',function(){try{ensureOrderState();applyOrderControls();}catch(e){}});
+  // Inicialización al cargar.
+  try{ensureRowOrders();}catch(e){}
 })();
 </script>
 
