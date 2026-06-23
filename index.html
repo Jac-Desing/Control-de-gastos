@@ -173,7 +173,7 @@ select option{background:#020617;color:#e5e7eb}
         <select id="formPeriod" onchange="validateInputMonthSelection()"></select>
       </label>
       <label>Valor
-        <input id="formAmount" inputmode="decimal" placeholder="Ej. 1.250.000">
+        <input id="formAmount" inputmode="text" placeholder="Ej. 1.250.000 o -500.000">
       </label>
       <label id="formModeWrap">Acción
         <select id="formMode">
@@ -970,10 +970,16 @@ function validateInputMonthSelection(){
  return true;
 }
 function normalizeFormAmount(secId,value){
- let v=num(value);
+ const raw=String(value||'');
+ let v=num(raw);
  const sec=section(secId);
+ // Ingresos siempre conservan la lógica del modelo: entradas negativas.
  if(secId==='income' && v>0)v=-v;
+ // Bancos siempre se registran positivos.
  if(sec && sec.kind==='bank')v=Math.abs(v);
+ // Otros movimientos, incluido CXC, debe respetar el signo digitado:
+ // valores negativos representan entradas de caja del mes.
+ if(secId==='other' && raw.includes('-'))v=-Math.abs(v);
  return v;
 }
 function makeInputBullet(rec){
