@@ -1779,17 +1779,17 @@ initCloud();
   function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(s=>s.id===secId);}
   function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map((_,i)=>i);}}
   function orderState(){data.rowOrders=data.rowOrders||{};data.orderUnlocked=data.orderUnlocked||{};return data.rowOrders;}
-  function ensureRowOrders(){orderState();(data.sections||[]).forEach(sec=>{data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];(sec.rows||[]).forEach((r,i)=>{if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=(i+1)*10;});data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);});}
+  function ensureRowOrders(){orderState();(data.sections||[]).forEach(sec=>{data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];(sec.rows||[]).forEach((r,i)=>{if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=(i+1);});data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);});}
   function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
   function remapKeys(obj,secId,map){const out={};Object.keys(obj||{}).forEach(k=>{const p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrder(secId){ensureRowOrders();const sec=getSection(secId);if(!sec||!Array.isArray(sec.rows))return;const oldRows=sec.rows.slice();const oldOrders=(data.rowOrders[secId]||[]).slice();const items=oldRows.map((row,i)=>({row,old:i,ord:Number(oldOrders[i]||0)}));items.sort((a,b)=>a.ord-b.ord||a.old-b.old);const map={};items.forEach((it,newIdx)=>map[it.old]=newIdx);sec.rows=items.map(it=>it.row);data.rowOrders[secId]=items.map((it,i)=>Number.isFinite(it.ord)?it.ord:(i+1)*10);data.notes=remapKeys(data.notes||{},secId,map);data.paid=remapKeys(data.paid||{},secId,map);(data.formInputs||[]).forEach(r=>{if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});}
+  function sortSectionByOrder(secId){ensureRowOrders();const sec=getSection(secId);if(!sec||!Array.isArray(sec.rows))return;const oldRows=sec.rows.slice();const oldOrders=(data.rowOrders[secId]||[]).slice();const items=oldRows.map((row,i)=>({row,old:i,ord:Number(oldOrders[i]||0)}));items.sort((a,b)=>a.ord-b.ord||a.old-b.old);const map={};items.forEach((it,newIdx)=>map[it.old]=newIdx);sec.rows=items.map(it=>it.row);data.rowOrders[secId]=items.map((it,i)=>Number.isFinite(it.ord)?it.ord:(i+1));data.notes=remapKeys(data.notes||{},secId,map);data.paid=remapKeys(data.paid||{},secId,map);(data.formInputs||[]).forEach(r=>{if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});}
   window.toggleSectionOrder=function(secId){ensureRowOrders();data.orderUnlocked=data.orderUnlocked||{};if(data.orderUnlocked[secId]){sortSectionByOrder(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}if(typeof saveSilent==='function')saveSilent();if(typeof render==='function')render();};
   window.setRowOrder=function(secId,ri,value){ensureRowOrders();data.rowOrders[secId][Number(ri)]=Number(value)||0;if(typeof saveSilent==='function')saveSilent();};
 
   // Crear concepto: solo Gastos variables y Otros movimientos.
   window.openConceptModal=function(fromInput){const modal=document.getElementById('conceptModal');if(!modal){alert('No se encontró el formulario de crear concepto.');return;}const sel=document.getElementById('newConceptSection');const name=document.getElementById('newConceptName');if(sel){sel.innerHTML='<option value="variable">Gastos variables</option><option value="other">Otros movimientos</option>';const fs=document.getElementById('formSection');sel.value=(fs&&['variable','other'].includes(fs.value))?fs.value:'variable';}if(name){name.value='';setTimeout(()=>name.focus(),50);}modal.dataset.fromInput=fromInput?'1':'0';modal.classList.add('open');};
   window.closeConceptModal=function(){const modal=document.getElementById('conceptModal');if(modal)modal.classList.remove('open');};
-  window.saveNewConceptFromModal=function(){const secId=(document.getElementById('newConceptSection')||{}).value;const name=(document.getElementById('newConceptName')||{}).value||'';const clean=name.trim();if(!['variable','other'].includes(secId)){alert('Solo se pueden crear conceptos en Gastos variables u Otros movimientos.');return;}if(!clean){alert('Escribe el nombre del concepto.');return;}const sec=getSection(secId);if(!sec){alert('No se encontró la sección.');return;}if((sec.rows||[]).some(r=>String(r[0]||'').trim().toLowerCase()===clean.toLowerCase())){alert('Ese concepto ya existe en la sección.');return;}sec.rows.push([clean,Array(data.periods.length).fill(0)]);ensureRowOrders();data.rowOrders[secId][sec.rows.length-1]=sec.rows.length*10;if(typeof logInput==='function')logInput({source:'Crear concepto',secId,ri:sec.rows.length-1,pi:0,mode:'create-concept',amount:0,before:'',after:clean,note:'Concepto creado desde formulario',paid:false});if(typeof saveSilent==='function')saveSilent();closeConceptModal();if(typeof render==='function')render();const fs=document.getElementById('formSection'), fc=document.getElementById('formConcept');if(fs&&fc){fs.value=secId;if(typeof updateConceptSelect==='function')updateConceptSelect();fc.value=String(sec.rows.length-1);}alert('Concepto creado: '+clean);};
+  window.saveNewConceptFromModal=function(){const secId=(document.getElementById('newConceptSection')||{}).value;const name=(document.getElementById('newConceptName')||{}).value||'';const clean=name.trim();if(!['variable','other'].includes(secId)){alert('Solo se pueden crear conceptos en Gastos variables u Otros movimientos.');return;}if(!clean){alert('Escribe el nombre del concepto.');return;}const sec=getSection(secId);if(!sec){alert('No se encontró la sección.');return;}if((sec.rows||[]).some(r=>String(r[0]||'').trim().toLowerCase()===clean.toLowerCase())){alert('Ese concepto ya existe en la sección.');return;}sec.rows.push([clean,Array(data.periods.length).fill(0)]);ensureRowOrders();data.rowOrders[secId][sec.rows.length-1]=sec.rows.length;if(typeof logInput==='function')logInput({source:'Crear concepto',secId,ri:sec.rows.length-1,pi:0,mode:'create-concept',amount:0,before:'',after:clean,note:'Concepto creado desde formulario',paid:false});if(typeof saveSilent==='function')saveSilent();closeConceptModal();if(typeof render==='function')render();const fs=document.getElementById('formSection'), fc=document.getElementById('formConcept');if(fs&&fc){fs.value=secId;if(typeof updateConceptSelect==='function')updateConceptSelect();fc.value=String(sec.rows.length-1);}alert('Concepto creado: '+clean);};
 
   // Submenús desplegables por categoría.
   window.toggleSubmenu=function(btn){const box=btn&&btn.closest?btn.closest('.submenu'):null;if(!box)return;box.classList.toggle('open');};
@@ -1799,7 +1799,7 @@ initCloud();
   function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
   function sectionTitle(sec, visibleCount, initialForBank){const collapsed=isCollapsed(sec.id);const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const span=1+visibleCount+(initialForBank?1:0);return `<tr class="section-title"><td style="${colStyle('concept')}"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button><span>${safeEsc(sec.title)}</span><button class="secondary order-toggle" onclick="toggleSectionOrder('${sec.id}')">${unlocked?'🔓 Guardar orden':'🔒 Orden'}</button></div></td>`+Array.from({length:span-1},()=>'<td></td>').join('')+'</tr>';}
   function repeatedHeader(sec, vis, showBankInitial){let row=`<tr class="section-period-row"><td style="${colStyle('concept')}">${safeEsc(sec.title)}</td>`;if(showBankInitial)row+=`<td style="${colStyle('initial')}">${safeEsc(data.initialColumnLabel)}</td>`;vis.forEach(i=>row+=`<td style="${colStyle('p'+i)}">${monthHead(i)}</td>`);return row+'</tr>';}
-  function conceptCell(sec,ri,row){ensureRowOrders();const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const ord=(data.rowOrders[sec.id]||[])[ri]??((ri+1)*10);const orderHtml=unlocked?`<input class="order-input" type="number" value="${safeEsc(ord)}" onchange="setRowOrder('${sec.id}',${ri},this.value)" title="Orden de menor a mayor">`:`<span class="order-badge" title="Orden">${safeEsc(ord)}</span>`;return `<td style="${colStyle('concept')}"><div class="concept">${orderHtml}<input value="${safeEsc(row[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;}
+  function conceptCell(sec,ri,row){ensureRowOrders();const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const ord=(data.rowOrders[sec.id]||[])[ri]??((ri+1));const orderHtml=unlocked?`<input class="order-input" type="number" value="${safeEsc(ord)}" onchange="setRowOrder('${sec.id}',${ri},this.value)" title="Orden de menor a mayor">`:`<span class="order-badge" title="Orden">${safeEsc(ord)}</span>`;return `<td style="${colStyle('concept')}"><div class="concept">${orderHtml}<input value="${safeEsc(row[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;}
 
   // Render corregido: saldo inicial solo en bancos; orden por número; sin drag & drop.
   window.render=function(){ensureLengths();ensureRowOrders();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');if(!t)return;const showInit=!!data.showInitialColumn;const vis=periodIndexes();const btn=document.getElementById('toggleInitialBtn');if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+vis.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${safeEsc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
@@ -1810,6 +1810,111 @@ initCloud();
 
   // Inicialización al cargar.
   try{ensureRowOrders();}catch(e){}
+})();
+</script>
+
+
+<script>
+/* v41 - ajustes seguros sobre v39 funcional
+   1) Orden de conceptos de 1 en 1.
+   2) Estado del mes integrado dentro del desplegable del formulario, sin bolita externa. */
+(function(){
+  function safeEscV41(x){
+    if(typeof esc==='function') return esc(x);
+    return String(x==null?'':x).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});
+  }
+  function v41HasActiveInputs(pi){
+    try{
+      return Array.isArray(data.formInputs) && data.formInputs.some(function(r){
+        return r && r.active!==false && Number(r.pi)===Number(pi) && (r.secId==='variable' || r.secId==='other');
+      });
+    }catch(e){return false;}
+  }
+  window.monthStateText = function(pi){
+    pi=Number(pi);
+    try{ if(typeof isMonthClosed==='function' && isMonthClosed(pi)) return 'Cerrado'; }catch(e){}
+    try{
+      if(typeof isVariableInitialized==='function' && isVariableInitialized(pi)){
+        return v41HasActiveInputs(pi) ? 'Abierto' : 'Inicializado';
+      }
+    }catch(e){}
+    return 'Sin inicializar';
+  };
+  function v41Emoji(pi){
+    var st=window.monthStateText(pi);
+    if(st==='Cerrado') return '🔴';
+    if(st==='Abierto') return '🟢';
+    if(st==='Inicializado') return '🔵';
+    return '⚪';
+  }
+  window.periodOptionsWithState = function(){
+    return (data.periods||[]).map(function(p,i){
+      return '<option value="'+i+'">'+v41Emoji(i)+' '+safeEscV41(window.monthStateText(i))+' - '+safeEscV41(p)+'</option>';
+    }).join('');
+  };
+  function v41CleanExternalStatus(){
+    document.querySelectorAll('.month-status-help').forEach(function(el){ el.remove(); });
+  }
+  function v41RefreshPeriodDropdown(){
+    var fp=document.getElementById('formPeriod');
+    if(!fp) return;
+    var old=fp.value;
+    fp.innerHTML=window.periodOptionsWithState();
+    if([].slice.call(fp.options).some(function(o){return o.value===old;})) fp.value=old;
+    v41CleanExternalStatus();
+  }
+  var oldUpdateConceptSelectV41=window.updateConceptSelect;
+  if(typeof oldUpdateConceptSelectV41==='function'){
+    window.updateConceptSelect=function(){
+      var res=oldUpdateConceptSelectV41.apply(this,arguments);
+      v41RefreshPeriodDropdown();
+      return res;
+    };
+  }
+  var oldRenderInputFormV41=window.renderInputForm;
+  if(typeof oldRenderInputFormV41==='function'){
+    window.renderInputForm=function(){
+      var res=oldRenderInputFormV41.apply(this,arguments);
+      v41RefreshPeriodDropdown();
+      return res;
+    };
+  }
+  var oldValidateInputMonthSelectionV41=window.validateInputMonthSelection;
+  if(typeof oldValidateInputMonthSelectionV41==='function'){
+    window.validateInputMonthSelection=function(){
+      var res=oldValidateInputMonthSelectionV41.apply(this,arguments);
+      v41CleanExternalStatus();
+      return res;
+    };
+  }
+  var oldRenderV41=window.render;
+  if(typeof oldRenderV41==='function'){
+    window.render=function(){
+      var res=oldRenderV41.apply(this,arguments);
+      v41RefreshPeriodDropdown();
+      v41CleanExternalStatus();
+      return res;
+    };
+  }
+  function v41NormalizeOrders(){
+    data.rowOrders=data.rowOrders||{};
+    (data.sections||[]).forEach(function(sec){
+      if(!sec || !Array.isArray(sec.rows)) return;
+      var arr=data.rowOrders[sec.id]||[];
+      while(arr.length<sec.rows.length) arr.push(arr.length+1);
+      arr=arr.slice(0,sec.rows.length);
+      var oldScale=arr.length>0 && arr.every(function(v,i){ return Number(v)===(i+1)*10; });
+      if(oldScale) arr=arr.map(function(_,i){ return i+1; });
+      arr=arr.map(function(v,i){ v=Number(v); return Number.isFinite(v)?v:(i+1); });
+      data.rowOrders[sec.id]=arr;
+    });
+  }
+  var oldEnsureRowOrdersV41=window.ensureRowOrders;
+  window.ensureRowOrders=function(){
+    if(typeof oldEnsureRowOrdersV41==='function') oldEnsureRowOrdersV41.apply(this,arguments);
+    v41NormalizeOrders();
+  };
+  try{ v41NormalizeOrders(); }catch(e){}
 })();
 </script>
 
