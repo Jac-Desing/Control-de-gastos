@@ -1,11 +1,18 @@
-# App web modelo v36.2
+# App web modelo v38
 
-Versión corregida sobre v36 ajustada.
+Versión construida sobre la **v36.2 corregida** suministrada por el usuario.
 
-Incluye:
-- Menú lateral con submenús desplegables por categoría.
-- Cuadro resumen contraíble: al contraerse muestra encabezado, saldo proyectado, total bancos y cuadre de caja.
-- Control presupuestal contraíble: al contraerse muestra solo diferencia presupuesto vs real.
-- Reordenamiento manual de conceptos dentro de cada sección mediante arrastre o control táctil.
-- Cierre de mes condicionado a que el cuadre de caja sea cero.
-- Mantiene Firebase, datos en la nube y compatibilidad con versiones anteriores.
+Incluye estas correcciones:
+
+- Reparación del formulario **Crear concepto**, disponible solo para:
+  - Gastos variables.
+  - Otros movimientos.
+- Submenús laterales desplegables por categoría.
+- Cierre de mes con validación previa: el **cuadre de caja debe ser cero**.
+- La columna **Saldo inicial bancos** se muestra únicamente en la sección **Saldos bancos** y conserva el botón de ocultar/mostrar.
+- Se elimina el drag & drop de conceptos.
+- Se agrega campo **Orden** por concepto dentro de cada sección.
+- Cada sección tiene botón **Orden / Guardar orden**.
+- El orden se guarda de **menor a mayor** y persiste en Firebase.
+
+No se modifica Firebase Auth, Firestore, login ni estructura principal del modelo.

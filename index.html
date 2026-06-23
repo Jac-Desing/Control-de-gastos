@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v35</title>
+<title>Modelo mensual de caja v38</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -77,6 +77,16 @@ select option{background:#020617;color:#e5e7eb}
 .drag-row.drag-over td{outline:2px dashed #60a5fa;outline-offset:-3px}
 .drag-hint{font-size:11px;color:#93c5fd;margin-left:auto;font-weight:700}
 #summaryTable.compact-summary tbody tr td:first-child,#variableBudgetSummaryTable.compact-budget tbody tr td:first-child{font-weight:900;color:#e5e7eb}
+
+
+/* v38 fixes */
+.order-chip{display:inline-flex;align-items:center;gap:4px;margin-right:8px;background:#0b1220;border:1px solid #334155;border-radius:8px;padding:2px 5px;color:#bfdbfe;font-size:11px;font-weight:800}
+.order-chip input{width:48px!important;height:24px!important;text-align:center!important;border:1px solid #475569!important;background:#020617!important;color:#e5e7eb!important;border-radius:6px!important;padding:2px 4px!important;font-size:12px!important}
+.order-chip input:disabled{opacity:.45;cursor:not-allowed}
+.order-section-btn{margin-left:8px;padding:4px 8px;font-size:11px;border-radius:8px;background:#172554!important}
+.drag-hint{display:none!important}.drag-row{cursor:default!important}.drag-row.drag-over td{outline:none!important}
+.submenu-content{display:none}.submenu.open .submenu-content{display:block}
+
 </style>
 </head>
 <body class="locked">
@@ -826,28 +836,28 @@ function cellKey(sec,ri,pi,type='value'){return `${sec}|${ri}|${pi}|${type}`}
 function visiblePeriodIndexes(){return data.periods.map((_,i)=>i).filter(i=>!data.hiddenPeriods.includes(i))}
 function visiblePeriods(){return visiblePeriodIndexes().map(i=>data.periods[i])}
 function isPeriodVisible(i){return !data.hiddenPeriods.includes(i)}
-function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader=initialVisible?`<th style="${colStyle('initial')}"><input class="month-input" value="${esc(data.initialColumnLabel)}" onchange="renameInitialColumn(this.value)"><small>${esc(data.initialColumnDate)}</small><span class="resizer" onmousedown="startColumnResize(event,'initial')"></span></th>`:'';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
+function render(){ensureLengths();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');const initialVisible=!!data.showInitialColumn;const visibleIdx=visiblePeriodIndexes();document.getElementById('toggleInitialBtn').textContent=initialVisible?'Ocultar saldo inicial':'Mostrar saldo inicial';let initialHeader='';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+initialHeader+visibleIdx.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${esc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
 function isSectionCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId]}
 function sectionTitleRow(sec, initialVisible){
- const extraCells=visibleIdx.length+(initialVisible?1:0);
+ const extraCells=visibleIdx.length+((initialVisible&&sec.kind==='bank')?1:0);
  const collapsed=isSectionCollapsed(sec.id);
  return `<tr class="section-title"><td style="${colStyle('concept')}"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button><span>${esc(sec.title)}</span></div></td>`+Array.from({length:extraCells},()=>'<td></td>').join('')+'</tr>';
 }
 function repeatedMonthHeader(sec, initialVisible){
  let row=`<tr class="section-period-row"><td style="${colStyle('concept')}">${esc(sec.title)}</td>`;
- if(initialVisible)row+=`<td style="${colStyle('initial')}">${esc(data.initialColumnLabel)}</td>`;
+ if(initialVisible&&sec.kind==='bank')row+=`<td style="${colStyle('initial')}">${esc(data.initialColumnLabel)}</td>`;
  visibleIdx.forEach(i=>row+=`<td style="${colStyle('p'+i)}">${esc(data.periods[i])}</td>`);
  return row+'</tr>';
 }
 
  data.sections.forEach(sec=>{html+=sectionTitleRow(sec, initialVisible);
- if(isSectionCollapsed(sec.id)){html+=`<tr class="collapsed-section-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}">Sección contraída. Usa el botón + para expandir.</td></tr>`;return;}
+ if(isSectionCollapsed(sec.id)){html+=`<tr class="collapsed-section-row"><td colspan="${visibleIdx.length+((initialVisible&&sec.kind==='bank')?2:1)}">Sección contraída. Usa el botón + para expandir.</td></tr>`;return;}
  html+=repeatedMonthHeader(sec, initialVisible);
  sec.rows.forEach((r,ri)=>{html+=`<tr class="${sec.kind==='bank'?'bank-row':''}"><td style="${colStyle('concept')}"><div class="concept"><input value="${esc(r[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;
- if(initialVisible){if(sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}else{html+=`<td class="money muted" style="${colStyle('initial')}">—</td>`}}
+ if(initialVisible&&sec.kind==='bank'){html+=`<td style="${colStyle('initial')}">${inputCell(sec.id,ri,'initial',r[2]||0)}</td>`}
  for(const pi of visibleIdx){const displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+=`<td style="${colStyle('p'+pi)}">${inputCell(sec.id,ri,pi,displayVal)}</td>`;}
  html+='</tr>'});
- html+=`<tr class="add-row"><td colspan="${visibleIdx.length+(initialVisible?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
+ html+=`<tr class="add-row"><td colspan="${visibleIdx.length+((initialVisible&&sec.kind==='bank')?2:1)}"><button class="soft" onclick="addRow('${sec.id}')">+ Agregar concepto en ${esc(sec.title)}</button></td></tr>`;
  });
  html+='</tbody>';t.innerHTML=html;}
 function inputCell(sec,ri,pi,val){
@@ -2307,6 +2317,190 @@ initCloud();
     if(Math.abs(check)>=1){alert('No se puede cerrar '+(data.periods[pi]||'este mes')+'. El cuadre de caja debe ser cero. Cuadre actual: '+safeMoney(check));return;}
     if(typeof previousCloseMonth==='function')return previousCloseMonth(pi);
   };
+})();
+</script>
+
+
+<script>
+/* ===================== v38 sobre v36.2 corregida =====================
+   Correcciones acotadas: crear conceptos, submenues, cierre con cuadre 0,
+   saldo inicial solo en bancos y orden por prioridad ascendente.
+*/
+(function(){
+  function v38Esc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+  function v38Money(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
+  function v38Sec(secId){return (typeof section==='function')?section(secId):null;}
+
+  window.openConceptModal=function(fromInput){
+    if(typeof requireNoInputEdit==='function' && !requireNoInputEdit())return;
+    var modal=document.getElementById('conceptModal');
+    var sec=document.getElementById('newConceptSection');
+    var name=document.getElementById('newConceptName');
+    if(!modal||!sec||!name){alert('No se encontró el formulario de creación de conceptos.');return;}
+    modal.dataset.returnToInput=fromInput?'1':'0';
+    var current=document.getElementById('formSection');
+    sec.value=(current && ['variable','other'].includes(current.value))?current.value:'variable';
+    name.value='';
+    modal.classList.add('open');
+    setTimeout(function(){name.focus();},50);
+  };
+  window.closeConceptModal=function(){
+    var modal=document.getElementById('conceptModal');
+    if(modal)modal.classList.remove('open');
+  };
+  window.saveNewConceptFromModal=function(){
+    var secId=(document.getElementById('newConceptSection')||{}).value;
+    var name=(document.getElementById('newConceptName')||{}).value||'';
+    name=name.trim();
+    if(!['variable','other'].includes(secId)){alert('Solo puedes crear conceptos en Gastos variables u Otros movimientos.');return;}
+    if(!name){alert('Escribe el nombre del concepto.');return;}
+    var sec=v38Sec(secId);
+    if(!sec){alert('No se encontró la sección seleccionada.');return;}
+    if(sec.rows.some(function(r){return String(r[0]||'').trim().toLowerCase()===name.toLowerCase();})){
+      alert('Ya existe un concepto con ese nombre en esta sección.');return;
+    }
+    sec.rows.push([name,Array(data.periods.length).fill(0)]);
+    ensureOrderState();
+    var arr=data.rowOrder[secId];
+    arr.push(nextOrderValue(arr));
+    logInput({source:'Creación de concepto',secId:secId,ri:sec.rows.length-1,pi:0,mode:'createConcept',amount:0,before:'',after:name,note:'Concepto creado desde formulario',paid:false});
+    if(typeof saveSilent==='function')saveSilent();
+    if(typeof render==='function')render();
+    var formSec=document.getElementById('formSection');
+    if(formSec){formSec.value=secId; if(typeof updateConceptSelect==='function')updateConceptSelect(); var formConcept=document.getElementById('formConcept'); if(formConcept)formConcept.value=String(sec.rows.length-1);}
+    closeConceptModal();
+  };
+
+  window.toggleSubmenu=function(btn){
+    var box=btn&&btn.closest?btn.closest('.submenu'):null;
+    if(!box)return;
+    box.classList.toggle('open');
+  };
+
+  function ensureOrderState(){
+    data.rowOrder=data.rowOrder||{};
+    data.orderUnlocked=data.orderUnlocked||{};
+    (data.sections||[]).forEach(function(sec){
+      if(!data.rowOrder[sec.id])data.rowOrder[sec.id]=[];
+      while(data.rowOrder[sec.id].length<(sec.rows||[]).length)data.rowOrder[sec.id].push((data.rowOrder[sec.id].length+1)*10);
+      if(data.rowOrder[sec.id].length>(sec.rows||[]).length)data.rowOrder[sec.id]=data.rowOrder[sec.id].slice(0,(sec.rows||[]).length);
+      if(data.orderUnlocked[sec.id]==null)data.orderUnlocked[sec.id]=false;
+    });
+  }
+  function nextOrderValue(arr){
+    var nums=(arr||[]).map(Number).filter(function(v){return isFinite(v);});
+    return nums.length?Math.max.apply(null,nums)+10:10;
+  }
+  function remapKeyObject(obj,secId,map){
+    var out={};
+    Object.keys(obj||{}).forEach(function(k){
+      var parts=k.split('|');
+      if(parts[0]===secId && map[parts[1]]!=null){parts[1]=String(map[parts[1]]);out[parts.join('|')]=obj[k];}
+      else out[k]=obj[k];
+    });
+    return out;
+  }
+  function sortSectionByOrder(secId){
+    ensureOrderState();
+    var sec=v38Sec(secId); if(!sec||!sec.rows)return;
+    var pairs=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(data.rowOrder[secId][i]||0)};});
+    pairs.sort(function(a,b){return a.ord-b.ord || a.old-b.old;});
+    var map={}; pairs.forEach(function(p,i){map[String(p.old)]=i;});
+    sec.rows=pairs.map(function(p){return p.row;});
+    data.rowOrder[secId]=pairs.map(function(p){return p.ord;});
+    data.notes=remapKeyObject(data.notes,secId,map);
+    data.paid=remapKeyObject(data.paid,secId,map);
+    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId&&map[String(r.ri)]!=null)r.ri=map[String(r.ri)];});
+    if(typeof rebuildAllInputNotes==='function')rebuildAllInputNotes();
+  }
+  window.toggleOrderEdit=function(secId){
+    ensureOrderState();
+    if(data.orderUnlocked[secId]){
+      sortSectionByOrder(secId);
+      data.orderUnlocked[secId]=false;
+      var sec=v38Sec(secId);
+      logInput({source:'Ordenamiento de conceptos',secId:secId,ri:0,pi:0,mode:'sort',amount:0,before:'',after:'',note:'Conceptos ordenados de menor a mayor por prioridad',paid:false});
+    }else{
+      data.orderUnlocked[secId]=true;
+    }
+    if(typeof saveSilent==='function')saveSilent();
+    if(typeof render==='function')render();
+  };
+  window.setRowOrderValue=function(secId,ri,val){
+    ensureOrderState();
+    data.rowOrder[secId][Number(ri)]=Number(val)||0;
+    if(typeof saveSilent==='function')saveSilent();
+  };
+
+  function applyOrderControls(){
+    ensureOrderState();
+    var tbody=document.querySelector('#modelTable tbody'); if(!tbody)return;
+    var secIndex=-1,rowIndex=-1,currentSec=null;
+    Array.from(tbody.children).forEach(function(tr){
+      tr.draggable=false;tr.ondragstart=null;tr.ondragover=null;tr.ondragleave=null;tr.ondrop=null;
+      tr.classList.remove('drag-row','drag-over');
+      tr.querySelectorAll('.drag-hint').forEach(function(x){x.remove();});
+      if(tr.classList.contains('section-title')){
+        secIndex++;currentSec=(data.sections||[])[secIndex];rowIndex=-1;
+        var head=tr.querySelector('.section-head');
+        if(head&&currentSec&&!head.querySelector('.order-section-btn')){
+          var btn=document.createElement('button');
+          btn.className='order-section-btn';
+          btn.type='button';
+          btn.textContent=data.orderUnlocked[currentSec.id]?'🔓 Guardar orden':'🔒 Orden';
+          btn.onclick=function(ev){ev.stopPropagation();toggleOrderEdit(currentSec.id);};
+          head.appendChild(btn);
+        }
+        return;
+      }
+      if(!currentSec || tr.classList.contains('section-period-row') || tr.classList.contains('collapsed-section-row') || tr.classList.contains('add-row'))return;
+      if(!currentSec.rows || rowIndex+1>=currentSec.rows.length)return;
+      rowIndex++;
+      var concept=tr.querySelector('td:first-child .concept');
+      if(concept&&!concept.querySelector('.order-chip')){
+        var wrap=document.createElement('span');wrap.className='order-chip';wrap.title='Orden de menor a mayor dentro de la sección';
+        var inp=document.createElement('input');inp.type='number';inp.value=data.rowOrder[currentSec.id][rowIndex];inp.disabled=!data.orderUnlocked[currentSec.id];
+        (function(secId,ri){inp.onchange=function(){setRowOrderValue(secId,ri,this.value);};})(currentSec.id,rowIndex);
+        wrap.appendChild(document.createTextNode('Orden'));wrap.appendChild(inp);concept.insertBefore(wrap,concept.firstChild);
+      }
+    });
+  }
+
+  function cashCheckValue(pi){
+    var c=(typeof calculations==='function')?calculations():null;
+    return c&&c.cashCheck?Number(c.cashCheck[Number(pi)]||0):0;
+  }
+  window.closeMonth=function(pi){
+    pi=Number(pi);
+    if(typeof isMonthClosed==='function' && isMonthClosed(pi)){alert('El mes ya está cerrado.');return;}
+    var check=cashCheckValue(pi);
+    if(Math.abs(check)>=1){alert('No es posible cerrar '+(data.periods[pi]||'este mes')+'.\n\nEl cuadre de caja debe ser cero.\nCuadre actual: '+v38Money(check));return;}
+    if(typeof canCloseMonth==='function' && !canCloseMonth(pi)){alert('No se puede cerrar este mes porque aún no ha pasado su último día calendario.');return;}
+    var msg='Cerrar '+(data.periods[pi]||'este mes')+'?\n\nSe bloquearán edición manual, inputs, edición y eliminación de inputs para este mes. Se creará un respaldo independiente con corte a hoy.';
+    if(!confirm(msg))return;
+    if(typeof ensureMonthStatusState==='function')ensureMonthStatusState(data);
+    data.monthClosed[pi]=true;
+    var key='corte_'+String(data.periods[pi]||('mes_'+pi)).replace(/\s+/g,'_').toLowerCase();
+    data.monthClosedBackups=data.monthClosedBackups||{};
+    data.monthClosedMeta=data.monthClosedMeta||{};
+    data.monthClosedBackups[key]={period:data.periods[pi],periodIndex:pi,closedAt:new Date().toLocaleString('es-CO'),model:clone(data)};
+    data.monthClosedMeta[pi]={closedAt:new Date().toLocaleString('es-CO'),user:currentUser?currentUser.email:''};
+    logInput({source:'Cierre de mes',secId:'other',ri:0,pi:pi,mode:'close',amount:0,before:'',after:'',note:'Mes cerrado con cuadre de caja en cero y respaldo independiente',paid:false});
+    if(typeof saveSilent==='function')saveSilent();
+    if(typeof render==='function')render();
+    if(typeof renderCloseMonthList==='function')renderCloseMonthList();
+  };
+
+  var oldMigrate=window.migrateData;
+  if(typeof oldMigrate==='function'){
+    window.migrateData=function(d){d=oldMigrate(d); try{var old=data;data=d;ensureOrderState();data=old;}catch(e){} return d;};
+  }
+  var oldRender=window.render;
+  window.render=function(){
+    if(typeof oldRender==='function')oldRender.apply(this,arguments);
+    try{applyOrderControls();}catch(e){console.warn('v38 orden',e);}
+  };
+  document.addEventListener('DOMContentLoaded',function(){try{ensureOrderState();applyOrderControls();}catch(e){}});
 })();
 </script>
 
