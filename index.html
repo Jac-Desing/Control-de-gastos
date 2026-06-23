@@ -77,31 +77,6 @@ select option{background:#020617;color:#e5e7eb}
 .drag-row.drag-over td{outline:2px dashed #60a5fa;outline-offset:-3px}
 .drag-hint{font-size:11px;color:#93c5fd;margin-left:auto;font-weight:700}
 #summaryTable.compact-summary tbody tr td:first-child,#variableBudgetSummaryTable.compact-budget tbody tr td:first-child{font-weight:900;color:#e5e7eb}
-
-
-/* v42 - mejoras moviles y orden 1 en 1 */
-.tableWrap{position:relative;overflow:auto;-webkit-overflow-scrolling:touch;}
-#summaryTable th:first-child,#summaryTable td:first-child,
-#variableBudgetSummaryTable th:first-child,#variableBudgetSummaryTable td:first-child{
-  position:sticky!important;left:0!important;z-index:6!important;background:#111827!important;box-shadow:6px 0 12px rgba(0,0,0,.28);white-space:normal!important;
-}
-#summaryTable thead th:first-child,#variableBudgetSummaryTable thead th:first-child{z-index:9!important;background:#0b1220!important;}
-.order-input{appearance:textfield!important;-moz-appearance:textfield!important;}
-.order-input::-webkit-outer-spin-button,.order-input::-webkit-inner-spin-button{appearance:none!important;-webkit-appearance:none!important;margin:0!important;}
-.budget-indicator-box{margin:0 14px 12px;padding:12px 14px;border:1px solid #334155;border-radius:14px;background:linear-gradient(135deg,#0b1220,#111827);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;}
-.budget-indicator-box .label{font-size:12px;color:#94a3b8;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
-.budget-indicator-box .value{font-size:18px;font-weight:900;}
-.budget-indicator-box .period{font-size:12px;color:#cbd5e1;}
-#formPeriod + .month-status-help{display:none!important;}
-@media(max-width:700px){
-  th:first-child,td:first-child{min-width:var(--concept-mobile-width,180px)!important;}
-  .concept input{font-size:12px;}
-  #summaryTable th:first-child,#summaryTable td:first-child,
-  #variableBudgetSummaryTable th:first-child,#variableBudgetSummaryTable td:first-child{min-width:150px!important;max-width:170px;}
-  .budget-indicator-box{margin:0 10px 12px;align-items:flex-start;}
-  .budget-indicator-box .value{font-size:16px;}
-}
-
 </style>
 </head>
 <body class="locked">
@@ -1197,126 +1172,6 @@ function exportVariableInputsExcel(){
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:'';return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
-
-<script id="v42-fixes">
-(function(){
-  const V42='v42';
-  function safeEsc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(function(s){return s.id===secId;});}
-  function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map(function(_,i){return i;});}}
-  function stateText(pi){try{return typeof monthStateText==='function'?monthStateText(pi):(typeof isMonthClosed==='function'&&isMonthClosed(pi)?'Cerrado':(typeof isVariableInitialized==='function'&&isVariableInitialized(pi)?'Inicializado':'Sin inicializar'));}catch(e){return 'Sin inicializar';}}
-  function stateEmoji(pi){var t=stateText(pi); if(t==='Cerrado')return '🔴'; if(t==='Abierto')return '🟢'; if(t==='Inicializado')return '🔵'; return '⚪';}
-  function periodOptionLabel(pi){return stateEmoji(pi)+' '+stateText(pi)+' - '+(data.periods[Number(pi)]||'');}
-  function removeExternalMonthHelp(){
-    try{var fp=document.getElementById('formPeriod'); if(fp&&fp.parentElement){fp.parentElement.querySelectorAll('.month-status-help').forEach(function(n){n.remove();});}}catch(e){}
-  }
-  function ensureBudgetIndicatorBox(){
-    var panel=document.getElementById('inputPanel'); if(!panel)return null;
-    var box=document.getElementById('formBudgetIndicator');
-    if(!box){
-      box=document.createElement('div'); box.id='formBudgetIndicator'; box.className='budget-indicator-box';
-      var form=document.getElementById('lineInputForm');
-      if(form) panel.insertBefore(box,form); else panel.appendChild(box);
-    }
-    return box;
-  }
-  window.updateFormBudgetIndicator=function(){
-    var box=ensureBudgetIndicatorBox(); if(!box)return;
-    var fp=document.getElementById('formPeriod'); var pi=fp?Number(fp.value||0):0;
-    var period=(data.periods||[])[pi]||'';
-    var initialized=false; try{initialized=!!isVariableInitialized(pi);}catch(e){}
-    if(!initialized){
-      box.innerHTML='<div><div class="label">Control presupuestal</div><div class="period">'+safeEsc(period)+'</div></div><div class="value neutral">Mes sin inicializar</div>';
-      return;
-    }
-    var diff=0; try{diff=(calculations().variableDiff||[])[pi]||0;}catch(e){}
-    var cls=diff<0?'positive':'negative';
-    box.innerHTML='<div><div class="label">Diferencia ppto - real</div><div class="period">'+safeEsc(period)+'</div></div><div class="value '+cls+'">'+safeMoney(diff)+'</div>';
-  };
-  function normalizeOrdersForce(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      var n=(sec.rows||[]).length;
-      var arr=data.rowOrders[sec.id].slice(0,n);
-      var needs=!arr.length || arr.length!==n || arr.some(function(v,i){return Number(v)!==(i+1);});
-      if(data.orderUnitVersion!==V42 || needs){data.rowOrders[sec.id]=(sec.rows||[]).map(function(_,i){return i+1;});}
-    });
-    data.orderUnitVersion=V42;
-  }
-  function ensureRowOrdersV42(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      (sec.rows||[]).forEach(function(_,i){if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=i+1;});
-      data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);
-    });
-  }
-  function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
-  function remapKeys(obj,secId,map){var out={};Object.keys(obj||{}).forEach(function(k){var p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrderV42(secId){
-    ensureRowOrdersV42(); var sec=getSection(secId); if(!sec||!Array.isArray(sec.rows))return;
-    var oldOrders=(data.rowOrders[secId]||[]).slice();
-    var items=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(oldOrders[i]||0)};});
-    items.sort(function(a,b){return a.ord-b.ord||a.old-b.old;});
-    var map={}; items.forEach(function(it,newIdx){map[it.old]=newIdx;});
-    sec.rows=items.map(function(it){return it.row;});
-    data.rowOrders[secId]=items.map(function(_,i){return i+1;});
-    data.notes=remapKeys(data.notes||{},secId,map); data.paid=remapKeys(data.paid||{},secId,map);
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});
-  }
-  window.toggleSectionOrder=function(secId){
-    ensureRowOrdersV42(); data.orderUnlocked=data.orderUnlocked||{};
-    if(data.orderUnlocked[secId]){sortSectionByOrderV42(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}
-    if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();
-  };
-  window.setRowOrder=function(secId,ri,value){
-    ensureRowOrdersV42(); var n=String(value||'').replace(/[^0-9-]/g,''); data.rowOrders[secId][Number(ri)]=Number(n)||0; if(typeof saveSilent==='function')saveSilent();
-  };
-  function colStyleSafe(key){try{return colStyle(key);}catch(e){return '';}}
-  function monthHead(pi){try{return typeof monthNameWithDot==='function'?monthNameWithDot(pi):safeEsc(data.periods[pi]);}catch(e){return safeEsc(data.periods[pi]);}}
-  function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
-  function sectionTitle(sec, visibleCount, initialForBank){
-    var collapsed=isCollapsed(sec.id); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var span=1+visibleCount+(initialForBank?1:0);
-    return '<tr class="section-title"><td style="'+colStyleSafe('concept')+'"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed(\''+sec.id+'\')">'+(collapsed?'+':'−')+'</button><span>'+safeEsc(sec.title)+'</span><button class="secondary order-toggle" onclick="toggleSectionOrder(\''+sec.id+'\')">'+(unlocked?'🔓 Guardar orden':'🔒 Orden')+'</button></div></td>'+Array.from({length:span-1},function(){return '<td></td>';}).join('')+'</tr>';
-  }
-  function repeatedHeader(sec, vis, showBankInitial){
-    var row='<tr class="section-period-row"><td style="'+colStyleSafe('concept')+'">'+safeEsc(sec.title)+'</td>';
-    if(showBankInitial)row+='<td style="'+colStyleSafe('initial')+'">'+safeEsc(data.initialColumnLabel)+'</td>';
-    vis.forEach(function(i){row+='<td style="'+colStyleSafe('p'+i)+'">'+monthHead(i)+'</td>';});
-    return row+'</tr>';
-  }
-  function conceptCell(sec,ri,row){
-    ensureRowOrdersV42(); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var ord=(data.rowOrders[sec.id]||[])[ri]||(ri+1);
-    var orderHtml=unlocked?'<input class="order-input" type="text" inputmode="numeric" pattern="[0-9]*" value="'+safeEsc(ord)+'" onchange="setRowOrder(\''+sec.id+'\','+ri+',this.value)" title="Orden de menor a mayor">':'<span class="order-badge" title="Orden">'+safeEsc(ord)+'</span>';
-    return '<td style="'+colStyleSafe('concept')+'"><div class="concept">'+orderHtml+'<input value="'+safeEsc(row[0])+'" onchange="renameRow(\''+sec.id+'\','+ri+',this.value)"><span class="row-actions"><button class="soft" onclick="addRow(\''+sec.id+'\','+(ri+1)+')">+</button><button class="danger" onclick="deleteRow(\''+sec.id+'\','+ri+')">×</button></span></div></td>';
-  }
-  window.render=function(){
-    ensureLengths(); ensureRowOrdersV42(); var c=calculations(); renderSummary(c); renderInputForm(); renderInputsLedger(); updateFormBudgetIndicator(); removeExternalMonthHelp();
-    var t=document.getElementById('modelTable'); if(!t)return;
-    var showInit=!!data.showInitialColumn; var vis=periodIndexes(); var btn=document.getElementById('toggleInitialBtn'); if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';
-    var html='<thead><tr><th style="'+colStyleSafe('concept')+'">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,\'concept\')"></span></th>'+vis.map(function(i){return '<th style="'+colStyleSafe('p'+i)+'"><input class="month-input" value="'+safeEsc(data.periods[i])+'" onchange="renamePeriod('+i+',this.value)"><span class="resizer" onmousedown="startColumnResize(event,\'p'+i+'\')"></span></th>';}).join('')+'</tr></thead><tbody>';
-    (data.sections||[]).forEach(function(sec){
-      var showBankInitial=showInit&&sec.kind==='bank'; html+=sectionTitle(sec,vis.length,showBankInitial);
-      if(isCollapsed(sec.id)){html+='<tr class="collapsed-section-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'">Sección contraída. Usa el botón + para expandir.</td></tr>';return;}
-      html+=repeatedHeader(sec,vis,showBankInitial);
-      (sec.rows||[]).forEach(function(r,ri){html+='<tr class="'+(sec.kind==='bank'?'bank-row':'')+'">'+conceptCell(sec,ri,r); if(showBankInitial)html+='<td style="'+colStyleSafe('initial')+'">'+inputCell(sec.id,ri,'initial',r[2]||0)+'</td>'; vis.forEach(function(pi){var displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+='<td style="'+colStyleSafe('p'+pi)+'">'+inputCell(sec.id,ri,pi,displayVal)+'</td>';}); html+='</tr>';});
-      html+='<tr class="add-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'"><button class="soft" onclick="addRow(\''+sec.id+'\')">+ Agregar concepto en '+safeEsc(sec.title)+'</button></td></tr>';
-    });
-    html+='</tbody>'; t.innerHTML=html; removeExternalMonthHelp();
-  };
-  var oldRenderInputForm=window.renderInputForm;
-  window.renderInputForm=function(){if(typeof oldRenderInputForm==='function')oldRenderInputForm.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldUpdateConcept=window.updateConceptSelect;
-  window.updateConceptSelect=function(){if(typeof oldUpdateConcept==='function')oldUpdateConcept.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldValidate=window.validateInputMonthSelection;
-  window.validateInputMonthSelection=function(){var res=true; if(typeof oldValidate==='function')res=oldValidate.apply(this,arguments); updateFormBudgetIndicator(); removeExternalMonthHelp(); return res;};
-  window.startColumnResize=(function(prev){return function(ev,key){return prev.apply(this,arguments);};})(window.startColumnResize||function(){});
-  try{normalizeOrdersForce(); removeExternalMonthHelp();}catch(e){console.warn('v42 init',e);}
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
@@ -1327,126 +1182,6 @@ function exportInputLogExcel(){
  const headers=['Fecha','Origen','Sección','Concepto','Periodo','Acción','Valor ingresado','Valor anterior','Valor final','Comentario','Pago realizado'];
  const tr=rows.map(r=>`<tr><td>${esc(r.fecha)}</td><td>${esc(r.origen)}</td><td>${esc(r.seccion)}</td><td>${esc(r.concepto)}</td><td>${esc(r.periodo)}</td><td>${esc(r.accion)}</td><td>${esc(r.valorIngresado)}</td><td>${esc(r.valorAnterior)}</td><td>${esc(r.valorFinal)}</td><td>${esc(r.comentario)}</td><td>${esc(r.pagoRealizado)}</td></tr>`).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Historial de cambios del modelo</h2><table border="1"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${tr}</tbody></table>
-
-<script id="v42-fixes">
-(function(){
-  const V42='v42';
-  function safeEsc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(function(s){return s.id===secId;});}
-  function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map(function(_,i){return i;});}}
-  function stateText(pi){try{return typeof monthStateText==='function'?monthStateText(pi):(typeof isMonthClosed==='function'&&isMonthClosed(pi)?'Cerrado':(typeof isVariableInitialized==='function'&&isVariableInitialized(pi)?'Inicializado':'Sin inicializar'));}catch(e){return 'Sin inicializar';}}
-  function stateEmoji(pi){var t=stateText(pi); if(t==='Cerrado')return '🔴'; if(t==='Abierto')return '🟢'; if(t==='Inicializado')return '🔵'; return '⚪';}
-  function periodOptionLabel(pi){return stateEmoji(pi)+' '+stateText(pi)+' - '+(data.periods[Number(pi)]||'');}
-  function removeExternalMonthHelp(){
-    try{var fp=document.getElementById('formPeriod'); if(fp&&fp.parentElement){fp.parentElement.querySelectorAll('.month-status-help').forEach(function(n){n.remove();});}}catch(e){}
-  }
-  function ensureBudgetIndicatorBox(){
-    var panel=document.getElementById('inputPanel'); if(!panel)return null;
-    var box=document.getElementById('formBudgetIndicator');
-    if(!box){
-      box=document.createElement('div'); box.id='formBudgetIndicator'; box.className='budget-indicator-box';
-      var form=document.getElementById('lineInputForm');
-      if(form) panel.insertBefore(box,form); else panel.appendChild(box);
-    }
-    return box;
-  }
-  window.updateFormBudgetIndicator=function(){
-    var box=ensureBudgetIndicatorBox(); if(!box)return;
-    var fp=document.getElementById('formPeriod'); var pi=fp?Number(fp.value||0):0;
-    var period=(data.periods||[])[pi]||'';
-    var initialized=false; try{initialized=!!isVariableInitialized(pi);}catch(e){}
-    if(!initialized){
-      box.innerHTML='<div><div class="label">Control presupuestal</div><div class="period">'+safeEsc(period)+'</div></div><div class="value neutral">Mes sin inicializar</div>';
-      return;
-    }
-    var diff=0; try{diff=(calculations().variableDiff||[])[pi]||0;}catch(e){}
-    var cls=diff<0?'positive':'negative';
-    box.innerHTML='<div><div class="label">Diferencia ppto - real</div><div class="period">'+safeEsc(period)+'</div></div><div class="value '+cls+'">'+safeMoney(diff)+'</div>';
-  };
-  function normalizeOrdersForce(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      var n=(sec.rows||[]).length;
-      var arr=data.rowOrders[sec.id].slice(0,n);
-      var needs=!arr.length || arr.length!==n || arr.some(function(v,i){return Number(v)!==(i+1);});
-      if(data.orderUnitVersion!==V42 || needs){data.rowOrders[sec.id]=(sec.rows||[]).map(function(_,i){return i+1;});}
-    });
-    data.orderUnitVersion=V42;
-  }
-  function ensureRowOrdersV42(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      (sec.rows||[]).forEach(function(_,i){if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=i+1;});
-      data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);
-    });
-  }
-  function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
-  function remapKeys(obj,secId,map){var out={};Object.keys(obj||{}).forEach(function(k){var p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrderV42(secId){
-    ensureRowOrdersV42(); var sec=getSection(secId); if(!sec||!Array.isArray(sec.rows))return;
-    var oldOrders=(data.rowOrders[secId]||[]).slice();
-    var items=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(oldOrders[i]||0)};});
-    items.sort(function(a,b){return a.ord-b.ord||a.old-b.old;});
-    var map={}; items.forEach(function(it,newIdx){map[it.old]=newIdx;});
-    sec.rows=items.map(function(it){return it.row;});
-    data.rowOrders[secId]=items.map(function(_,i){return i+1;});
-    data.notes=remapKeys(data.notes||{},secId,map); data.paid=remapKeys(data.paid||{},secId,map);
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});
-  }
-  window.toggleSectionOrder=function(secId){
-    ensureRowOrdersV42(); data.orderUnlocked=data.orderUnlocked||{};
-    if(data.orderUnlocked[secId]){sortSectionByOrderV42(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}
-    if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();
-  };
-  window.setRowOrder=function(secId,ri,value){
-    ensureRowOrdersV42(); var n=String(value||'').replace(/[^0-9-]/g,''); data.rowOrders[secId][Number(ri)]=Number(n)||0; if(typeof saveSilent==='function')saveSilent();
-  };
-  function colStyleSafe(key){try{return colStyle(key);}catch(e){return '';}}
-  function monthHead(pi){try{return typeof monthNameWithDot==='function'?monthNameWithDot(pi):safeEsc(data.periods[pi]);}catch(e){return safeEsc(data.periods[pi]);}}
-  function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
-  function sectionTitle(sec, visibleCount, initialForBank){
-    var collapsed=isCollapsed(sec.id); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var span=1+visibleCount+(initialForBank?1:0);
-    return '<tr class="section-title"><td style="'+colStyleSafe('concept')+'"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed(\''+sec.id+'\')">'+(collapsed?'+':'−')+'</button><span>'+safeEsc(sec.title)+'</span><button class="secondary order-toggle" onclick="toggleSectionOrder(\''+sec.id+'\')">'+(unlocked?'🔓 Guardar orden':'🔒 Orden')+'</button></div></td>'+Array.from({length:span-1},function(){return '<td></td>';}).join('')+'</tr>';
-  }
-  function repeatedHeader(sec, vis, showBankInitial){
-    var row='<tr class="section-period-row"><td style="'+colStyleSafe('concept')+'">'+safeEsc(sec.title)+'</td>';
-    if(showBankInitial)row+='<td style="'+colStyleSafe('initial')+'">'+safeEsc(data.initialColumnLabel)+'</td>';
-    vis.forEach(function(i){row+='<td style="'+colStyleSafe('p'+i)+'">'+monthHead(i)+'</td>';});
-    return row+'</tr>';
-  }
-  function conceptCell(sec,ri,row){
-    ensureRowOrdersV42(); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var ord=(data.rowOrders[sec.id]||[])[ri]||(ri+1);
-    var orderHtml=unlocked?'<input class="order-input" type="text" inputmode="numeric" pattern="[0-9]*" value="'+safeEsc(ord)+'" onchange="setRowOrder(\''+sec.id+'\','+ri+',this.value)" title="Orden de menor a mayor">':'<span class="order-badge" title="Orden">'+safeEsc(ord)+'</span>';
-    return '<td style="'+colStyleSafe('concept')+'"><div class="concept">'+orderHtml+'<input value="'+safeEsc(row[0])+'" onchange="renameRow(\''+sec.id+'\','+ri+',this.value)"><span class="row-actions"><button class="soft" onclick="addRow(\''+sec.id+'\','+(ri+1)+')">+</button><button class="danger" onclick="deleteRow(\''+sec.id+'\','+ri+')">×</button></span></div></td>';
-  }
-  window.render=function(){
-    ensureLengths(); ensureRowOrdersV42(); var c=calculations(); renderSummary(c); renderInputForm(); renderInputsLedger(); updateFormBudgetIndicator(); removeExternalMonthHelp();
-    var t=document.getElementById('modelTable'); if(!t)return;
-    var showInit=!!data.showInitialColumn; var vis=periodIndexes(); var btn=document.getElementById('toggleInitialBtn'); if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';
-    var html='<thead><tr><th style="'+colStyleSafe('concept')+'">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,\'concept\')"></span></th>'+vis.map(function(i){return '<th style="'+colStyleSafe('p'+i)+'"><input class="month-input" value="'+safeEsc(data.periods[i])+'" onchange="renamePeriod('+i+',this.value)"><span class="resizer" onmousedown="startColumnResize(event,\'p'+i+'\')"></span></th>';}).join('')+'</tr></thead><tbody>';
-    (data.sections||[]).forEach(function(sec){
-      var showBankInitial=showInit&&sec.kind==='bank'; html+=sectionTitle(sec,vis.length,showBankInitial);
-      if(isCollapsed(sec.id)){html+='<tr class="collapsed-section-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'">Sección contraída. Usa el botón + para expandir.</td></tr>';return;}
-      html+=repeatedHeader(sec,vis,showBankInitial);
-      (sec.rows||[]).forEach(function(r,ri){html+='<tr class="'+(sec.kind==='bank'?'bank-row':'')+'">'+conceptCell(sec,ri,r); if(showBankInitial)html+='<td style="'+colStyleSafe('initial')+'">'+inputCell(sec.id,ri,'initial',r[2]||0)+'</td>'; vis.forEach(function(pi){var displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+='<td style="'+colStyleSafe('p'+pi)+'">'+inputCell(sec.id,ri,pi,displayVal)+'</td>';}); html+='</tr>';});
-      html+='<tr class="add-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'"><button class="soft" onclick="addRow(\''+sec.id+'\')">+ Agregar concepto en '+safeEsc(sec.title)+'</button></td></tr>';
-    });
-    html+='</tbody>'; t.innerHTML=html; removeExternalMonthHelp();
-  };
-  var oldRenderInputForm=window.renderInputForm;
-  window.renderInputForm=function(){if(typeof oldRenderInputForm==='function')oldRenderInputForm.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldUpdateConcept=window.updateConceptSelect;
-  window.updateConceptSelect=function(){if(typeof oldUpdateConcept==='function')oldUpdateConcept.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldValidate=window.validateInputMonthSelection;
-  window.validateInputMonthSelection=function(){var res=true; if(typeof oldValidate==='function')res=oldValidate.apply(this,arguments); updateFormBudgetIndicator(); removeExternalMonthHelp(); return res;};
-  window.startColumnResize=(function(prev){return function(ev,key){return prev.apply(this,arguments);};})(window.startColumnResize||function(){});
-  try{normalizeOrdersForce(); removeExternalMonthHelp();}catch(e){console.warn('v42 init',e);}
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='historial-cambios-modelo.xls';a.click();URL.revokeObjectURL(a.href);
@@ -1567,126 +1302,6 @@ exportVariableInputsExcel=function(){
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(r.mode==='add'?'Sumar':'Reemplazar')}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
-
-<script id="v42-fixes">
-(function(){
-  const V42='v42';
-  function safeEsc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(function(s){return s.id===secId;});}
-  function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map(function(_,i){return i;});}}
-  function stateText(pi){try{return typeof monthStateText==='function'?monthStateText(pi):(typeof isMonthClosed==='function'&&isMonthClosed(pi)?'Cerrado':(typeof isVariableInitialized==='function'&&isVariableInitialized(pi)?'Inicializado':'Sin inicializar'));}catch(e){return 'Sin inicializar';}}
-  function stateEmoji(pi){var t=stateText(pi); if(t==='Cerrado')return '🔴'; if(t==='Abierto')return '🟢'; if(t==='Inicializado')return '🔵'; return '⚪';}
-  function periodOptionLabel(pi){return stateEmoji(pi)+' '+stateText(pi)+' - '+(data.periods[Number(pi)]||'');}
-  function removeExternalMonthHelp(){
-    try{var fp=document.getElementById('formPeriod'); if(fp&&fp.parentElement){fp.parentElement.querySelectorAll('.month-status-help').forEach(function(n){n.remove();});}}catch(e){}
-  }
-  function ensureBudgetIndicatorBox(){
-    var panel=document.getElementById('inputPanel'); if(!panel)return null;
-    var box=document.getElementById('formBudgetIndicator');
-    if(!box){
-      box=document.createElement('div'); box.id='formBudgetIndicator'; box.className='budget-indicator-box';
-      var form=document.getElementById('lineInputForm');
-      if(form) panel.insertBefore(box,form); else panel.appendChild(box);
-    }
-    return box;
-  }
-  window.updateFormBudgetIndicator=function(){
-    var box=ensureBudgetIndicatorBox(); if(!box)return;
-    var fp=document.getElementById('formPeriod'); var pi=fp?Number(fp.value||0):0;
-    var period=(data.periods||[])[pi]||'';
-    var initialized=false; try{initialized=!!isVariableInitialized(pi);}catch(e){}
-    if(!initialized){
-      box.innerHTML='<div><div class="label">Control presupuestal</div><div class="period">'+safeEsc(period)+'</div></div><div class="value neutral">Mes sin inicializar</div>';
-      return;
-    }
-    var diff=0; try{diff=(calculations().variableDiff||[])[pi]||0;}catch(e){}
-    var cls=diff<0?'positive':'negative';
-    box.innerHTML='<div><div class="label">Diferencia ppto - real</div><div class="period">'+safeEsc(period)+'</div></div><div class="value '+cls+'">'+safeMoney(diff)+'</div>';
-  };
-  function normalizeOrdersForce(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      var n=(sec.rows||[]).length;
-      var arr=data.rowOrders[sec.id].slice(0,n);
-      var needs=!arr.length || arr.length!==n || arr.some(function(v,i){return Number(v)!==(i+1);});
-      if(data.orderUnitVersion!==V42 || needs){data.rowOrders[sec.id]=(sec.rows||[]).map(function(_,i){return i+1;});}
-    });
-    data.orderUnitVersion=V42;
-  }
-  function ensureRowOrdersV42(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      (sec.rows||[]).forEach(function(_,i){if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=i+1;});
-      data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);
-    });
-  }
-  function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
-  function remapKeys(obj,secId,map){var out={};Object.keys(obj||{}).forEach(function(k){var p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrderV42(secId){
-    ensureRowOrdersV42(); var sec=getSection(secId); if(!sec||!Array.isArray(sec.rows))return;
-    var oldOrders=(data.rowOrders[secId]||[]).slice();
-    var items=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(oldOrders[i]||0)};});
-    items.sort(function(a,b){return a.ord-b.ord||a.old-b.old;});
-    var map={}; items.forEach(function(it,newIdx){map[it.old]=newIdx;});
-    sec.rows=items.map(function(it){return it.row;});
-    data.rowOrders[secId]=items.map(function(_,i){return i+1;});
-    data.notes=remapKeys(data.notes||{},secId,map); data.paid=remapKeys(data.paid||{},secId,map);
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});
-  }
-  window.toggleSectionOrder=function(secId){
-    ensureRowOrdersV42(); data.orderUnlocked=data.orderUnlocked||{};
-    if(data.orderUnlocked[secId]){sortSectionByOrderV42(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}
-    if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();
-  };
-  window.setRowOrder=function(secId,ri,value){
-    ensureRowOrdersV42(); var n=String(value||'').replace(/[^0-9-]/g,''); data.rowOrders[secId][Number(ri)]=Number(n)||0; if(typeof saveSilent==='function')saveSilent();
-  };
-  function colStyleSafe(key){try{return colStyle(key);}catch(e){return '';}}
-  function monthHead(pi){try{return typeof monthNameWithDot==='function'?monthNameWithDot(pi):safeEsc(data.periods[pi]);}catch(e){return safeEsc(data.periods[pi]);}}
-  function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
-  function sectionTitle(sec, visibleCount, initialForBank){
-    var collapsed=isCollapsed(sec.id); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var span=1+visibleCount+(initialForBank?1:0);
-    return '<tr class="section-title"><td style="'+colStyleSafe('concept')+'"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed(\''+sec.id+'\')">'+(collapsed?'+':'−')+'</button><span>'+safeEsc(sec.title)+'</span><button class="secondary order-toggle" onclick="toggleSectionOrder(\''+sec.id+'\')">'+(unlocked?'🔓 Guardar orden':'🔒 Orden')+'</button></div></td>'+Array.from({length:span-1},function(){return '<td></td>';}).join('')+'</tr>';
-  }
-  function repeatedHeader(sec, vis, showBankInitial){
-    var row='<tr class="section-period-row"><td style="'+colStyleSafe('concept')+'">'+safeEsc(sec.title)+'</td>';
-    if(showBankInitial)row+='<td style="'+colStyleSafe('initial')+'">'+safeEsc(data.initialColumnLabel)+'</td>';
-    vis.forEach(function(i){row+='<td style="'+colStyleSafe('p'+i)+'">'+monthHead(i)+'</td>';});
-    return row+'</tr>';
-  }
-  function conceptCell(sec,ri,row){
-    ensureRowOrdersV42(); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var ord=(data.rowOrders[sec.id]||[])[ri]||(ri+1);
-    var orderHtml=unlocked?'<input class="order-input" type="text" inputmode="numeric" pattern="[0-9]*" value="'+safeEsc(ord)+'" onchange="setRowOrder(\''+sec.id+'\','+ri+',this.value)" title="Orden de menor a mayor">':'<span class="order-badge" title="Orden">'+safeEsc(ord)+'</span>';
-    return '<td style="'+colStyleSafe('concept')+'"><div class="concept">'+orderHtml+'<input value="'+safeEsc(row[0])+'" onchange="renameRow(\''+sec.id+'\','+ri+',this.value)"><span class="row-actions"><button class="soft" onclick="addRow(\''+sec.id+'\','+(ri+1)+')">+</button><button class="danger" onclick="deleteRow(\''+sec.id+'\','+ri+')">×</button></span></div></td>';
-  }
-  window.render=function(){
-    ensureLengths(); ensureRowOrdersV42(); var c=calculations(); renderSummary(c); renderInputForm(); renderInputsLedger(); updateFormBudgetIndicator(); removeExternalMonthHelp();
-    var t=document.getElementById('modelTable'); if(!t)return;
-    var showInit=!!data.showInitialColumn; var vis=periodIndexes(); var btn=document.getElementById('toggleInitialBtn'); if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';
-    var html='<thead><tr><th style="'+colStyleSafe('concept')+'">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,\'concept\')"></span></th>'+vis.map(function(i){return '<th style="'+colStyleSafe('p'+i)+'"><input class="month-input" value="'+safeEsc(data.periods[i])+'" onchange="renamePeriod('+i+',this.value)"><span class="resizer" onmousedown="startColumnResize(event,\'p'+i+'\')"></span></th>';}).join('')+'</tr></thead><tbody>';
-    (data.sections||[]).forEach(function(sec){
-      var showBankInitial=showInit&&sec.kind==='bank'; html+=sectionTitle(sec,vis.length,showBankInitial);
-      if(isCollapsed(sec.id)){html+='<tr class="collapsed-section-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'">Sección contraída. Usa el botón + para expandir.</td></tr>';return;}
-      html+=repeatedHeader(sec,vis,showBankInitial);
-      (sec.rows||[]).forEach(function(r,ri){html+='<tr class="'+(sec.kind==='bank'?'bank-row':'')+'">'+conceptCell(sec,ri,r); if(showBankInitial)html+='<td style="'+colStyleSafe('initial')+'">'+inputCell(sec.id,ri,'initial',r[2]||0)+'</td>'; vis.forEach(function(pi){var displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+='<td style="'+colStyleSafe('p'+pi)+'">'+inputCell(sec.id,ri,pi,displayVal)+'</td>';}); html+='</tr>';});
-      html+='<tr class="add-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'"><button class="soft" onclick="addRow(\''+sec.id+'\')">+ Agregar concepto en '+safeEsc(sec.title)+'</button></td></tr>';
-    });
-    html+='</tbody>'; t.innerHTML=html; removeExternalMonthHelp();
-  };
-  var oldRenderInputForm=window.renderInputForm;
-  window.renderInputForm=function(){if(typeof oldRenderInputForm==='function')oldRenderInputForm.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldUpdateConcept=window.updateConceptSelect;
-  window.updateConceptSelect=function(){if(typeof oldUpdateConcept==='function')oldUpdateConcept.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldValidate=window.validateInputMonthSelection;
-  window.validateInputMonthSelection=function(){var res=true; if(typeof oldValidate==='function')res=oldValidate.apply(this,arguments); updateFormBudgetIndicator(); removeExternalMonthHelp(); return res;};
-  window.startColumnResize=(function(prev){return function(ev,key){return prev.apply(this,arguments);};})(window.startColumnResize||function(){});
-  try{normalizeOrdersForce(); removeExternalMonthHelp();}catch(e){console.warn('v42 init',e);}
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 }
@@ -1922,126 +1537,6 @@ exportVariableInputsExcel=function(){
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(actionLabel(r))}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
  const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
-
-<script id="v42-fixes">
-(function(){
-  const V42='v42';
-  function safeEsc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(function(s){return s.id===secId;});}
-  function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map(function(_,i){return i;});}}
-  function stateText(pi){try{return typeof monthStateText==='function'?monthStateText(pi):(typeof isMonthClosed==='function'&&isMonthClosed(pi)?'Cerrado':(typeof isVariableInitialized==='function'&&isVariableInitialized(pi)?'Inicializado':'Sin inicializar'));}catch(e){return 'Sin inicializar';}}
-  function stateEmoji(pi){var t=stateText(pi); if(t==='Cerrado')return '🔴'; if(t==='Abierto')return '🟢'; if(t==='Inicializado')return '🔵'; return '⚪';}
-  function periodOptionLabel(pi){return stateEmoji(pi)+' '+stateText(pi)+' - '+(data.periods[Number(pi)]||'');}
-  function removeExternalMonthHelp(){
-    try{var fp=document.getElementById('formPeriod'); if(fp&&fp.parentElement){fp.parentElement.querySelectorAll('.month-status-help').forEach(function(n){n.remove();});}}catch(e){}
-  }
-  function ensureBudgetIndicatorBox(){
-    var panel=document.getElementById('inputPanel'); if(!panel)return null;
-    var box=document.getElementById('formBudgetIndicator');
-    if(!box){
-      box=document.createElement('div'); box.id='formBudgetIndicator'; box.className='budget-indicator-box';
-      var form=document.getElementById('lineInputForm');
-      if(form) panel.insertBefore(box,form); else panel.appendChild(box);
-    }
-    return box;
-  }
-  window.updateFormBudgetIndicator=function(){
-    var box=ensureBudgetIndicatorBox(); if(!box)return;
-    var fp=document.getElementById('formPeriod'); var pi=fp?Number(fp.value||0):0;
-    var period=(data.periods||[])[pi]||'';
-    var initialized=false; try{initialized=!!isVariableInitialized(pi);}catch(e){}
-    if(!initialized){
-      box.innerHTML='<div><div class="label">Control presupuestal</div><div class="period">'+safeEsc(period)+'</div></div><div class="value neutral">Mes sin inicializar</div>';
-      return;
-    }
-    var diff=0; try{diff=(calculations().variableDiff||[])[pi]||0;}catch(e){}
-    var cls=diff<0?'positive':'negative';
-    box.innerHTML='<div><div class="label">Diferencia ppto - real</div><div class="period">'+safeEsc(period)+'</div></div><div class="value '+cls+'">'+safeMoney(diff)+'</div>';
-  };
-  function normalizeOrdersForce(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      var n=(sec.rows||[]).length;
-      var arr=data.rowOrders[sec.id].slice(0,n);
-      var needs=!arr.length || arr.length!==n || arr.some(function(v,i){return Number(v)!==(i+1);});
-      if(data.orderUnitVersion!==V42 || needs){data.rowOrders[sec.id]=(sec.rows||[]).map(function(_,i){return i+1;});}
-    });
-    data.orderUnitVersion=V42;
-  }
-  function ensureRowOrdersV42(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      (sec.rows||[]).forEach(function(_,i){if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=i+1;});
-      data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);
-    });
-  }
-  function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
-  function remapKeys(obj,secId,map){var out={};Object.keys(obj||{}).forEach(function(k){var p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrderV42(secId){
-    ensureRowOrdersV42(); var sec=getSection(secId); if(!sec||!Array.isArray(sec.rows))return;
-    var oldOrders=(data.rowOrders[secId]||[]).slice();
-    var items=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(oldOrders[i]||0)};});
-    items.sort(function(a,b){return a.ord-b.ord||a.old-b.old;});
-    var map={}; items.forEach(function(it,newIdx){map[it.old]=newIdx;});
-    sec.rows=items.map(function(it){return it.row;});
-    data.rowOrders[secId]=items.map(function(_,i){return i+1;});
-    data.notes=remapKeys(data.notes||{},secId,map); data.paid=remapKeys(data.paid||{},secId,map);
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});
-  }
-  window.toggleSectionOrder=function(secId){
-    ensureRowOrdersV42(); data.orderUnlocked=data.orderUnlocked||{};
-    if(data.orderUnlocked[secId]){sortSectionByOrderV42(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}
-    if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();
-  };
-  window.setRowOrder=function(secId,ri,value){
-    ensureRowOrdersV42(); var n=String(value||'').replace(/[^0-9-]/g,''); data.rowOrders[secId][Number(ri)]=Number(n)||0; if(typeof saveSilent==='function')saveSilent();
-  };
-  function colStyleSafe(key){try{return colStyle(key);}catch(e){return '';}}
-  function monthHead(pi){try{return typeof monthNameWithDot==='function'?monthNameWithDot(pi):safeEsc(data.periods[pi]);}catch(e){return safeEsc(data.periods[pi]);}}
-  function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
-  function sectionTitle(sec, visibleCount, initialForBank){
-    var collapsed=isCollapsed(sec.id); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var span=1+visibleCount+(initialForBank?1:0);
-    return '<tr class="section-title"><td style="'+colStyleSafe('concept')+'"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed(\''+sec.id+'\')">'+(collapsed?'+':'−')+'</button><span>'+safeEsc(sec.title)+'</span><button class="secondary order-toggle" onclick="toggleSectionOrder(\''+sec.id+'\')">'+(unlocked?'🔓 Guardar orden':'🔒 Orden')+'</button></div></td>'+Array.from({length:span-1},function(){return '<td></td>';}).join('')+'</tr>';
-  }
-  function repeatedHeader(sec, vis, showBankInitial){
-    var row='<tr class="section-period-row"><td style="'+colStyleSafe('concept')+'">'+safeEsc(sec.title)+'</td>';
-    if(showBankInitial)row+='<td style="'+colStyleSafe('initial')+'">'+safeEsc(data.initialColumnLabel)+'</td>';
-    vis.forEach(function(i){row+='<td style="'+colStyleSafe('p'+i)+'">'+monthHead(i)+'</td>';});
-    return row+'</tr>';
-  }
-  function conceptCell(sec,ri,row){
-    ensureRowOrdersV42(); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var ord=(data.rowOrders[sec.id]||[])[ri]||(ri+1);
-    var orderHtml=unlocked?'<input class="order-input" type="text" inputmode="numeric" pattern="[0-9]*" value="'+safeEsc(ord)+'" onchange="setRowOrder(\''+sec.id+'\','+ri+',this.value)" title="Orden de menor a mayor">':'<span class="order-badge" title="Orden">'+safeEsc(ord)+'</span>';
-    return '<td style="'+colStyleSafe('concept')+'"><div class="concept">'+orderHtml+'<input value="'+safeEsc(row[0])+'" onchange="renameRow(\''+sec.id+'\','+ri+',this.value)"><span class="row-actions"><button class="soft" onclick="addRow(\''+sec.id+'\','+(ri+1)+')">+</button><button class="danger" onclick="deleteRow(\''+sec.id+'\','+ri+')">×</button></span></div></td>';
-  }
-  window.render=function(){
-    ensureLengths(); ensureRowOrdersV42(); var c=calculations(); renderSummary(c); renderInputForm(); renderInputsLedger(); updateFormBudgetIndicator(); removeExternalMonthHelp();
-    var t=document.getElementById('modelTable'); if(!t)return;
-    var showInit=!!data.showInitialColumn; var vis=periodIndexes(); var btn=document.getElementById('toggleInitialBtn'); if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';
-    var html='<thead><tr><th style="'+colStyleSafe('concept')+'">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,\'concept\')"></span></th>'+vis.map(function(i){return '<th style="'+colStyleSafe('p'+i)+'"><input class="month-input" value="'+safeEsc(data.periods[i])+'" onchange="renamePeriod('+i+',this.value)"><span class="resizer" onmousedown="startColumnResize(event,\'p'+i+'\')"></span></th>';}).join('')+'</tr></thead><tbody>';
-    (data.sections||[]).forEach(function(sec){
-      var showBankInitial=showInit&&sec.kind==='bank'; html+=sectionTitle(sec,vis.length,showBankInitial);
-      if(isCollapsed(sec.id)){html+='<tr class="collapsed-section-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'">Sección contraída. Usa el botón + para expandir.</td></tr>';return;}
-      html+=repeatedHeader(sec,vis,showBankInitial);
-      (sec.rows||[]).forEach(function(r,ri){html+='<tr class="'+(sec.kind==='bank'?'bank-row':'')+'">'+conceptCell(sec,ri,r); if(showBankInitial)html+='<td style="'+colStyleSafe('initial')+'">'+inputCell(sec.id,ri,'initial',r[2]||0)+'</td>'; vis.forEach(function(pi){var displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+='<td style="'+colStyleSafe('p'+pi)+'">'+inputCell(sec.id,ri,pi,displayVal)+'</td>';}); html+='</tr>';});
-      html+='<tr class="add-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'"><button class="soft" onclick="addRow(\''+sec.id+'\')">+ Agregar concepto en '+safeEsc(sec.title)+'</button></td></tr>';
-    });
-    html+='</tbody>'; t.innerHTML=html; removeExternalMonthHelp();
-  };
-  var oldRenderInputForm=window.renderInputForm;
-  window.renderInputForm=function(){if(typeof oldRenderInputForm==='function')oldRenderInputForm.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldUpdateConcept=window.updateConceptSelect;
-  window.updateConceptSelect=function(){if(typeof oldUpdateConcept==='function')oldUpdateConcept.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldValidate=window.validateInputMonthSelection;
-  window.validateInputMonthSelection=function(){var res=true; if(typeof oldValidate==='function')res=oldValidate.apply(this,arguments); updateFormBudgetIndicator(); removeExternalMonthHelp(); return res;};
-  window.startColumnResize=(function(prev){return function(ev,key){return prev.apply(this,arguments);};})(window.startColumnResize||function(){});
-  try{normalizeOrdersForce(); removeExternalMonthHelp();}catch(e){console.warn('v42 init',e);}
-})();
-</script>
-
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 };
@@ -2284,17 +1779,17 @@ initCloud();
   function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(s=>s.id===secId);}
   function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map((_,i)=>i);}}
   function orderState(){data.rowOrders=data.rowOrders||{};data.orderUnlocked=data.orderUnlocked||{};return data.rowOrders;}
-  function ensureRowOrders(){orderState();(data.sections||[]).forEach(sec=>{data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];(sec.rows||[]).forEach((r,i)=>{if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=(i+1)*10;});data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);});}
+  function ensureRowOrders(){orderState();(data.sections||[]).forEach(sec=>{data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];(sec.rows||[]).forEach((r,i)=>{if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=(i+1);});data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);});}
   function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
   function remapKeys(obj,secId,map){const out={};Object.keys(obj||{}).forEach(k=>{const p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrder(secId){ensureRowOrders();const sec=getSection(secId);if(!sec||!Array.isArray(sec.rows))return;const oldRows=sec.rows.slice();const oldOrders=(data.rowOrders[secId]||[]).slice();const items=oldRows.map((row,i)=>({row,old:i,ord:Number(oldOrders[i]||0)}));items.sort((a,b)=>a.ord-b.ord||a.old-b.old);const map={};items.forEach((it,newIdx)=>map[it.old]=newIdx);sec.rows=items.map(it=>it.row);data.rowOrders[secId]=items.map((it,i)=>Number.isFinite(it.ord)?it.ord:(i+1)*10);data.notes=remapKeys(data.notes||{},secId,map);data.paid=remapKeys(data.paid||{},secId,map);(data.formInputs||[]).forEach(r=>{if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});}
+  function sortSectionByOrder(secId){ensureRowOrders();const sec=getSection(secId);if(!sec||!Array.isArray(sec.rows))return;const oldRows=sec.rows.slice();const oldOrders=(data.rowOrders[secId]||[]).slice();const items=oldRows.map((row,i)=>({row,old:i,ord:Number(oldOrders[i]||0)}));items.sort((a,b)=>a.ord-b.ord||a.old-b.old);const map={};items.forEach((it,newIdx)=>map[it.old]=newIdx);sec.rows=items.map(it=>it.row);data.rowOrders[secId]=items.map((it,i)=>Number.isFinite(it.ord)?it.ord:(i+1));data.notes=remapKeys(data.notes||{},secId,map);data.paid=remapKeys(data.paid||{},secId,map);(data.formInputs||[]).forEach(r=>{if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});}
   window.toggleSectionOrder=function(secId){ensureRowOrders();data.orderUnlocked=data.orderUnlocked||{};if(data.orderUnlocked[secId]){sortSectionByOrder(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}if(typeof saveSilent==='function')saveSilent();if(typeof render==='function')render();};
   window.setRowOrder=function(secId,ri,value){ensureRowOrders();data.rowOrders[secId][Number(ri)]=Number(value)||0;if(typeof saveSilent==='function')saveSilent();};
 
   // Crear concepto: solo Gastos variables y Otros movimientos.
   window.openConceptModal=function(fromInput){const modal=document.getElementById('conceptModal');if(!modal){alert('No se encontró el formulario de crear concepto.');return;}const sel=document.getElementById('newConceptSection');const name=document.getElementById('newConceptName');if(sel){sel.innerHTML='<option value="variable">Gastos variables</option><option value="other">Otros movimientos</option>';const fs=document.getElementById('formSection');sel.value=(fs&&['variable','other'].includes(fs.value))?fs.value:'variable';}if(name){name.value='';setTimeout(()=>name.focus(),50);}modal.dataset.fromInput=fromInput?'1':'0';modal.classList.add('open');};
   window.closeConceptModal=function(){const modal=document.getElementById('conceptModal');if(modal)modal.classList.remove('open');};
-  window.saveNewConceptFromModal=function(){const secId=(document.getElementById('newConceptSection')||{}).value;const name=(document.getElementById('newConceptName')||{}).value||'';const clean=name.trim();if(!['variable','other'].includes(secId)){alert('Solo se pueden crear conceptos en Gastos variables u Otros movimientos.');return;}if(!clean){alert('Escribe el nombre del concepto.');return;}const sec=getSection(secId);if(!sec){alert('No se encontró la sección.');return;}if((sec.rows||[]).some(r=>String(r[0]||'').trim().toLowerCase()===clean.toLowerCase())){alert('Ese concepto ya existe en la sección.');return;}sec.rows.push([clean,Array(data.periods.length).fill(0)]);ensureRowOrders();data.rowOrders[secId][sec.rows.length-1]=sec.rows.length*10;if(typeof logInput==='function')logInput({source:'Crear concepto',secId,ri:sec.rows.length-1,pi:0,mode:'create-concept',amount:0,before:'',after:clean,note:'Concepto creado desde formulario',paid:false});if(typeof saveSilent==='function')saveSilent();closeConceptModal();if(typeof render==='function')render();const fs=document.getElementById('formSection'), fc=document.getElementById('formConcept');if(fs&&fc){fs.value=secId;if(typeof updateConceptSelect==='function')updateConceptSelect();fc.value=String(sec.rows.length-1);}alert('Concepto creado: '+clean);};
+  window.saveNewConceptFromModal=function(){const secId=(document.getElementById('newConceptSection')||{}).value;const name=(document.getElementById('newConceptName')||{}).value||'';const clean=name.trim();if(!['variable','other'].includes(secId)){alert('Solo se pueden crear conceptos en Gastos variables u Otros movimientos.');return;}if(!clean){alert('Escribe el nombre del concepto.');return;}const sec=getSection(secId);if(!sec){alert('No se encontró la sección.');return;}if((sec.rows||[]).some(r=>String(r[0]||'').trim().toLowerCase()===clean.toLowerCase())){alert('Ese concepto ya existe en la sección.');return;}sec.rows.push([clean,Array(data.periods.length).fill(0)]);ensureRowOrders();data.rowOrders[secId][sec.rows.length-1]=sec.rows.length;if(typeof logInput==='function')logInput({source:'Crear concepto',secId,ri:sec.rows.length-1,pi:0,mode:'create-concept',amount:0,before:'',after:clean,note:'Concepto creado desde formulario',paid:false});if(typeof saveSilent==='function')saveSilent();closeConceptModal();if(typeof render==='function')render();const fs=document.getElementById('formSection'), fc=document.getElementById('formConcept');if(fs&&fc){fs.value=secId;if(typeof updateConceptSelect==='function')updateConceptSelect();fc.value=String(sec.rows.length-1);}alert('Concepto creado: '+clean);};
 
   // Submenús desplegables por categoría.
   window.toggleSubmenu=function(btn){const box=btn&&btn.closest?btn.closest('.submenu'):null;if(!box)return;box.classList.toggle('open');};
@@ -2304,7 +1799,7 @@ initCloud();
   function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
   function sectionTitle(sec, visibleCount, initialForBank){const collapsed=isCollapsed(sec.id);const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const span=1+visibleCount+(initialForBank?1:0);return `<tr class="section-title"><td style="${colStyle('concept')}"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed('${sec.id}')">${collapsed?'+':'−'}</button><span>${safeEsc(sec.title)}</span><button class="secondary order-toggle" onclick="toggleSectionOrder('${sec.id}')">${unlocked?'🔓 Guardar orden':'🔒 Orden'}</button></div></td>`+Array.from({length:span-1},()=>'<td></td>').join('')+'</tr>';}
   function repeatedHeader(sec, vis, showBankInitial){let row=`<tr class="section-period-row"><td style="${colStyle('concept')}">${safeEsc(sec.title)}</td>`;if(showBankInitial)row+=`<td style="${colStyle('initial')}">${safeEsc(data.initialColumnLabel)}</td>`;vis.forEach(i=>row+=`<td style="${colStyle('p'+i)}">${monthHead(i)}</td>`);return row+'</tr>';}
-  function conceptCell(sec,ri,row){ensureRowOrders();const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const ord=(data.rowOrders[sec.id]||[])[ri]??((ri+1)*10);const orderHtml=unlocked?`<input class="order-input" type="number" value="${safeEsc(ord)}" onchange="setRowOrder('${sec.id}',${ri},this.value)" title="Orden de menor a mayor">`:`<span class="order-badge" title="Orden">${safeEsc(ord)}</span>`;return `<td style="${colStyle('concept')}"><div class="concept">${orderHtml}<input value="${safeEsc(row[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;}
+  function conceptCell(sec,ri,row){ensureRowOrders();const unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id];const ord=(data.rowOrders[sec.id]||[])[ri]??((ri+1));const orderHtml=unlocked?`<input class="order-input" type="text" value="${safeEsc(ord)}" onchange="setRowOrder('${sec.id}',${ri},this.value)" title="Orden de menor a mayor">`:`<span class="order-badge" title="Orden">${safeEsc(ord)}</span>`;return `<td style="${colStyle('concept')}"><div class="concept">${orderHtml}<input value="${safeEsc(row[0])}" onchange="renameRow('${sec.id}',${ri},this.value)"><span class="row-actions"><button class="soft" onclick="addRow('${sec.id}',${ri}+1)">+</button><button class="danger" onclick="deleteRow('${sec.id}',${ri})">×</button></span></div></td>`;}
 
   // Render corregido: saldo inicial solo en bancos; orden por número; sin drag & drop.
   window.render=function(){ensureLengths();ensureRowOrders();const c=calculations();renderSummary(c);renderInputForm();renderInputsLedger();const t=document.getElementById('modelTable');if(!t)return;const showInit=!!data.showInitialColumn;const vis=periodIndexes();const btn=document.getElementById('toggleInitialBtn');if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';let html=`<thead><tr><th style="${colStyle('concept')}">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,'concept')"></span></th>`+vis.map(i=>`<th style="${colStyle('p'+i)}"><input class="month-input" value="${safeEsc(data.periods[i])}" onchange="renamePeriod(${i},this.value)"><span class="resizer" onmousedown="startColumnResize(event,'p${i}')"></span></th>`).join('')+'</tr></thead><tbody>';
@@ -2319,122 +1814,107 @@ initCloud();
 </script>
 
 
-<script id="v42-fixes">
+<script>
+/* v41 - ajustes seguros sobre v39 funcional
+   1) Orden de conceptos de 1 en 1.
+   2) Estado del mes integrado dentro del desplegable del formulario, sin bolita externa. */
 (function(){
-  const V42='v42';
-  function safeEsc(x){return (typeof esc==='function')?esc(x):String(x==null?'':x).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-  function safeMoney(n){return (typeof money==='function')?money(n):(Number(n)||0).toLocaleString('es-CO');}
-  function getSection(secId){return (typeof section==='function')?section(secId):(data.sections||[]).find(function(s){return s.id===secId;});}
-  function periodIndexes(){try{return visiblePeriodIndexes();}catch(e){return (data.periods||[]).map(function(_,i){return i;});}}
-  function stateText(pi){try{return typeof monthStateText==='function'?monthStateText(pi):(typeof isMonthClosed==='function'&&isMonthClosed(pi)?'Cerrado':(typeof isVariableInitialized==='function'&&isVariableInitialized(pi)?'Inicializado':'Sin inicializar'));}catch(e){return 'Sin inicializar';}}
-  function stateEmoji(pi){var t=stateText(pi); if(t==='Cerrado')return '🔴'; if(t==='Abierto')return '🟢'; if(t==='Inicializado')return '🔵'; return '⚪';}
-  function periodOptionLabel(pi){return stateEmoji(pi)+' '+stateText(pi)+' - '+(data.periods[Number(pi)]||'');}
-  function removeExternalMonthHelp(){
-    try{var fp=document.getElementById('formPeriod'); if(fp&&fp.parentElement){fp.parentElement.querySelectorAll('.month-status-help').forEach(function(n){n.remove();});}}catch(e){}
+  function safeEscV41(x){
+    if(typeof esc==='function') return esc(x);
+    return String(x==null?'':x).replace(/[&<>"]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});
   }
-  function ensureBudgetIndicatorBox(){
-    var panel=document.getElementById('inputPanel'); if(!panel)return null;
-    var box=document.getElementById('formBudgetIndicator');
-    if(!box){
-      box=document.createElement('div'); box.id='formBudgetIndicator'; box.className='budget-indicator-box';
-      var form=document.getElementById('lineInputForm');
-      if(form) panel.insertBefore(box,form); else panel.appendChild(box);
-    }
-    return box;
+  function v41HasActiveInputs(pi){
+    try{
+      return Array.isArray(data.formInputs) && data.formInputs.some(function(r){
+        return r && r.active!==false && Number(r.pi)===Number(pi) && (r.secId==='variable' || r.secId==='other');
+      });
+    }catch(e){return false;}
   }
-  window.updateFormBudgetIndicator=function(){
-    var box=ensureBudgetIndicatorBox(); if(!box)return;
-    var fp=document.getElementById('formPeriod'); var pi=fp?Number(fp.value||0):0;
-    var period=(data.periods||[])[pi]||'';
-    var initialized=false; try{initialized=!!isVariableInitialized(pi);}catch(e){}
-    if(!initialized){
-      box.innerHTML='<div><div class="label">Control presupuestal</div><div class="period">'+safeEsc(period)+'</div></div><div class="value neutral">Mes sin inicializar</div>';
-      return;
-    }
-    var diff=0; try{diff=(calculations().variableDiff||[])[pi]||0;}catch(e){}
-    var cls=diff<0?'positive':'negative';
-    box.innerHTML='<div><div class="label">Diferencia ppto - real</div><div class="period">'+safeEsc(period)+'</div></div><div class="value '+cls+'">'+safeMoney(diff)+'</div>';
+  window.monthStateText = function(pi){
+    pi=Number(pi);
+    try{ if(typeof isMonthClosed==='function' && isMonthClosed(pi)) return 'Cerrado'; }catch(e){}
+    try{
+      if(typeof isVariableInitialized==='function' && isVariableInitialized(pi)){
+        return v41HasActiveInputs(pi) ? 'Abierto' : 'Inicializado';
+      }
+    }catch(e){}
+    return 'Sin inicializar';
   };
-  function normalizeOrdersForce(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
+  function v41Emoji(pi){
+    var st=window.monthStateText(pi);
+    if(st==='Cerrado') return '🔴';
+    if(st==='Abierto') return '🟢';
+    if(st==='Inicializado') return '🔵';
+    return '⚪';
+  }
+  window.periodOptionsWithState = function(){
+    return (data.periods||[]).map(function(p,i){
+      return '<option value="'+i+'">'+v41Emoji(i)+' '+safeEscV41(window.monthStateText(i))+' - '+safeEscV41(p)+'</option>';
+    }).join('');
+  };
+  function v41CleanExternalStatus(){
+    document.querySelectorAll('.month-status-help').forEach(function(el){ el.remove(); });
+  }
+  function v41RefreshPeriodDropdown(){
+    var fp=document.getElementById('formPeriod');
+    if(!fp) return;
+    var old=fp.value;
+    fp.innerHTML=window.periodOptionsWithState();
+    if([].slice.call(fp.options).some(function(o){return o.value===old;})) fp.value=old;
+    v41CleanExternalStatus();
+  }
+  var oldUpdateConceptSelectV41=window.updateConceptSelect;
+  if(typeof oldUpdateConceptSelectV41==='function'){
+    window.updateConceptSelect=function(){
+      var res=oldUpdateConceptSelectV41.apply(this,arguments);
+      v41RefreshPeriodDropdown();
+      return res;
+    };
+  }
+  var oldRenderInputFormV41=window.renderInputForm;
+  if(typeof oldRenderInputFormV41==='function'){
+    window.renderInputForm=function(){
+      var res=oldRenderInputFormV41.apply(this,arguments);
+      v41RefreshPeriodDropdown();
+      return res;
+    };
+  }
+  var oldValidateInputMonthSelectionV41=window.validateInputMonthSelection;
+  if(typeof oldValidateInputMonthSelectionV41==='function'){
+    window.validateInputMonthSelection=function(){
+      var res=oldValidateInputMonthSelectionV41.apply(this,arguments);
+      v41CleanExternalStatus();
+      return res;
+    };
+  }
+  var oldRenderV41=window.render;
+  if(typeof oldRenderV41==='function'){
+    window.render=function(){
+      var res=oldRenderV41.apply(this,arguments);
+      v41RefreshPeriodDropdown();
+      v41CleanExternalStatus();
+      return res;
+    };
+  }
+  function v41NormalizeOrders(){
+    data.rowOrders=data.rowOrders||{};
     (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      var n=(sec.rows||[]).length;
-      var arr=data.rowOrders[sec.id].slice(0,n);
-      var needs=!arr.length || arr.length!==n || arr.some(function(v,i){return Number(v)!==(i+1);});
-      if(data.orderUnitVersion!==V42 || needs){data.rowOrders[sec.id]=(sec.rows||[]).map(function(_,i){return i+1;});}
-    });
-    data.orderUnitVersion=V42;
-  }
-  function ensureRowOrdersV42(){
-    data.rowOrders=data.rowOrders||{}; data.orderUnlocked=data.orderUnlocked||{};
-    (data.sections||[]).forEach(function(sec){
-      data.rowOrders[sec.id]=data.rowOrders[sec.id]||[];
-      (sec.rows||[]).forEach(function(_,i){if(data.rowOrders[sec.id][i]==null||isNaN(Number(data.rowOrders[sec.id][i])))data.rowOrders[sec.id][i]=i+1;});
-      data.rowOrders[sec.id]=data.rowOrders[sec.id].slice(0,(sec.rows||[]).length);
+      if(!sec || !Array.isArray(sec.rows)) return;
+      var arr=data.rowOrders[sec.id]||[];
+      while(arr.length<sec.rows.length) arr.push(arr.length+1);
+      arr=arr.slice(0,sec.rows.length);
+      var oldScale=arr.length>0 && arr.every(function(v,i){ return Number(v)===(i+1)*10; });
+      if(oldScale) arr=arr.map(function(_,i){ return i+1; });
+      arr=arr.map(function(v,i){ v=Number(v); return Number.isFinite(v)?v:(i+1); });
+      data.rowOrders[sec.id]=arr;
     });
   }
-  function remapIndex(idx,map){idx=Number(idx);return map[idx]==null?idx:map[idx];}
-  function remapKeys(obj,secId,map){var out={};Object.keys(obj||{}).forEach(function(k){var p=k.split('|');if(p[0]===secId){p[1]=String(remapIndex(p[1],map));out[p.join('|')]=obj[k];}else out[k]=obj[k];});return out;}
-  function sortSectionByOrderV42(secId){
-    ensureRowOrdersV42(); var sec=getSection(secId); if(!sec||!Array.isArray(sec.rows))return;
-    var oldOrders=(data.rowOrders[secId]||[]).slice();
-    var items=sec.rows.map(function(row,i){return {row:row,old:i,ord:Number(oldOrders[i]||0)};});
-    items.sort(function(a,b){return a.ord-b.ord||a.old-b.old;});
-    var map={}; items.forEach(function(it,newIdx){map[it.old]=newIdx;});
-    sec.rows=items.map(function(it){return it.row;});
-    data.rowOrders[secId]=items.map(function(_,i){return i+1;});
-    data.notes=remapKeys(data.notes||{},secId,map); data.paid=remapKeys(data.paid||{},secId,map);
-    (data.formInputs||[]).forEach(function(r){if(r&&r.secId===secId)r.ri=remapIndex(r.ri,map);});
-  }
-  window.toggleSectionOrder=function(secId){
-    ensureRowOrdersV42(); data.orderUnlocked=data.orderUnlocked||{};
-    if(data.orderUnlocked[secId]){sortSectionByOrderV42(secId);data.orderUnlocked[secId]=false;}else{data.orderUnlocked[secId]=true;}
-    if(typeof saveSilent==='function')saveSilent(); if(typeof render==='function')render();
+  var oldEnsureRowOrdersV41=window.ensureRowOrders;
+  window.ensureRowOrders=function(){
+    if(typeof oldEnsureRowOrdersV41==='function') oldEnsureRowOrdersV41.apply(this,arguments);
+    v41NormalizeOrders();
   };
-  window.setRowOrder=function(secId,ri,value){
-    ensureRowOrdersV42(); var n=String(value||'').replace(/[^0-9-]/g,''); data.rowOrders[secId][Number(ri)]=Number(n)||0; if(typeof saveSilent==='function')saveSilent();
-  };
-  function colStyleSafe(key){try{return colStyle(key);}catch(e){return '';}}
-  function monthHead(pi){try{return typeof monthNameWithDot==='function'?monthNameWithDot(pi):safeEsc(data.periods[pi]);}catch(e){return safeEsc(data.periods[pi]);}}
-  function isCollapsed(secId){data.collapsedSections=data.collapsedSections||{};return !!data.collapsedSections[secId];}
-  function sectionTitle(sec, visibleCount, initialForBank){
-    var collapsed=isCollapsed(sec.id); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var span=1+visibleCount+(initialForBank?1:0);
-    return '<tr class="section-title"><td style="'+colStyleSafe('concept')+'"><div class="section-head"><button class="section-toggle" onclick="toggleSectionCollapsed(\''+sec.id+'\')">'+(collapsed?'+':'−')+'</button><span>'+safeEsc(sec.title)+'</span><button class="secondary order-toggle" onclick="toggleSectionOrder(\''+sec.id+'\')">'+(unlocked?'🔓 Guardar orden':'🔒 Orden')+'</button></div></td>'+Array.from({length:span-1},function(){return '<td></td>';}).join('')+'</tr>';
-  }
-  function repeatedHeader(sec, vis, showBankInitial){
-    var row='<tr class="section-period-row"><td style="'+colStyleSafe('concept')+'">'+safeEsc(sec.title)+'</td>';
-    if(showBankInitial)row+='<td style="'+colStyleSafe('initial')+'">'+safeEsc(data.initialColumnLabel)+'</td>';
-    vis.forEach(function(i){row+='<td style="'+colStyleSafe('p'+i)+'">'+monthHead(i)+'</td>';});
-    return row+'</tr>';
-  }
-  function conceptCell(sec,ri,row){
-    ensureRowOrdersV42(); var unlocked=data.orderUnlocked&&data.orderUnlocked[sec.id]; var ord=(data.rowOrders[sec.id]||[])[ri]||(ri+1);
-    var orderHtml=unlocked?'<input class="order-input" type="text" inputmode="numeric" pattern="[0-9]*" value="'+safeEsc(ord)+'" onchange="setRowOrder(\''+sec.id+'\','+ri+',this.value)" title="Orden de menor a mayor">':'<span class="order-badge" title="Orden">'+safeEsc(ord)+'</span>';
-    return '<td style="'+colStyleSafe('concept')+'"><div class="concept">'+orderHtml+'<input value="'+safeEsc(row[0])+'" onchange="renameRow(\''+sec.id+'\','+ri+',this.value)"><span class="row-actions"><button class="soft" onclick="addRow(\''+sec.id+'\','+(ri+1)+')">+</button><button class="danger" onclick="deleteRow(\''+sec.id+'\','+ri+')">×</button></span></div></td>';
-  }
-  window.render=function(){
-    ensureLengths(); ensureRowOrdersV42(); var c=calculations(); renderSummary(c); renderInputForm(); renderInputsLedger(); updateFormBudgetIndicator(); removeExternalMonthHelp();
-    var t=document.getElementById('modelTable'); if(!t)return;
-    var showInit=!!data.showInitialColumn; var vis=periodIndexes(); var btn=document.getElementById('toggleInitialBtn'); if(btn)btn.textContent=showInit?'Ocultar saldo inicial':'Mostrar saldo inicial';
-    var html='<thead><tr><th style="'+colStyleSafe('concept')+'">Concepto / Orden<span class="resizer" onmousedown="startColumnResize(event,\'concept\')"></span></th>'+vis.map(function(i){return '<th style="'+colStyleSafe('p'+i)+'"><input class="month-input" value="'+safeEsc(data.periods[i])+'" onchange="renamePeriod('+i+',this.value)"><span class="resizer" onmousedown="startColumnResize(event,\'p'+i+'\')"></span></th>';}).join('')+'</tr></thead><tbody>';
-    (data.sections||[]).forEach(function(sec){
-      var showBankInitial=showInit&&sec.kind==='bank'; html+=sectionTitle(sec,vis.length,showBankInitial);
-      if(isCollapsed(sec.id)){html+='<tr class="collapsed-section-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'">Sección contraída. Usa el botón + para expandir.</td></tr>';return;}
-      html+=repeatedHeader(sec,vis,showBankInitial);
-      (sec.rows||[]).forEach(function(r,ri){html+='<tr class="'+(sec.kind==='bank'?'bank-row':'')+'">'+conceptCell(sec,ri,r); if(showBankInitial)html+='<td style="'+colStyleSafe('initial')+'">'+inputCell(sec.id,ri,'initial',r[2]||0)+'</td>'; vis.forEach(function(pi){var displayVal=(sec.id==='variableBudget'?variableBudgetValue(pi):r[1][pi]);html+='<td style="'+colStyleSafe('p'+pi)+'">'+inputCell(sec.id,ri,pi,displayVal)+'</td>';}); html+='</tr>';});
-      html+='<tr class="add-row"><td colspan="'+(1+vis.length+(showBankInitial?1:0))+'"><button class="soft" onclick="addRow(\''+sec.id+'\')">+ Agregar concepto en '+safeEsc(sec.title)+'</button></td></tr>';
-    });
-    html+='</tbody>'; t.innerHTML=html; removeExternalMonthHelp();
-  };
-  var oldRenderInputForm=window.renderInputForm;
-  window.renderInputForm=function(){if(typeof oldRenderInputForm==='function')oldRenderInputForm.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldUpdateConcept=window.updateConceptSelect;
-  window.updateConceptSelect=function(){if(typeof oldUpdateConcept==='function')oldUpdateConcept.apply(this,arguments); var fp=document.getElementById('formPeriod'); if(fp){var old=fp.value; fp.innerHTML=(data.periods||[]).map(function(p,i){return '<option value="'+i+'">'+safeEsc(periodOptionLabel(i))+'</option>';}).join(''); if(Array.from(fp.options).some(function(o){return o.value===String(old);}))fp.value=old;} updateFormBudgetIndicator(); removeExternalMonthHelp();};
-  var oldValidate=window.validateInputMonthSelection;
-  window.validateInputMonthSelection=function(){var res=true; if(typeof oldValidate==='function')res=oldValidate.apply(this,arguments); updateFormBudgetIndicator(); removeExternalMonthHelp(); return res;};
-  window.startColumnResize=(function(prev){return function(ev,key){return prev.apply(this,arguments);};})(window.startColumnResize||function(){});
-  try{normalizeOrdersForce(); removeExternalMonthHelp();}catch(e){console.warn('v42 init',e);}
+  try{ v41NormalizeOrders(); }catch(e){}
 })();
 </script>
 
