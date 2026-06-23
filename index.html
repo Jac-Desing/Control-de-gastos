@@ -2127,5 +2127,245 @@ initCloud();
 })();
 
 </script>
+
+
+<!-- v44: correccion visual sticky, bloqueo titulos meses y anchos moviles -->
+<style>
+/* v44 - mantener tablas por debajo de la cinta superior */
+:root{--app-sticky-top:86px;}
+header{z-index:1000!important;}
+#sidePanel,#sideBackdrop,.modal{z-index:1100!important;}
+thead th{top:var(--app-sticky-top)!important;}
+#summaryTable th:first-child,
+#summaryTable td:first-child,
+#variableBudgetSummaryTable th:first-child,
+#variableBudgetSummaryTable td:first-child{
+  z-index:8!important;
+}
+#summaryTable thead th:first-child,
+#variableBudgetSummaryTable thead th:first-child{
+  z-index:9!important;
+}
+#modelTable thead th,
+.sheet-wrap thead th{z-index:7!important;}
+#modelTable thead th:first-child,
+.sheet-wrap thead th:first-child{z-index:8!important;}
+.month-input.month-title-locked{
+  cursor:not-allowed!important;
+  color:#94a3b8!important;
+  background:#111827!important;
+  border-color:transparent!important;
+}
+.month-title-lock-btn{
+  width:100%;
+  text-align:left;
+  background:#1e293b!important;
+}
+@media(max-width:700px){
+  :root{--app-sticky-top:74px;}
+  #summaryTable th,#summaryTable td,
+  #variableBudgetSummaryTable th,#variableBudgetSummaryTable td{
+    min-width:108px!important;
+    padding:7px 8px!important;
+    font-size:12px!important;
+  }
+  #summaryTable th:first-child,#summaryTable td:first-child,
+  #variableBudgetSummaryTable th:first-child,#variableBudgetSummaryTable td:first-child{
+    min-width:152px!important;
+    width:152px!important;
+    max-width:152px!important;
+  }
+  #modelTable th:not(:first-child),#modelTable td:not(:first-child){
+    min-width:108px;
+  }
+}
+</style>
+<script>
+(function(){
+  'use strict';
+  function safeSave(){try{if(typeof saveSilent==='function')saveSilent();}catch(e){}}
+  function safeRender(){try{if(typeof render==='function')render();}catch(e){}}
+  function ensureMonthTitleState(){
+    if(!window.data)return;
+    if(typeof data.monthTitlesUnlocked==='undefined')data.monthTitlesUnlocked=false;
+  }
+  function applyMonthTitleLock(){
+    ensureMonthTitleState();
+    var unlocked=!!(window.data&&data.monthTitlesUnlocked);
+    document.querySelectorAll('#modelTable thead input.month-input').forEach(function(inp){
+      inp.readOnly=!unlocked;
+      inp.classList.toggle('month-title-locked',!unlocked);
+      inp.title=unlocked?'Edicion de titulos de meses habilitada':'Titulos de meses bloqueados';
+    });
+    var btn=document.getElementById('monthTitleLockBtn');
+    if(btn){btn.textContent=unlocked?'🔓 Bloquear títulos de meses':'🔒 Habilitar edición títulos de meses';}
+  }
+  window.toggleMonthTitleEdit=function(){
+    ensureMonthTitleState();
+    data.monthTitlesUnlocked=!data.monthTitlesUnlocked;
+    safeSave();
+    safeRender();
+    setTimeout(applyMonthTitleLock,0);
+  };
+  function installMonthTitleButton(){
+    if(document.getElementById('monthTitleLockBtn'))return;
+    var target=null;
+    var buttons=[].slice.call(document.querySelectorAll('.submenu-content button'));
+    for(var i=0;i<buttons.length;i++){
+      var oc=buttons[i].getAttribute('onclick')||'';
+      if(oc.indexOf('toggleInitialColumn')>=0){target=buttons[i];break;}
+    }
+    if(!target)return;
+    var b=document.createElement('button');
+    b.id='monthTitleLockBtn';
+    b.type='button';
+    b.className='side-menu-btn month-title-lock-btn';
+    b.onclick=function(){window.toggleMonthTitleEdit();};
+    target.parentNode.insertBefore(b,target);
+  }
+  function optimizeMobileWidthsOnce(){
+    if(!window.data)return;
+    data.columnWidths=data.columnWidths||{concept:190,initial:130,periods:{}};
+    data.columnWidths.periods=data.columnWidths.periods||{};
+    if(data.v44MobileWidthsApplied)return;
+    if(!Number.isFinite(Number(data.columnWidths.concept))||Number(data.columnWidths.concept)>190)data.columnWidths.concept=190;
+    (data.periods||[]).forEach(function(_,i){
+      var key=String(i);
+      var current=Number(data.columnWidths.periods[key]||0);
+      if(!current || current===130 || current>125)data.columnWidths.periods[key]=112;
+    });
+    data.v44MobileWidthsApplied=true;
+    safeSave();
+  }
+  function afterV44(){
+    ensureMonthTitleState();
+    installMonthTitleButton();
+    applyMonthTitleLock();
+  }
+  var oldRender=window.render;
+  if(typeof oldRender==='function'){
+    window.render=function(){
+      optimizeMobileWidthsOnce();
+      var result=oldRender.apply(this,arguments);
+      setTimeout(afterV44,0);
+      return result;
+    };
+  }
+  var oldToggleSide=window.toggleSidePanel;
+  if(typeof oldToggleSide==='function'){
+    window.toggleSidePanel=function(){
+      var r=oldToggleSide.apply(this,arguments);
+      setTimeout(afterV44,0);
+      return r;
+    };
+  }
+  setTimeout(function(){optimizeMobileWidthsOnce();afterV44();},0);
+})();
+</script>
+
+
+<!-- v44.1: correccion robusta bloqueo/desbloqueo titulos de meses -->
+<style>
+.month-input.month-title-locked{
+  cursor:not-allowed!important;
+  color:#94a3b8!important;
+  background:#111827!important;
+  border-color:transparent!important;
+}
+.month-input.month-title-unlocked{
+  cursor:text!important;
+  color:#e5e7eb!important;
+  background:#020617!important;
+  border-color:#38bdf8!important;
+  box-shadow:0 0 0 1px rgba(56,189,248,.35)!important;
+}
+</style>
+<script>
+(function(){
+  'use strict';
+  function save(){try{if(typeof saveSilent==='function')saveSilent();}catch(e){}}
+  function ensure(){
+    if(!window.data)return;
+    if(typeof data.monthTitlesUnlocked==='undefined')data.monthTitlesUnlocked=false;
+  }
+  function isMonthHeaderInput(el){
+    return !!(el && el.matches && el.matches('#modelTable thead input.month-input'));
+  }
+  function apply(){
+    ensure();
+    var unlocked=!!(window.data&&data.monthTitlesUnlocked);
+    document.querySelectorAll('#modelTable thead input.month-input').forEach(function(inp){
+      inp.readOnly=!unlocked;
+      inp.disabled=false;
+      inp.removeAttribute('disabled');
+      inp.classList.toggle('month-title-locked',!unlocked);
+      inp.classList.toggle('month-title-unlocked',unlocked);
+      inp.style.pointerEvents='auto';
+      inp.title=unlocked?'Edicion habilitada: puedes cambiar el nombre del mes':'Titulos bloqueados: usa el boton para habilitar edicion';
+      inp.setAttribute('aria-readonly',unlocked?'false':'true');
+    });
+    var btn=document.getElementById('monthTitleLockBtn');
+    if(btn){
+      btn.textContent=unlocked?'🔓 Bloquear títulos de meses':'🔒 Habilitar edición títulos de meses';
+      btn.title=unlocked?'Bloquear edición de los nombres de los meses':'Permitir edición de los nombres de los meses';
+    }
+  }
+  function install(){
+    var existing=document.getElementById('monthTitleLockBtn');
+    if(existing){
+      existing.onclick=function(ev){ev.preventDefault();window.toggleMonthTitleEdit();};
+      return;
+    }
+    var target=null;
+    var buttons=[].slice.call(document.querySelectorAll('.submenu-content button'));
+    for(var i=0;i<buttons.length;i++){
+      var oc=buttons[i].getAttribute('onclick')||'';
+      if(oc.indexOf('toggleInitialColumn')>=0){target=buttons[i];break;}
+    }
+    if(!target)return;
+    var b=document.createElement('button');
+    b.id='monthTitleLockBtn';
+    b.type='button';
+    b.className='side-menu-btn month-title-lock-btn';
+    b.onclick=function(ev){ev.preventDefault();window.toggleMonthTitleEdit();};
+    target.parentNode.insertBefore(b,target);
+  }
+  window.toggleMonthTitleEdit=function(){
+    ensure();
+    data.monthTitlesUnlocked=!data.monthTitlesUnlocked;
+    save();
+    apply();
+    setTimeout(apply,80);
+  };
+  document.addEventListener('focusin',function(ev){
+    if(!isMonthHeaderInput(ev.target))return;
+    ensure();
+    if(!data.monthTitlesUnlocked){ev.target.blur();return;}
+    try{ev.target.select();}catch(e){}
+  },true);
+  document.addEventListener('click',function(ev){
+    if(!isMonthHeaderInput(ev.target))return;
+    ensure();
+    if(!data.monthTitlesUnlocked){ev.preventDefault();ev.target.blur();}
+  },true);
+  var previousRender=window.render;
+  if(typeof previousRender==='function'){
+    window.render=function(){
+      var result=previousRender.apply(this,arguments);
+      setTimeout(function(){install();apply();},0);
+      return result;
+    };
+  }
+  var previousToggleSide=window.toggleSidePanel;
+  if(typeof previousToggleSide==='function'){
+    window.toggleSidePanel=function(){
+      var result=previousToggleSide.apply(this,arguments);
+      setTimeout(function(){install();apply();},0);
+      return result;
+    };
+  }
+  setTimeout(function(){install();apply();},0);
+})();
+</script>
 </body>
 </html>
