@@ -1,11 +1,19 @@
-# App web modelo v37
+# App web modelo v35
 
-Versión basada en la v36 corregida.
+Versión basada en la v33 estable. Restaura funcionamiento y agrega indicadores 3D brillantes de estado de mes sin modificar la estructura Firebase.
 
-Incluye:
-- Bolitas/estado dentro de los desplegables, sin línea adicional que desordene el formulario.
-- Cuadro resumen contraíble: encabezado, saldo proyectado, total bancos y cuadre de caja.
-- Control presupuestal contraíble: diferencia presupuesto vs real.
-- Reordenamiento de conceptos dentro de cada sección por arrastre con mouse o dedo.
-- Cierre de mes condicionado a que el cuadre de caja sea cero.
-- Submenús desplegables conservados.
+Estados:
+- Sin inicializar: bolita gris/blanca.
+- Inicializado: bolita azul.
+- Abierto: bolita verde.
+- Cerrado: bolita roja.
+
+Subir a GitHub reemplazando `index.html` y `README.md`.
+
+
+## Versión 37 segura
+
+- Estados de mes dentro del desplegable, sin bolita externa debajo del selector.
+- Cuadro resumen contraíble: muestra solo Saldo proyectado, Total bancos y Cuadre de caja.
+- Control presupuestal GV contraíble: muestra solo Diferencia ppto - real.
+- No modifica Firebase ni la estructura de datos.
