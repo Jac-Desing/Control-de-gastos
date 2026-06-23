@@ -1,10 +1,13 @@
-# App web modelo v40
+# App web modelo v39
 
-Versión basada en la v39 funcional.
+Versión generada desde la v36 corregida entregada por el usuario.
 
-Cambios aplicados:
-- Orden de conceptos con escala de 1 en 1.
-- Estado del mes integrado dentro del desplegable del formulario de inputs.
-- Eliminación de la bolita/estado externo que rompía la alineación del formulario.
+Correcciones incluidas:
+- Reparación de Crear concepto desde formulario de inputs y menú/informe completo.
+- Submenús desplegables por categoría.
+- Validación de cuadre de caja igual a cero antes de cerrar mes.
+- Columna Saldo inicial bancos visible únicamente en la sección Bancos y controlable con el botón existente.
+- Reemplazo del drag & drop por orden numérico editable por sección, ordenado de menor a mayor al guardar orden.
+- Se eliminaron scripts incrustados dentro de exportaciones Excel para evitar errores de sintaxis.
 
-No incluye todavía las mejoras móviles de la futura v41.
+No se modifica Firebase, Authentication ni la ruta de datos en Firestore.
