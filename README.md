@@ -1,11 +1,12 @@
-# App web modelo v43
+# App web modelo v43 corregida
 
-Base: v42 minima funcional.
+Base: v42 mínima funcional.
 
-Cambios:
-- Primera columna fija en Cuadro Resumen para movil.
-- Primera columna fija en Control Presupuestal para movil.
-- Ancho de conceptos ajustable y persistente.
-- Indicador visible en formulario de inputs con diferencia ppto - real o mes sin inicializar.
+Cambios aplicados:
+- Primera columna fija en el Cuadro Resumen.
+- Primera columna fija en el Control Presupuestal.
+- Ajuste del ancho de conceptos en el cuerpo del informe completo.
+- Tarjeta elegante “Disponible” en el formulario de inputs.
+- Si el mes no está inicializado, muestra “Mes sin inicializar”.
 
-No se modifican login, Firebase ni estructura de datos.
+No modifica Firebase, login ni estructura de datos.
