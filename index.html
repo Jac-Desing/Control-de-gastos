@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modelo mensual de caja v39</title>
+<title>Modelo mensual de caja v43</title>
 <style>
 :root{--bg:#0f172a;--panel:#111827;--panel2:#1f2937;--line:#334155;--text:#e5e7eb;--muted:#94a3b8;--accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#38bdf8;--input:#020617;--head:#0b1220;--row:#0f172a}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0f172a,#111827);color:var(--text)}
@@ -1536,7 +1536,72 @@ exportVariableInputsExcel=function(){
  const summaryRows=Object.values(summary).sort((a,b)=>String(a.seccion).localeCompare(String(b.seccion))||String(a.periodo).localeCompare(String(b.periodo))||String(a.concepto).localeCompare(String(b.concepto)));
  const summaryTr=summaryRows.map(r=>`<tr><td>${esc(r.seccion)}</td><td>${esc(r.periodo)}</td><td>${esc(r.concepto)}</td><td>${r.cantidad}</td><td>${esc(r.total)}</td><td>${esc(money(r.total))}</td><td>${esc(r.comentarios.join(' | '))}</td></tr>`).join('');
  const detailTr=rows.map(r=>{const sec=section(r.secId);const periodo=r.pi==='initial'?data.initialColumnLabel:data.periods[Number(r.pi)];const concepto=sec&&sec.rows[r.ri]?sec.rows[r.ri][0]:(r.conceptoFinal||'');return `<tr><td>${esc(r.fecha)}</td><td>${esc(sec?sec.title:r.secId)}</td><td>${esc(periodo)}</td><td>${esc(concepto)}</td><td>${esc(r.mergedFrom||'')}</td><td>${esc(actionLabel(r))}</td><td>${esc(r.amount)}</td><td>${esc(money(num(r.amount)))}</td><td>${esc(r.note||'')}</td></tr>`}).join('');
- const html=`<html><head><meta charset="utf-8"></head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
+ const html=`<html><head><meta charset="utf-8">
+<style id="v43-mobile-usability-css">
+/* v43 - informe móvil y formulario: columnas fijas y control presupuestal visible */
+#summaryTable th:first-child,
+#summaryTable td:first-child,
+#variableBudgetSummaryTable th:first-child,
+#variableBudgetSummaryTable td:first-child{
+  position:sticky!important;
+  left:0!important;
+  z-index:9!important;
+  background:#111827!important;
+  box-shadow:8px 0 14px rgba(0,0,0,.26)!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  line-height:1.2!important;
+}
+#summaryTable thead th:first-child,
+#variableBudgetSummaryTable thead th:first-child{
+  z-index:11!important;
+  background:#0b1220!important;
+}
+#summaryTable th:first-child,
+#variableBudgetSummaryTable th:first-child{
+  position:sticky!important;
+}
+.v43-firstcol-resizer{
+  position:absolute;
+  right:0;
+  top:0;
+  width:10px;
+  height:100%;
+  cursor:col-resize;
+  user-select:none;
+}
+#summaryTable th:first-child,
+#variableBudgetSummaryTable th:first-child{position:sticky!important;}
+.budget-insight{
+  margin:0 18px 14px;
+  padding:12px 14px;
+  border:1px solid #334155;
+  border-radius:14px;
+  background:#0b1220;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.budget-insight .title{font-weight:900;color:#bfdbfe;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.budget-insight .value{font-size:18px;font-weight:900;color:#e5e7eb}
+.budget-insight .value.good{color:#86efac}
+.budget-insight .value.bad{color:#fca5a5}
+.budget-insight .value.warn{color:#fde68a}
+@media(max-width:900px){
+  #summaryTable th:first-child,#summaryTable td:first-child,
+  #variableBudgetSummaryTable th:first-child,#variableBudgetSummaryTable td:first-child{
+    min-width:var(--v43-concept-width,190px)!important;
+    width:var(--v43-concept-width,190px)!important;
+    max-width:var(--v43-concept-width,190px)!important;
+    font-size:12px!important;
+  }
+  .budget-insight{margin:0 10px 12px;padding:10px 12px;display:block}
+  .budget-insight .value{margin-top:6px;font-size:17px}
+}
+</style>
+</head><body><h2>Resumen de inputs activos</h2><table border="1"><thead><tr><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Cantidad de inputs</th><th>Total numérico</th><th>Total COP</th><th>Comentarios</th></tr></thead><tbody>${summaryTr}</tbody></table><br><h2>Detalle de inputs activos</h2><table border="1"><thead><tr><th>Fecha</th><th>Sección</th><th>Periodo</th><th>Concepto final</th><th>Fusionado desde</th><th>Acción</th><th>Valor ingresado</th><th>Valor COP</th><th>Comentario</th></tr></thead><tbody>${detailTr}</tbody></table>
 </body></html>`;
  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe-inputs-activos.xls';a.click();URL.revokeObjectURL(a.href);
 };
@@ -1918,5 +1983,126 @@ initCloud();
 })();
 </script>
 
+
+<script id="v43-mobile-usability-js">
+(function(){
+  function safeNum(v){ return Number(v)||0; }
+  function safeMoney(n){ return (typeof money==='function') ? money(n) : (Number(n)||0).toLocaleString('es-CO'); }
+  function v43ConceptWidth(){
+    try{
+      data.columnWidths=data.columnWidths||{concept:190,initial:130,periods:{}};
+      if(!data.columnWidths.concept || Number(data.columnWidths.concept)>230) data.columnWidths.concept=190;
+      return Math.max(150, Math.min(420, Number(data.columnWidths.concept)||190));
+    }catch(e){ return 190; }
+  }
+  function v43ApplyConceptWidth(){
+    var w=v43ConceptWidth();
+    document.documentElement.style.setProperty('--v43-concept-width', w+'px');
+    ['summaryTable','variableBudgetSummaryTable'].forEach(function(id){
+      var t=document.getElementById(id); if(!t) return;
+      t.querySelectorAll('tr').forEach(function(tr){
+        var cell=tr.children&&tr.children[0];
+        if(cell){ cell.style.minWidth=w+'px'; cell.style.width=w+'px'; cell.style.maxWidth=w+'px'; }
+      });
+      var th=t.querySelector('thead th:first-child');
+      if(th && !th.querySelector('.v43-firstcol-resizer')){
+        th.style.position='sticky';
+        th.insertAdjacentHTML('beforeend','<span class="v43-firstcol-resizer" title="Ajustar ancho de conceptos"></span>');
+        var rz=th.querySelector('.v43-firstcol-resizer');
+        rz.addEventListener('mousedown',function(ev){
+          ev.preventDefault(); ev.stopPropagation();
+          if(typeof startColumnResize==='function') startColumnResize(ev,'concept');
+        });
+        rz.addEventListener('touchstart',function(ev){
+          var touch=ev.touches && ev.touches[0]; if(!touch) return;
+          ev.preventDefault(); ev.stopPropagation();
+          var startX=touch.clientX, startW=v43ConceptWidth();
+          function move(e){
+            var t=e.touches&&e.touches[0]; if(!t) return;
+            data.columnWidths=data.columnWidths||{concept:190,initial:130,periods:{}};
+            data.columnWidths.concept=Math.max(150,Math.min(420,Math.round(startW+(t.clientX-startX))));
+            v43ApplyConceptWidth();
+          }
+          function up(){document.removeEventListener('touchmove',move);document.removeEventListener('touchend',up); if(typeof saveSilent==='function') saveSilent();}
+          document.addEventListener('touchmove',move,{passive:false});
+          document.addEventListener('touchend',up);
+        },{passive:false});
+      }
+    });
+  }
+  function v43EnsureBudgetInsight(){
+    var panel=document.getElementById('inputPanel'); if(!panel) return null;
+    var insight=document.getElementById('budgetInsight');
+    if(!insight){
+      var help=panel.querySelector('.exclusive-help');
+      var html='<div id="budgetInsight" class="budget-insight"><div><div class="title">Control presupuestal</div><div id="budgetInsightMonth" class="muted"></div></div><div id="budgetInsightValue" class="value warn">Seleccione un mes</div></div>';
+      if(help) help.insertAdjacentHTML('afterend',html); else panel.insertAdjacentHTML('afterbegin',html);
+      insight=document.getElementById('budgetInsight');
+    }
+    return insight;
+  }
+  window.updateBudgetInsight=function(){
+    try{
+      var sel=document.getElementById('formPeriod'); if(!sel) return;
+      v43EnsureBudgetInsight();
+      var pi=Number(sel.value||0);
+      var month=document.getElementById('budgetInsightMonth');
+      var val=document.getElementById('budgetInsightValue');
+      if(month) month.textContent=(data.periods&&data.periods[pi])?data.periods[pi]:'';
+      if(!val) return;
+      if(typeof isVariableInitialized==='function' && !isVariableInitialized(pi)){
+        val.textContent='Mes sin inicializar';
+        val.className='value warn';
+        return;
+      }
+      var c=(typeof calculations==='function')?calculations():null;
+      var diff=c && c.variableDiff ? safeNum(c.variableDiff[pi]) : 0;
+      val.textContent='Diferencia ppto - real: '+safeMoney(diff);
+      val.className='value '+(diff<0?'bad':'good');
+    }catch(e){ console.warn('v43 budget insight',e); }
+  };
+  var oldValidate=window.validateInputMonthSelection;
+  if(typeof oldValidate==='function'){
+    window.validateInputMonthSelection=function(){
+      var res=oldValidate.apply(this,arguments);
+      try{ updateBudgetInsight(); }catch(e){}
+      return res;
+    };
+  }
+  var oldUpdate=window.updateConceptSelect;
+  if(typeof oldUpdate==='function'){
+    window.updateConceptSelect=function(){
+      var res=oldUpdate.apply(this,arguments);
+      try{ updateBudgetInsight(); }catch(e){}
+      return res;
+    };
+  }
+  var oldRender=window.render;
+  if(typeof oldRender==='function'){
+    window.render=function(){
+      var res=oldRender.apply(this,arguments);
+      try{ v43ApplyConceptWidth(); updateBudgetInsight(); }catch(e){ console.warn('v43 render apply',e); }
+      return res;
+    };
+  }
+  var oldRenderSummary=window.renderSummary;
+  if(typeof oldRenderSummary==='function'){
+    window.renderSummary=function(c){
+      var res=oldRenderSummary.apply(this,arguments);
+      try{ v43ApplyConceptWidth(); }catch(e){}
+      return res;
+    };
+  }
+  var oldBudget=window.renderVariableBudgetSummary;
+  if(typeof oldBudget==='function'){
+    window.renderVariableBudgetSummary=function(c){
+      var res=oldBudget.apply(this,arguments);
+      try{ v43ApplyConceptWidth(); }catch(e){}
+      return res;
+    };
+  }
+  try{ v43ApplyConceptWidth(); v43EnsureBudgetInsight(); updateBudgetInsight(); }catch(e){}
+})();
+</script>
 </body>
 </html>

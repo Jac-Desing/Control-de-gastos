@@ -1,9 +1,11 @@
-# App web modelo v41
+# App web modelo v43
 
-Versión generada desde la v39 funcional.
+Base: v42 minima funcional.
 
-Cambios incluidos:
-- Orden de conceptos de 1 en 1.
-- Estado del mes dentro del desplegable del formulario de inputs.
-- Eliminación de la bolita externa que desalineaba el formulario.
-- Sin cambios en Firebase ni en la lógica principal del modelo.
+Cambios:
+- Primera columna fija en Cuadro Resumen para movil.
+- Primera columna fija en Control Presupuestal para movil.
+- Ancho de conceptos ajustable y persistente.
+- Indicador visible en formulario de inputs con diferencia ppto - real o mes sin inicializar.
+
+No se modifican login, Firebase ni estructura de datos.
