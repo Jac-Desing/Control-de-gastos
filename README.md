@@ -1,9 +1,12 @@
-# App web modelo v44
+# App web modelo v43 corregida
 
-Versión basada en v43 corregida.
+Base: v42 mínima funcional.
 
-Cambios:
-- Corrige la superposición de columnas fijas con la cinta superior.
-- Agrega botón para habilitar/bloquear edición de títulos de meses.
-- Optimiza anchos iniciales para móvil sin impedir ajuste manual posterior.
-- Mantiene Firebase, login, inputs y estructura de datos.
+Cambios aplicados:
+- Primera columna fija en el Cuadro Resumen.
+- Primera columna fija en el Control Presupuestal.
+- Ajuste del ancho de conceptos en el cuerpo del informe completo.
+- Tarjeta elegante “Disponible” en el formulario de inputs.
+- Si el mes no está inicializado, muestra “Mes sin inicializar”.
+
+No modifica Firebase, login ni estructura de datos.
